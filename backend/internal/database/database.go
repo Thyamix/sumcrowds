@@ -14,31 +14,39 @@ import (
 var DB *sql.DB
 
 func InitDB() {
+	fmt.Println("Started init DB")
 	_, err := os.Stat("./data")
 	if os.IsNotExist(err) {
 		os.Mkdir("./data", os.ModeDir|0755)
 	}
 
+	fmt.Println("Created /data file")
+
 	if err != nil {
 		log.Println(err)
 	}
 
-	DB, err = sql.Open("sqlite3", "./data/prod.db")
+	DB, err = sql.Open("sqlite3", "./data/data.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("Created .db file")
 
 	err = initTables()
 	if err != nil {
 		log.Fatal("Failed to init DB:", err)
 	}
 
+	fmt.Println("Created tables for db file")
+
 	fmt.Println("Database started")
+	fmt.Println("Successfully init the DB")
 }
 
 func initTables() error {
 
-	sqlBytes, err := os.ReadFile("internal/database/init.sql")
+	sqlBytes, err := os.ReadFile("static/init.sql")
 	if err != nil {
 		return err
 	}

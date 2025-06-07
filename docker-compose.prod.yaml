@@ -1,0 +1,47 @@
+services:
+  backend_app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    environment:
+      - PORT=8080
+      - ORIGIN=https://sumcrowds.com
+    restart: unless-stopped
+    networks:
+      - prod_network
+    volumes:
+      - prod_backend_data:/app/data
+
+  frontend_app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_APIURL: "https://sumcrowds.com/api/"
+        VITE_WSURL: "wss://sumcrowds.com/ws/"
+    env_file:
+      - front.env.prod
+    restart: unless-stopped
+    networks:
+      - prod_network
+
+  nginx_proxy:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.prod
+    ports:
+      - "40001:80"
+    restart: unless-stopped
+    networks:
+      - prod_network
+    depends_on:
+      - backend_app
+      - frontend_app
+    command: ["nginx", "-g", "daemon off;"]
+
+networks:
+  prod_network:
+    driver: bridge
+
+volumes:
+  prod_backend_data:

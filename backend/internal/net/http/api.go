@@ -6,26 +6,21 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 	"github.com/thyamix/festival-counter/internal/net/websockets"
 )
 
 func StartAPI() {
+	fmt.Println("Started StartAPI")
 	wsServer := websockets.NewHub()
 	router := getRoutes(wsServer)
 
 	handler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://testing.sumcrowds.com"},
+		AllowedOrigins:   []string{os.Getenv("ORIGIN")},
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 	}).Handler(router)
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	server := http.Server{
 		Addr:    ":" + os.Getenv("PORT"),

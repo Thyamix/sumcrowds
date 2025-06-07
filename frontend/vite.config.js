@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: "192.168.1.35",
-    port: 5174,
-    allowedHosts: ["testing.sumcrowds.com"],
+    port: 3000,
+    allowedHosts: ["testing.sumcrowds.com", "sumcrowds.com"],
   }
 })
