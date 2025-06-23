@@ -148,3 +148,24 @@ func RefreshToken(token string) (*models.RefreshToken, *models.AccessToken, erro
 
 	return newRefreshToken, accessToken, nil
 }
+
+func CheckFestivalAccess(festival models.FestivalData, accessToken models.AccessToken) error {
+	_, err := CheckAccess(accessToken.Token)
+
+	if err != nil {
+		return err
+	}
+
+	festivalAccess, err := database.GetFestivalAccess(accessToken.UserId, festival.Id)
+
+	if err != nil {
+		log.Println("Failed to get festival access", err)
+		return fmt.Errorf("no access")
+	}
+
+	if festivalAccess.LastUsedAt <= time.Now().Add(-(time.Hour * 24 * 14)).Unix() {
+		return fmt.Errorf("expired access")
+	}
+
+	return nil
+}

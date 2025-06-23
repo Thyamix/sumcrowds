@@ -13,7 +13,6 @@ export function Admin() {
   const [inputValue, setInputValue] = useState("")
 
   const { festivalCode } = useParams()
-  const navigate = useNavigate()
 
 
   /** 

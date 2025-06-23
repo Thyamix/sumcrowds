@@ -13,6 +13,7 @@ import (
 	"github.com/thyamix/festival-counter/internal/auth"
 	"github.com/thyamix/festival-counter/internal/database"
 	"github.com/thyamix/festival-counter/internal/models"
+	"github.com/thyamix/festival-counter/internal/net/websockets"
 )
 
 func CreateFestival(w http.ResponseWriter, r *http.Request) {
@@ -91,6 +92,7 @@ func GetTotalAndGauge(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid festival code: %v", http.StatusNoContent)
 		return
 	}
+
 	total, maxGauge, err := database.GetEventTotalAndMax(festival.Id)
 	if err != nil {
 		log.Print(err)
@@ -111,17 +113,17 @@ func GetTotalAndGauge(w http.ResponseWriter, r *http.Request) {
 func CheckAccess(w http.ResponseWriter, r *http.Request) {
 	accessCookie, err := r.Cookie("accessToken")
 	if err != nil {
-		http.Error(w, auth.ErrInvalidToken.Error(), http.StatusForbidden)
+		http.Error(w, auth.ErrInvalidToken.Error(), http.StatusUnauthorized)
 		return
 	}
 	accessToken, err := database.GetAccessToken(accessCookie.Value)
 	if err != nil {
-		http.Error(w, auth.ErrInvalidToken.Error(), http.StatusForbidden)
+		http.Error(w, auth.ErrInvalidToken.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	if accessToken.ExpiresAt <= time.Now().Unix() {
-		http.Error(w, auth.ErrExpiredToken.Error(), http.StatusForbidden)
+		http.Error(w, auth.ErrExpiredToken.Error(), http.StatusUnauthorized)
 		return
 	}
 
@@ -136,7 +138,7 @@ func CheckAccess(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Failed to get festival access", err)
-		http.Error(w, "no access", http.StatusForbidden)
+		http.Error(w, "no access", http.StatusUnauthorized)
 		return
 	}
 
@@ -198,4 +200,118 @@ func CheckExists(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func Inc(w http.ResponseWriter, r *http.Request) {
+	var valueChange models.ValueChange
+	festival, err := database.GetFestival(r.PathValue("festivalCode"))
+	if err != nil {
+		http.Error(w, "invalid festival code", http.StatusNotFound)
+		return
+	}
+	cookie, err := r.Cookie("accessToken")
+	if err != nil {
+		http.Error(w, "no access token", http.StatusUnauthorized)
+		return
+	}
+	accessToken, err := database.GetAccessToken(cookie.Value)
+	if err != nil {
+		http.Error(w, "invalid access token", http.StatusUnauthorized)
+		return
+	}
+
+	if auth.CheckFestivalAccess(*festival, *accessToken) != nil {
+		http.Error(w, "no access", http.StatusForbidden)
+		return
+	}
+
+	bodyJson, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "invalid request maybe", http.StatusInternalServerError)
+		return
+	}
+
+	err = json.Unmarshal(bodyJson, &valueChange)
+	if err != nil {
+		http.Error(w, "invalid json maybe", http.StatusInternalServerError)
+		return
+	}
+
+	amount := valueChange.Amount
+
+	if amount <= 0 || amount > 100 {
+		http.Error(w, fmt.Sprintf("can't increment by %v as it is not between 0 - 100", amount), http.StatusBadRequest)
+	}
+
+	total, _, err := database.GetTotal(festival.Code)
+	if err != nil {
+		http.Error(w, "failed to get total & maxGauge", http.StatusInternalServerError)
+	}
+
+	err = database.AddValue(amount, festival.Code)
+	if err != nil {
+		http.Error(w, "failed to add value to db", http.StatusInternalServerError)
+	}
+
+	fmt.Println("Value change on: ", festival.Code)
+	fmt.Println("+", amount)
+	fmt.Println("New total of", total+amount)
+
+	websockets.BroadcastTotal(festival.Code)
+}
+
+func Dec(w http.ResponseWriter, r *http.Request) {
+	var valueChange models.ValueChange
+	festival, err := database.GetFestival(r.PathValue("festivalCode"))
+	if err != nil {
+		http.Error(w, "invalid festival code", http.StatusNotFound)
+		return
+	}
+	cookie, err := r.Cookie("accessToken")
+	if err != nil {
+		http.Error(w, "no access token", http.StatusUnauthorized)
+		return
+	}
+	accessToken, err := database.GetAccessToken(cookie.Value)
+	if err != nil {
+		http.Error(w, "invalid access token", http.StatusUnauthorized)
+		return
+	}
+
+	if auth.CheckFestivalAccess(*festival, *accessToken) != nil {
+		http.Error(w, "no access", http.StatusForbidden)
+		return
+	}
+	bodyJson, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "invalid request maybe", http.StatusInternalServerError)
+		return
+	}
+
+	err = json.Unmarshal(bodyJson, &valueChange)
+	if err != nil {
+		http.Error(w, "invalid json maybe", http.StatusInternalServerError)
+		return
+	}
+
+	amount := valueChange.Amount
+
+	if amount <= 0 || amount > 100 {
+		http.Error(w, fmt.Sprintf("can't increment by %v as it is not between 0 - 100", amount), http.StatusBadRequest)
+	}
+
+	total, _, err := database.GetTotal(festival.Code)
+	if err != nil {
+		http.Error(w, "failed to get total & maxGauge", http.StatusInternalServerError)
+	}
+
+	err = database.AddValue(-amount, festival.Code)
+	if err != nil {
+		http.Error(w, "failed to add value to db", http.StatusInternalServerError)
+	}
+
+	fmt.Println("-", amount)
+	fmt.Println("New total of", total+amount)
+
+	websockets.BroadcastTotal(festival.Code)
 }

@@ -22,3 +22,7 @@ type Event struct {
 	LastUsedAt int `sql:"last_used_at"`
 	Active     int `sql:"active"`
 }
+
+type ValueChange struct {
+	Amount int `json:"amount"`
+}

@@ -17,7 +17,9 @@ export function Counter() {
   /** @type {[boolean, (boolean) => void]} */
   const [hasAccess, setHasAccess] = useState(false)
 
+  /** @type {string} */
   const { festivalCode } = useParams()
+
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -61,10 +63,13 @@ function FestivalCountedPage() {
   /** @type {[string, () => null]} */
   const [colour, setColour] = useState("#ffffff")
 
-  /** @type {React.RefObject < WebSocket >} */
-  const socketRef = useRef(null)
   /** @type {string} */
   const { festivalCode } = useParams()
+
+  /** @type {React.RefObject < WebSocket >} */
+  const socketRef = useRef(null)
+  /** @type {NodeJS.Timeout} */
+  let heartbeat
 
   useEffect(() => {
     socketRef.current = new WebSocket(WSURL + festivalCode)
@@ -72,6 +77,12 @@ function FestivalCountedPage() {
     socketRef.current.onopen = () => {
       getTotal(socketRef.current)
       console.log("Open")
+      heartbeat = setInterval(() => {
+        if (socketRef.current.readyState == WebSocket.OPEN) {
+          socketRef.current.send(JSON.stringify({ type: "ping" }))
+        }
+      }, 10000)
+
     }
 
     socketRef.current.onmessage = (event) => {
@@ -79,25 +90,29 @@ function FestivalCountedPage() {
     }
 
     socketRef.current.onclose = () => {
+      setTotal("Disconnected")
+      clearInterval(heartbeat)
       console.log("Closed")
-      location.reload()
+      //socketRef.current = new WebSocket(WSURL + festivalCode)
     }
   }, [])
 
   function ColourSelector() {
-    if (total >= maxJauge) {
-      setColour("#ffa6a6")
-    } else if (total >= (maxJauge * 0.9)) {
-      setColour("#ffff87")
-    } else {
-      setColour("#ffffff")
-    }
+    useEffect(() => {
+      if (total >= maxJauge) {
+        setColour("#ffa6a6")
+      } else if (total >= (maxJauge * 0.9)) {
+        setColour("#ffff87")
+      } else {
+        setColour("#ffffff")
+      }
+    })
   }
 
 
   return (
     <div className='counter-page'>
-      <ColourSelector total={total} max={maxJauge} />
+      <ColourSelector />
 
       <div className="counter-main-container">
         <div className="counter-info-bar">
@@ -122,7 +137,7 @@ function FestivalCountedPage() {
                 id="reduceThree"
                 className="counter-button counter-button--small counter-button--decrease"
                 onClick={() => {
-                  handleMinus(3, socketRef.current)
+                  handleMinus(3, festivalCode)
                   if (total < 3) {
                     setTotal(0)
                   } else {
@@ -136,7 +151,7 @@ function FestivalCountedPage() {
                 id="reduceTwo"
                 className="counter-button counter-button--small counter-button--decrease"
                 onClick={() => {
-                  handleMinus(2, socketRef.current)
+                  handleMinus(2, festivalCode)
                   if (total < 2) {
                     setTotal(0)
                   } else {
@@ -152,7 +167,7 @@ function FestivalCountedPage() {
                 id="reduceOne"
                 className="counter-button counter-button--large counter-button--decrease"
                 onClick={() => {
-                  handleMinus(1, socketRef.current)
+                  handleMinus(1, festivalCode)
                   if (total < 1) {
                     setTotal(0)
                   } else {
@@ -171,7 +186,7 @@ function FestivalCountedPage() {
                 id="addTwo"
                 className="counter-button counter-button--small counter-button--increase"
                 onClick={() => {
-                  handlePlus(2, socketRef.current)
+                  handlePlus(2, festivalCode)
                   setTotal(total + 2)
                 }}
               >
@@ -181,7 +196,7 @@ function FestivalCountedPage() {
                 id="addThree"
                 className="counter-button counter-button--small counter-button--increase"
                 onClick={() => {
-                  handlePlus(3, socketRef.current)
+                  handlePlus(3, festivalCode)
                   setTotal(total + 3)
                 }}
               >
@@ -193,7 +208,7 @@ function FestivalCountedPage() {
                 id="addOne"
                 className="counter-button counter-button--large counter-button--increase"
                 onClick={() => {
-                  handlePlus(1, socketRef.current)
+                  handlePlus(1, festivalCode)
                   setTotal(total + 1)
                 }}
               >
@@ -211,29 +226,35 @@ function FestivalCountedPage() {
 
 
 /**
- * @param {WebSocket} socket
-        * @param {int} amount
-        */
-async function handlePlus(amount, socket) {
-  socket.send(JSON.stringify({
-    type: "inc",
-    content: {
-      amount: amount
-    }
-  }))
+ * @param {int} amount
+*/
+async function handlePlus(amount, festivalCode) {
+  const body = JSON.stringify({
+    amount: amount
+  })
+  fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/inc", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: body,
+  })
 }
 
 /**
-        * @param {WebSocket} socket
-        * @param {int} amount
-        */
-async function handleMinus(amount, socket) {
-  socket.send(JSON.stringify({
-    type: "dec",
-    content: {
-      amount: amount
-    }
-  }))
+ * @param {int} amount
+*/
+async function handleMinus(amount, festivalCode) {
+  const body = JSON.stringify({
+    amount: amount
+  })
+  fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/dec", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: body,
+  })
 }
 
 /**
@@ -252,6 +273,9 @@ async function getTotal(socket) {
         **/
 function handleMessage(event, setTotal, setJauge) {
   let result = JSON.parse(event.data)
+  if (result.type == "pong") {
+    return
+  }
   setTotal(result.total)
   setJauge(result.jauge)
 }

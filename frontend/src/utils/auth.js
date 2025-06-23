@@ -27,8 +27,11 @@ export async function fetchWithAuth(url, options = {}) {
 		credentials: 'include'
 	})
 
+
 	if (response.status === 403 || response.status === 401) {
 		await auth()
+	} else {
+		return response
 	}
 
 	const retryResponse = await fetch(

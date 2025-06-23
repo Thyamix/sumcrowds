@@ -27,6 +27,8 @@ func StartAPI() {
 		Handler: handler,
 	}
 
+	fmt.Println(os.Getenv("PORT"))
+
 	fmt.Println("Server is starting...")
 
 	go wsServer.Run()

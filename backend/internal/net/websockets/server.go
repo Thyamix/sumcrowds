@@ -1,5 +1,13 @@
 package websockets
 
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+
+	"github.com/thyamix/festival-counter/internal/database"
+)
+
 type Server struct {
 	Clients map[*Client]bool
 
@@ -15,13 +23,16 @@ type Message struct {
 	FestivalCode string
 }
 
+var server *Server
+
 func NewHub() *Server {
-	return &Server{
+	server = &Server{
 		Clients:    make(map[*Client]bool),
 		Messages:   make(chan Message),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 	}
+	return server
 }
 
 func (s *Server) Run() {
@@ -48,4 +59,25 @@ func (s *Server) Run() {
 		}
 	}
 
+}
+
+func BroadcastTotal(festivalCode string) error {
+	total, maxGauge, err := database.GetTotal(festivalCode)
+	if err != nil {
+		log.Print(err)
+	}
+	totalJson, err := json.Marshal(map[string]int{
+		"total": total,
+		"jauge": maxGauge,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	server.Messages <- Message{Message: totalJson, FestivalCode: festivalCode}
+
+	fmt.Printf("Sending total:max:festivalCode: %v:%v:%v \n", total, maxGauge, festivalCode)
+
+	return nil
 }

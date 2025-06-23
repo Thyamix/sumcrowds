@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	api_handler_v1 "github.com/thyamix/festival-counter/internal/net/http/handlers/v1"
+	"github.com/thyamix/festival-counter/internal/net/http/middleware"
 	"github.com/thyamix/festival-counter/internal/net/websockets"
 )
 
@@ -20,24 +21,27 @@ func getRoutes(wsServer *websockets.Server) *http.ServeMux {
 	routes.HandleFunc("GET /api/v1/auth/refreshaccess", api_handler_v1.RefreshAccess)
 	routes.HandleFunc("GET /api/v1/auth/initaccess", api_handler_v1.InitAccess)
 
-	routes.HandleFunc("POST /api/v1/create/festival", api_handler_v1.CreateFestival)
+	routes.Handle("POST /api/v1/create/festival", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.CreateFestival)))
 
 	// /festival behind auth
 
-	routes.HandleFunc("GET /api/v1/festival/{festivalCode}/exists", api_handler_v1.CheckExists)
-	routes.HandleFunc("GET /api/v1/festival/{festivalCode}/access", api_handler_v1.CheckAccess)
-	routes.HandleFunc("POST /api/v1/festival/{festivalCode}/getAccess", api_handler_v1.GetAccess)
+	routes.Handle("GET /api/v1/festival/{festivalCode}/exists", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.CheckExists)))
+	routes.Handle("GET /api/v1/festival/{festivalCode}/access", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.CheckAccess)))
+	routes.Handle("POST /api/v1/festival/{festivalCode}/getAccess", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.GetAccess)))
 
-	routes.HandleFunc("GET /api/v1/festival/{festivalCode}/totalandgauge", api_handler_v1.GetTotalAndGauge)
-	routes.HandleFunc("GET /api/v1/festival/{festivalCode}/getarchivedevents", api_handler_v1.GetArchivedEvents)
+	routes.Handle("POST /api/v1/festival/{festivalCode}/inc", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.Inc)))
+	routes.Handle("POST /api/v1/festival/{festivalCode}/dec", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.Dec)))
 
-	routes.HandleFunc("POST /api/v1/festival/{festivalCode}/setgauge", api_handler_v1.SetGauge)
+	routes.Handle("GET /api/v1/festival/{festivalCode}/totalandgauge", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.GetTotalAndGauge)))
+	routes.Handle("GET /api/v1/festival/{festivalCode}/getarchivedevents", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.GetArchivedEvents)))
 
-	routes.HandleFunc("GET /api/v1/festival/{festivalCode}/archivecurrentevent", api_handler_v1.ArchiveCurrentEvent)
+	routes.Handle("POST /api/v1/festival/{festivalCode}/setgauge", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.SetGauge)))
 
-	routes.HandleFunc("GET /api/v1/festival/{festivalCode}/download/archivedcsv/{eventId}", api_handler_v1.GetArchivedCSV)
+	routes.Handle("GET /api/v1/festival/{festivalCode}/archivecurrentevent", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.ArchiveCurrentEvent)))
 
-	routes.HandleFunc("GET /api/v1/festival/{festivalCode}/download/activecsv", api_handler_v1.GetActiveCSV)
+	routes.Handle("GET /api/v1/festival/{festivalCode}/download/archivedcsv/{eventId}", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.GetArchivedCSV)))
+
+	routes.Handle("GET /api/v1/festival/{festivalCode}/download/activecsv", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.GetActiveCSV)))
 
 	return routes
 }
