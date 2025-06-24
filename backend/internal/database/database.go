@@ -14,13 +14,12 @@ import (
 var DB *sql.DB
 
 func InitDB() {
-	fmt.Println("Started init DB")
+	fmt.Println("Initialising Database")
 	_, err := os.Stat("./data")
 	if os.IsNotExist(err) {
 		os.Mkdir("./data", os.ModeDir|0755)
+		fmt.Println("Created /data file")
 	}
-
-	fmt.Println("Created /data file")
 
 	if err != nil {
 		log.Println(err)
@@ -31,17 +30,14 @@ func InitDB() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Created .db file")
+	fmt.Println("Opened .db file")
 
 	err = initTables()
 	if err != nil {
 		log.Fatal("Failed to init DB:", err)
 	}
 
-	fmt.Println("Created tables for db file")
-
 	fmt.Println("Database started")
-	fmt.Println("Successfully init the DB")
 }
 
 func initTables() error {

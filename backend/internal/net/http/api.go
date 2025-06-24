@@ -11,7 +11,7 @@ import (
 )
 
 func StartAPI() {
-	fmt.Println("Started StartAPI")
+	fmt.Println("Starting API")
 	wsServer := websockets.NewHub()
 	router := getRoutes(wsServer)
 
@@ -27,11 +27,8 @@ func StartAPI() {
 		Handler: handler,
 	}
 
-	fmt.Println(os.Getenv("PORT"))
-
-	fmt.Println("Server is starting...")
-
 	go wsServer.Run()
 
+	fmt.Println("Server is running...")
 	log.Fatal(server.ListenAndServe())
 }
