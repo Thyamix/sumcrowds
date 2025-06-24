@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func sendError(w http.ResponseWriter, appError *AppError) {
+func SendError(w http.ResponseWriter, appError *APIError) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(appError.StatusCode)
 

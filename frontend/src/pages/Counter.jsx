@@ -109,7 +109,6 @@ function FestivalCountedPage() {
     })
   }
 
-
   return (
     <div className='counter-page'>
       <ColourSelector />
@@ -223,7 +222,6 @@ function FestivalCountedPage() {
     </div>
   )
 }
-
 
 /**
  * @param {int} amount

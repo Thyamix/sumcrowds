@@ -6,27 +6,30 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/thyamix/festival-counter/internal/apperrors"
 	"github.com/thyamix/festival-counter/internal/auth"
+	"github.com/thyamix/festival-counter/internal/net/http/cookieutils"
 )
 
 func ValidateAccess(w http.ResponseWriter, r *http.Request) {
-	accessTokenCookie, err := r.Cookie("accessToken")
+	accessTokenCookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
 		if err == http.ErrNoCookie {
-			http.Error(w, "No access token", http.StatusUnauthorized)
+			apperrors.SendError(w, apperrors.APIErrNoAccessToken)
 			return
 		}
 	}
 
-	valid, err := auth.CheckAccess(accessTokenCookie.Value)
+	valid, err := auth.CheckAccess(accessTokenCookie)
 	if err != nil {
 		if err == auth.ErrInvalidToken {
-			log.Println(accessTokenCookie.Value)
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			log.Println(accessTokenCookie)
+			apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
 			return
 		}
 		if err == auth.ErrExpiredToken {
-			http.Error(w, "Expired token", http.StatusUnauthorized)
+			apperrors.SendError(w, apperrors.APIErrExpiredAccessToken)
+			return
 		}
 		http.Error(w, "Failed to refresh tokens", http.StatusInternalServerError)
 		return
@@ -43,15 +46,15 @@ func ValidateAccess(w http.ResponseWriter, r *http.Request) {
 }
 
 func RefreshAccess(w http.ResponseWriter, r *http.Request) {
-	refreshTokenCookie, err := r.Cookie("refreshToken")
+	refreshTokenCookie, err := cookieutils.GetRefreshToken(r)
 	if err != nil {
 		if err == http.ErrNoCookie {
-			http.Error(w, "No refresh token", http.StatusUnauthorized)
+			apperrors.SendError(w, apperrors.APIErrNoRefreshToken)
 			return
 		}
 	}
 
-	refreshToken, accessToken, err := auth.RefreshToken(refreshTokenCookie.Value)
+	refreshToken, accessToken, err := auth.RefreshToken(refreshTokenCookie)
 
 	if err != nil {
 		log.Println("Failed to refresh token", err)
@@ -59,25 +62,8 @@ func RefreshAccess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     "refreshToken",
-		Value:    refreshToken.Token,
-		Path:     "/api/v1/auth/refreshaccess",
-		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
-		Expires:  time.Unix(refreshToken.ExpiresAt, 0),
-	})
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     "accessToken",
-		Value:    accessToken.Token,
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
-		Expires:  time.Unix(accessToken.ExpiresAt, 0),
-	})
+	cookieutils.CreateAccessCookie(w, accessToken.Token, "/", time.Unix(accessToken.ExpiresAt, 0))
+	cookieutils.CreateRefreshCookie(w, refreshToken.Token, "/api/v1/auth/refreshaccess", time.Unix(refreshToken.ExpiresAt, 0))
 
 	w.WriteHeader(http.StatusNoContent)
 	w.Write([]byte("ok"))
@@ -92,25 +78,8 @@ func InitAccess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     "refreshToken",
-		Value:    refreshToken.Token,
-		Path:     "/api/v1/auth/refreshaccess",
-		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
-		Expires:  time.Unix(refreshToken.ExpiresAt, 0),
-	})
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     "accessToken",
-		Value:    accessToken.Token,
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
-		Expires:  time.Unix(accessToken.ExpiresAt, 0),
-	})
+	cookieutils.CreateAccessCookie(w, accessToken.Token, "/", time.Unix(accessToken.ExpiresAt, 0))
+	cookieutils.CreateRefreshCookie(w, refreshToken.Token, "/api/v1/auth/refreshaccess", time.Unix(refreshToken.ExpiresAt, 0))
 
 	fmt.Println("Sent new cookies")
 

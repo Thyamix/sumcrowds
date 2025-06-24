@@ -9,40 +9,37 @@ import (
 	"github.com/thyamix/festival-counter/internal/auth"
 	"github.com/thyamix/festival-counter/internal/contextkeys"
 	"github.com/thyamix/festival-counter/internal/database"
+	"github.com/thyamix/festival-counter/internal/net/http/cookieutils"
 )
 
 func RequireAccessToken(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		accessTokenCookie, err := r.Cookie("accessToken")
+		accessTokenValue, err := cookieutils.GetAccessToken(r)
 		festivalCode := r.PathValue("festivalCode")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				http.Error(w, apperrors.ErrNoAccessToken.Error(), http.StatusUnauthorized)
+				apperrors.SendError(w, apperrors.APIErrNoAccessToken)
 				return
 			}
 		}
 
-		valid, err := auth.CheckAccess(accessTokenCookie.Value)
+		accessToken, err := database.GetAccessToken(accessTokenValue)
+
+		valid, err := auth.CheckAccess(accessTokenValue)
 		if err != nil {
 			if err == auth.ErrInvalidToken {
-				log.Println(accessTokenCookie.Value)
-				http.Error(w, "Invalid token", http.StatusUnauthorized)
+				log.Println(accessTokenValue)
+				apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
 				return
 			}
 			if err == auth.ErrExpiredToken {
-				http.Error(w, "Expired token", http.StatusUnauthorized)
+				apperrors.SendError(w, apperrors.APIErrExpiredAccessToken)
 			}
 			http.Error(w, "Failed to refresh tokens", http.StatusInternalServerError)
 			return
 		}
 
 		if festivalCode != "" {
-			accessToken, err := database.GetAccessToken(accessTokenCookie.Value)
-			if err != nil {
-				log.Println(accessTokenCookie.Value)
-				http.Error(w, "Invalid token", http.StatusUnauthorized)
-				return
-			}
 			festival, err := database.GetFestival(festivalCode)
 			if err == nil {
 				err := auth.CheckFestivalAccess(*festival, *accessToken)

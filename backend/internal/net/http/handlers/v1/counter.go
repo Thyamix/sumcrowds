@@ -10,15 +10,17 @@ import (
 	"time"
 
 	"github.com/alexedwards/argon2id"
+	"github.com/thyamix/festival-counter/internal/apperrors"
 	"github.com/thyamix/festival-counter/internal/auth"
 	"github.com/thyamix/festival-counter/internal/database"
 	"github.com/thyamix/festival-counter/internal/models"
+	"github.com/thyamix/festival-counter/internal/net/http/cookieutils"
 	"github.com/thyamix/festival-counter/internal/net/websockets"
 )
 
 func CreateFestival(w http.ResponseWriter, r *http.Request) {
 	var festival models.FestivalData
-	accessTokenCookie, err := r.Cookie("accessToken")
+	accessTokenCookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
 		if err == http.ErrNoCookie {
 			http.Error(w, auth.ErrInvalidToken.Error(), http.StatusUnauthorized)
@@ -51,7 +53,7 @@ func CreateFestival(w http.ResponseWriter, r *http.Request) {
 	}
 	festival.Id = id
 
-	err = database.AddFestivalAccess(accessTokenCookie.Value, festival)
+	err = database.AddFestivalAccess(accessTokenCookie, festival)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
@@ -111,12 +113,12 @@ func GetTotalAndGauge(w http.ResponseWriter, r *http.Request) {
 }
 
 func CheckAccess(w http.ResponseWriter, r *http.Request) {
-	accessCookie, err := r.Cookie("accessToken")
+	accessCookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
 		http.Error(w, auth.ErrInvalidToken.Error(), http.StatusUnauthorized)
 		return
 	}
-	accessToken, err := database.GetAccessToken(accessCookie.Value)
+	accessToken, err := database.GetAccessToken(accessCookie)
 	if err != nil {
 		http.Error(w, auth.ErrInvalidToken.Error(), http.StatusUnauthorized)
 		return
@@ -159,7 +161,7 @@ func GetAccess(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Failed to get festival")
 	}
-	accessCookie, err := r.Cookie("accessToken")
+	accessCookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
 		log.Println("Failed to get access cookie")
 	}
@@ -181,7 +183,7 @@ func GetAccess(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Body, body, body.Password)
 
 	if allow, err := argon2id.ComparePasswordAndHash(body.Password, festival.PasswordHash); allow {
-		err = database.AddFestivalAccess(accessCookie.Value, *festival)
+		err = database.AddFestivalAccess(accessCookie, *festival)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "something went wrong", http.StatusInternalServerError)
@@ -206,17 +208,17 @@ func Inc(w http.ResponseWriter, r *http.Request) {
 	var valueChange models.ValueChange
 	festival, err := database.GetFestival(r.PathValue("festivalCode"))
 	if err != nil {
-		http.Error(w, "invalid festival code", http.StatusNotFound)
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
 		return
 	}
-	cookie, err := r.Cookie("accessToken")
+	cookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
-		http.Error(w, "no access token", http.StatusUnauthorized)
+		apperrors.SendError(w, apperrors.APIErrNoAccessToken)
 		return
 	}
-	accessToken, err := database.GetAccessToken(cookie.Value)
+	accessToken, err := database.GetAccessToken(cookie)
 	if err != nil {
-		http.Error(w, "invalid access token", http.StatusUnauthorized)
+		apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
 		return
 	}
 
@@ -264,17 +266,17 @@ func Dec(w http.ResponseWriter, r *http.Request) {
 	var valueChange models.ValueChange
 	festival, err := database.GetFestival(r.PathValue("festivalCode"))
 	if err != nil {
-		http.Error(w, "invalid festival code", http.StatusNotFound)
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
 		return
 	}
-	cookie, err := r.Cookie("accessToken")
+	cookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
-		http.Error(w, "no access token", http.StatusUnauthorized)
+		apperrors.SendError(w, apperrors.APIErrNoAccessToken)
 		return
 	}
-	accessToken, err := database.GetAccessToken(cookie.Value)
+	accessToken, err := database.GetAccessToken(cookie)
 	if err != nil {
-		http.Error(w, "invalid access token", http.StatusUnauthorized)
+		apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
 		return
 	}
 

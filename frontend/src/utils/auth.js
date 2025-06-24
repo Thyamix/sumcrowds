@@ -3,15 +3,11 @@ const APIURL = import.meta.env.VITE_APIURL;
 
 
 export async function auth() {
-	let response = await fetch(APIURL + "v1/auth/validateaccess", { credentials: "include" })
+	const response = await fetch(APIURL + "v1/auth/refreshaccess", { credentials: "include" })
 	if (response.ok) {
 		return
 	}
-	response = await fetch(APIURL + "v1/auth/refreshaccess", { credentials: "include" })
-	if (response.ok) {
-		return
-	}
-	response = await fetch(APIURL + "v1/auth/initaccess", { credentials: "include" })
+	await fetch(APIURL + "v1/auth/initaccess", { credentials: "include" })
 	return
 }
 
@@ -22,11 +18,10 @@ export async function auth() {
  * @returns {Promise<Response>}
 */
 export async function fetchWithAuth(url, options = {}) {
-	const response = await fetch(url, {
+	let response = await fetch(url, {
 		...options,
 		credentials: 'include'
 	})
-
 
 	if (response.status === 403 || response.status === 401) {
 		await auth()
@@ -34,13 +29,13 @@ export async function fetchWithAuth(url, options = {}) {
 		return response
 	}
 
-	const retryResponse = await fetch(
+	response = await fetch(
 		url, {
 		...options,
 		credentials: 'include'
 	})
 
-	return retryResponse
+	return response
 
 }
 
