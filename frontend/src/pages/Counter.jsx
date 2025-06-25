@@ -3,6 +3,8 @@ import '../App.css'
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { EnterPassword } from '../components/enterPassword';
 import { fetchWithAuth } from '../utils/auth';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../components/languageSwitcher';
 
 /** @type {string} */
 const WSURL = import.meta.env.VITE_WSURL;
@@ -33,7 +35,7 @@ export function Counter() {
       if (response.status == 404) {
         setIsValid(false)
       }
-      if (response.status == 403) {
+      if (response.status == 401) {
         setIsValid(true)
         setHasAccess(false)
       }
@@ -55,6 +57,8 @@ export function Counter() {
 }
 
 function FestivalCountedPage() {
+  const { t, i18n } = useTranslation()
+
   /** @type {[int, () => null]} */
   const [total, setTotal] = useState("Loading...")
   /** @type {[int, () => null]} */
@@ -93,7 +97,6 @@ function FestivalCountedPage() {
       setTotal("Disconnected")
       clearInterval(heartbeat)
       console.log("Closed")
-      //socketRef.current = new WebSocket(WSURL + festivalCode)
     }
   }, [])
 
@@ -112,11 +115,11 @@ function FestivalCountedPage() {
   return (
     <div className='counter-page'>
       <ColourSelector />
-
       <div className="counter-main-container">
+        <LanguageSwitcher />
         <div className="counter-info-bar">
           <div className="counter-info-item">
-            <span className="counter-info-label">CODE</span>
+            <span className="counter-info-label">{t("counter_code")}</span>
             <span className="counter-info-value">{festivalCode}</span>
           </div>
         </div>
@@ -124,7 +127,7 @@ function FestivalCountedPage() {
         <div className="counter-display-section" style={{ background: colour }}>
           <div className="counter-current-value">{total}</div>
           <div className="counter-gauge-info">
-            <span className="counter-gauge-label">GAUGE</span>
+            <span className="counter-gauge-label">{t("counter_gauge")}</span>
             <span className="counter-gauge-value">{maxJauge}</span>
           </div>
         </div>

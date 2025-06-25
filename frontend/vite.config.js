@@ -8,5 +8,8 @@ export default defineConfig({
     host: "192.168.1.35",
     port: 3000,
     allowedHosts: ["testing.sumcrowds.com", "sumcrowds.com", "dev.sumcrowds.com"],
+  },
+  optimizeDeps: {
+    include: ['i17next', 'react-i18next', 'i18next-http-backend']
   }
 })

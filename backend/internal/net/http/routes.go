@@ -27,7 +27,7 @@ func getRoutes(wsServer *websockets.Server) *http.ServeMux {
 
 	routes.Handle("GET /api/v1/festival/{festivalCode}/exists", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.CheckExists)))
 	routes.Handle("GET /api/v1/festival/{festivalCode}/access", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.CheckAccess)))
-	routes.Handle("POST /api/v1/festival/{festivalCode}/getAccess", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.GetAccess)))
+	routes.Handle("POST /api/v1/festival/{festivalCode}/getaccess", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.GetAccess)))
 
 	routes.Handle("POST /api/v1/festival/{festivalCode}/inc", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.Inc)))
 	routes.Handle("POST /api/v1/festival/{festivalCode}/dec", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.Dec)))

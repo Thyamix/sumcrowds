@@ -45,7 +45,7 @@ export function EnterPassword() {
     });
 
     try {
-      const response = await fetch(APIURL + "v1/festival/" + festivalCode + "/getAccess", {
+      const response = await fetch(APIURL + "v1/festival/" + festivalCode + "/getaccess", {
         method: "post",
         headers: {
           "Content-Type": "application/json",
