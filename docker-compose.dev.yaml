@@ -16,16 +16,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+      args:
+        VITE_APIURL: "https://testing.sumcrowds.com/api/"
+        VITE_WSURL: "wss://testing.sumcrowds.com/ws/"
     env_file:
-      - front.env.dev 
-    ports:
-      - 3000
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-      - WDS_SOCKET_PORT=0
+      - front.env.dev
     restart: unless-stopped
     networks:
       - dev_network

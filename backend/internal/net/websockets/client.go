@@ -102,6 +102,5 @@ func pong(c *Client) {
 		log.Println(err)
 		return
 	}
-	fmt.Println("pong")
 	c.Send <- pingJson
 }
