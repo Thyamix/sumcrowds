@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { auth, fetchWithAuth } from "../utils/auth"
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 /** @type {string} */
 const APIURL = import.meta.env.VITE_APIURL;
@@ -10,6 +11,8 @@ const APIURL = import.meta.env.VITE_APIURL;
  * @param {() => null} param0.close 
 */
 export function JoinPopup({ close }) {
+  const { t } = useTranslation()
+
   useEffect(() => { auth() }, [])
   /** @type {[string, () => null]} */
   const [codeInputValue, setCodeInputValue] = useState("")
@@ -45,7 +48,7 @@ export function JoinPopup({ close }) {
     if (response.ok) {
       navigate("/" + codeInputValue, { replace: true })
     } else {
-      setAlert("Invalid code")
+      setAlert(t("joinpopup_alert"))
     }
   }
 
@@ -56,7 +59,9 @@ export function JoinPopup({ close }) {
         <button className="join-close-button" onClick={close}>
           <b>×</b>
         </button>
-        <div className="join-header">Join</div>
+        <div className="join-header">
+          {t("joinpopup_header")}
+        </div>
         <div className="join-spacer" />
         <div className="join-form">
           <div className="join-input-group">
@@ -66,7 +71,7 @@ export function JoinPopup({ close }) {
               name="Code"
               value={codeInputValue}
               onChange={handleCodeInputValue}
-              placeholder="Enter session code"
+              placeholder={t("joinpopup_enter_code")}
               className="join-input"
             />
           </div>
@@ -74,7 +79,7 @@ export function JoinPopup({ close }) {
             className="join-button join-button--large join-button--success"
             onClick={handleJoin}
           >
-            Join Session
+            {t("joinpopup_confirm")}
           </button>
         </div>
       </div>

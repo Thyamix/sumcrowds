@@ -1,9 +1,21 @@
 {
 	"counter_gauge": "Gauge",
 	"counter_code": "code",
+
 	"home_home": "Home",
 	"home_select_option": "Choose an option to get started",
 	"home_join_button": "Join Session",
 	"home_create_button": "Create Session",
-	"home_welcome": "Welcome"
+	"home_welcome": "Welcome",
+
+	"pwpopup_header": "Enter Password",
+	"pwpopup_alert": "Invalid password",
+	"pwpopup_password": "Password",
+	"pwpopup_confirm": "Confirm",
+	"pwpopup_show_password": "Show Password",
+
+	"joinpopup_header": "Join",
+	"joinpopup_alert": "Invalid code",
+	"joinpopup_enter_code": "Enter session code",
+	"joinpopup_confirm": "Join Session"
 }

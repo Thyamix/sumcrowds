@@ -1,10 +1,21 @@
 {
 	"counter_gauge": "Jauge",
 	"counter_code": "code",
+
 	"home_home": "Accueil",
 	"home_select_option": "Selectionnez une option pour commencer",
 	"home_join_button": "Rejoindre Session",
 	"home_create_button": "Nouvelle Session",
-	"home_welcome": "Bienvenue"
+	"home_welcome": "Bienvenue",
+
+	"pwpopup_header": "Entrer mot de passe",
+	"pwpopup_password": "Mot de passe",
+	"pwpopup_confirm": "Valider",
+	"pwpopup_show_password": "Afficher le mot de passe",
+	
+	"joinpopup_header": "Rejoindre",
+	"joinpopup_alert": "Code incorrect",
+	"joinpopup_enter_code": "Entrer code de session",
+	"joinpopup_confirm": "Rejoindre session"
 }
 

@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 
 /** @type {string} */
 const APIURL = import.meta.env.VITE_APIURL;
 
 export function EnterPassword() {
+  const { t } = useTranslation()
+
   /** @type {[string, React.Dispatch<React.SetStateAction<string>>]} */
   const [passwordInputValue, setPasswordInputValue] = useState("");
   /** @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]} */
@@ -23,13 +26,13 @@ export function EnterPassword() {
     /** @type {string} */
     const value = event.target.value;
     if (
-      "abcdefghijklmnopqrstuvwxyx1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-+_*".includes(
+      "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-+_*".includes(
         value.at(-1)
       ) ||
       value === ""
     ) {
       setPasswordInputValue(value);
-      setPasswordError(null); // Clear error when user starts typing again
+      setPasswordError(null);
     }
   }
 
@@ -38,7 +41,7 @@ export function EnterPassword() {
    */
   async function handleConfirm(event) {
     event.preventDefault();
-    setPasswordError(null); // Clear previous errors
+    setPasswordError(null);
 
     const body = JSON.stringify({
       password: passwordInputValue,
@@ -54,11 +57,11 @@ export function EnterPassword() {
       });
 
       if (!response.ok) {
-        setPasswordError("Invalid password. Please try again.");
+        setPasswordError(t("pwpopup_alert"));
         console.error("API call failed:", response.statusText);
       } else {
         console.log("Password confirmed and API call initiated!");
-        setPasswordInputValue(""); // Make password disappear on success
+        setPasswordInputValue("");
         location.reload()
       }
     } catch (error) {
@@ -79,7 +82,7 @@ export function EnterPassword() {
           {" "}
           <b> x </b>{" "}
         </button>
-        <div className="join-header"> Enter Password </div>
+        <div className="join-header"> {t("pwpopup_header")}</div>
         <div className="spacer" />
         <form onSubmit={handleConfirm}>
           <input
@@ -97,19 +100,19 @@ export function EnterPassword() {
             name="password"
             value={passwordInputValue}
             onChange={handlePasswordInputValue}
-            placeholder="Password"
+            placeholder={t("pwpopup_password")}
             className="join-input"
           />
           <div className="checkbox-container">
             <input
               className="checkbox"
               type="checkbox"
-              checked={showPassword} // Reflect the state
-              onChange={() => setShowPassword(!showPassword)} // Toggle showPassword state
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
               name="show-password"
-            />Show Password</div>
+            />{t("pwpopup_show_password")}</div>
           <button type="submit" className="join-button join-button--large join-button--success">
-            Confirm
+            {t("pwpopup_confirm")}
           </button>
         </form>
       </div>
