@@ -4,20 +4,23 @@ import Backend from 'i18next-http-backend';
 
 const currentLang = localStorage.getItem("lang") || "en"
 
-i18n
-	.use(Backend)
-	.use(initReactI18next)
-	.init({
-		fallbackLng: 'en',
-		debug: false,
-		interpolation: {
-			escapeValue: false,
-		},
-		lng: currentLang,
-		backend: {
-			loadPath: '/locales/{{lng}}/translation.json',
-		}
-	});
-
-export default i18n;
+export function initI18n() {
+	return i18n
+		.use(initReactI18next)
+		.use(Backend)
+		.init({
+			fallbackLng: 'en',
+			debug: false,
+			interpolation: {
+				escapeValue: false,
+			},
+			lng: currentLang,
+			backend: {
+				loadPath: '/locales/{{lng}}/translation.json',
+			},
+			react: {
+				useSuspense: false,
+			},
+		});
+}
 

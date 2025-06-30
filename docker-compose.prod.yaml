@@ -4,6 +4,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.prod
     environment:
+      - APP_DEPLOY=docker
       - PORT=8080
       - ORIGIN=https://sumcrowds.com
     restart: unless-stopped

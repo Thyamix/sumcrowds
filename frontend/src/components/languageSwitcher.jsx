@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 
 const SUPPORTED_LANGUAGES = ["en", "fr"]
 
-export default function LanguageSwitcher() {
+export function LanguageSwitcher() {
   const { i18n } = useTranslation()
   function handleChange(e) {
     const lang = e.target.value;

@@ -4,7 +4,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { EnterPassword } from '../components/enterPassword';
 import { fetchWithAuth } from '../utils/auth';
 import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from '../components/languageSwitcher';
+import { LanguageSwitcher } from '../components/languageSwitcher';
 
 /** @type {string} */
 const WSURL = import.meta.env.VITE_WSURL;
@@ -57,7 +57,7 @@ export function Counter() {
 }
 
 function FestivalCountedPage() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   /** @type {[int, () => null]} */
   const [total, setTotal] = useState("Loading...")

@@ -29,6 +29,7 @@ func StartAPI() {
 
 	go wsServer.Run()
 
-	fmt.Println("Server is running...")
+	fmt.Printf("Server is listening to origin %v \n", os.Getenv("ORIGIN"))
+	fmt.Printf("Server is running on :%v...\n", os.Getenv("PORT"))
 	log.Fatal(server.ListenAndServe())
 }

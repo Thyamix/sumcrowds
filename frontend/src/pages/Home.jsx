@@ -2,7 +2,7 @@ import Popup from "reactjs-popup";
 import { JoinPopup } from "../components/joinFestivalButton";
 import { CreatePopup } from "../components/createFestivalButton";
 import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "../components/languageSwitcher";
+import { LanguageSwitcher } from "../components/languageSwitcher";
 
 export function Home() {
   const { t } = useTranslation()

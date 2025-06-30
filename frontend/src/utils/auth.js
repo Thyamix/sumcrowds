@@ -1,8 +1,7 @@
-/** @type {string} */
-const APIURL = import.meta.env.VITE_APIURL;
-
-
 export async function auth() {
+	/** @type {string} */
+	const APIURL = import.meta.env.VITE_APIURL;
+
 	const response = await fetch(APIURL + "v1/auth/refreshaccess", { credentials: "include" })
 	if (response.ok) {
 		return
