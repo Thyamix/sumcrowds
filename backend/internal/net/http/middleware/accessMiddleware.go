@@ -34,8 +34,9 @@ func RequireAccessToken(next http.Handler) http.Handler {
 			}
 			if err == auth.ErrExpiredToken {
 				apperrors.SendError(w, apperrors.APIErrExpiredAccessToken)
+				return
 			}
-			http.Error(w, "Failed to refresh tokens", http.StatusInternalServerError)
+			apperrors.SendError(w, apperrors.APIErrInternal)
 			return
 		}
 
@@ -54,7 +55,7 @@ func RequireAccessToken(next http.Handler) http.Handler {
 		if valid {
 			next.ServeHTTP(w, r)
 		} else {
-			http.Error(w, "Invalid or missing token", http.StatusUnauthorized)
+			apperrors.SendError(w, apperrors.APIErrNoAccess)
 			return
 		}
 	})

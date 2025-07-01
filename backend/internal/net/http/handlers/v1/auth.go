@@ -31,7 +31,7 @@ func ValidateAccess(w http.ResponseWriter, r *http.Request) {
 			apperrors.SendError(w, apperrors.APIErrExpiredAccessToken)
 			return
 		}
-		http.Error(w, "Failed to refresh tokens", http.StatusInternalServerError)
+		apperrors.SendError(w, apperrors.APIErrInternal)
 		return
 	}
 
@@ -41,7 +41,7 @@ func ValidateAccess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Error(w, "Invalid or missing token", http.StatusUnauthorized)
+	apperrors.SendError(w, apperrors.APIErrNoAccess)
 	return
 }
 
@@ -58,7 +58,7 @@ func RefreshAccess(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Failed to refresh token", err)
-		http.Error(w, "Failed to refresh tokens", http.StatusInternalServerError)
+		apperrors.SendError(w, apperrors.APIErrInternal)
 		return
 	}
 

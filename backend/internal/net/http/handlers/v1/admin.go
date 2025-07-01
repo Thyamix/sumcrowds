@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/thyamix/festival-counter/internal/apperrors"
 	"github.com/thyamix/festival-counter/internal/database"
 	csvOutput "github.com/thyamix/festival-counter/internal/output/csv"
 )
@@ -72,7 +73,8 @@ func GetActiveCSV(w http.ResponseWriter, r *http.Request) {
 func GetArchivedEvents(w http.ResponseWriter, r *http.Request) {
 	festival, err := database.GetFestival(r.PathValue("festivalCode"))
 	if err != nil {
-		http.Error(w, "invalid festival code", http.StatusNotFound)
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+		return
 	}
 	ids, times, err := database.GetArchivedEventsIdsTimes(festival.Id)
 	if err != nil {
@@ -80,7 +82,7 @@ func GetArchivedEvents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(ids) != len(times) {
-		http.Error(w, "Mismatched lengths", http.StatusInternalServerError)
+		apperrors.SendError(w, apperrors.APIErrMismatchedLengths)
 		return
 	}
 
@@ -100,14 +102,15 @@ func GetArchivedEvents(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		apperrors.SendError(w, apperrors.APIErrFailedEncodeResponse)
+		return
 	}
 }
 
 func ArchiveCurrentEvent(w http.ResponseWriter, r *http.Request) {
 	festival, err := database.GetFestival(r.PathValue("festivalCode"))
 	if err != nil {
-		http.Error(w, "invalid festival code", http.StatusNotFound)
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
 		return
 	}
 	_ = database.Reset(festival.Id)
@@ -124,14 +127,13 @@ func SetGauge(w http.ResponseWriter, r *http.Request) {
 
 	bodyJson, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "invalid request maybe", http.StatusInternalServerError)
+		apperrors.SendError(w, apperrors.APIErrInvalidRequest)
 		return
 	}
 
 	err = json.Unmarshal(bodyJson, &newMax)
 	if err != nil {
-		log.Println(err)
-		http.Error(w, "invalid json maybe", http.StatusInternalServerError)
+		apperrors.SendError(w, apperrors.APIErrInvalidJSON)
 		return
 	}
 

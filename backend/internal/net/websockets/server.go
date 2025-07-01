@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/thyamix/festival-counter/internal/apperrors"
 	"github.com/thyamix/festival-counter/internal/database"
 )
 
@@ -65,6 +66,7 @@ func BroadcastTotal(festivalCode string) error {
 	total, maxGauge, err := database.GetTotal(festivalCode)
 	if err != nil {
 		log.Print(err)
+		return apperrors.ErrFailedGetTotal
 	}
 	totalJson, err := json.Marshal(map[string]int{
 		"total": total,
@@ -72,7 +74,7 @@ func BroadcastTotal(festivalCode string) error {
 	})
 
 	if err != nil {
-		return err
+		return apperrors.ErrFailedMarshal
 	}
 
 	server.Messages <- Message{Message: totalJson, FestivalCode: festivalCode}

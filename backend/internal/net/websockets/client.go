@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
+	"github.com/thyamix/festival-counter/internal/apperrors"
 	"github.com/thyamix/festival-counter/internal/models"
 )
 
@@ -79,21 +80,24 @@ func HandleCounter(server *Server, w http.ResponseWriter, r *http.Request) {
 func handleMessage(c *Client, message []byte) error {
 	var incomingMessage IncomingMessage
 	if err := json.Unmarshal(message, &incomingMessage); err != nil {
-		return fmt.Errorf("invalid message from handle message: %v", err)
+		return apperrors.ErrInvalidRequest
 	}
 
 	switch incomingMessage.Type {
 	case "ping":
 		pong(c)
 	case "getTotal":
-		sendTotal(c)
+		return sendTotal(c)
 	}
 	return nil
 }
 
 func sendTotal(c *Client) error {
 	err := BroadcastTotal(c.FestivalCode)
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func pong(c *Client) {
