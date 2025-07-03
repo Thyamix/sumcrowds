@@ -41,8 +41,7 @@ func ValidateAccess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apperrors.SendError(w, apperrors.APIErrNoAccess)
-	return
+	apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
 }
 
 func RefreshAccess(w http.ResponseWriter, r *http.Request) {

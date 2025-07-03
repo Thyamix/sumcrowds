@@ -69,20 +69,15 @@ var (
 		Public:     "invalid json",
 		Internal:   ErrInvalidJSON,
 	}
-	APIErrNoAccess = &APIError{
+	APIErrNoFestivalAccess = &APIError{
 		StatusCode: http.StatusForbidden,
 		Public:     "no access",
-		Internal:   ErrNoAccess,
+		Internal:   ErrNoFestivalAccess,
 	}
-	APIErrExpiredAccess = &APIError{
+	APIErrExpiredFestivalAccess = &APIError{
 		StatusCode: http.StatusForbidden,
 		Public:     "expired access",
-		Internal:   ErrExpiredAccess,
-	}
-	APIErrInvalidCode = &APIError{
-		StatusCode: http.StatusNotFound,
-		Public:     "invalid code",
-		Internal:   ErrInvalidCode,
+		Internal:   ErrExpiredFestivalAccess,
 	}
 	APIErrInvalidAmount = &APIError{
 		StatusCode: http.StatusBadRequest,
@@ -114,13 +109,18 @@ var (
 		Public:     "internal server error",
 		Internal:   ErrFailedGetTotal,
 	}
+	APIErrInvalidPin = &APIError{
+		StatusCode: 422,
+		Public:     "invalid pin",
+		Internal:   ErrInvalidPin,
+	}
 )
 
 var (
 	ErrExpiredToken               = errors.New("token expired")
 	ErrInvalidToken               = errors.New("token invalid")
-	ErrNoAccess                   = errors.New("no access to resource")
-	ErrExpiredAccess              = errors.New("access to resource expired")
+	ErrNoFestivalAccess           = errors.New("no access to resource")
+	ErrExpiredFestivalAccess      = errors.New("access to resource expired")
 	ErrInvalidCode                = errors.New("invalid code")
 	ErrInvalidPassword            = errors.New("invalid password")
 	ErrInvalidAmount              = errors.New("amount must be between 1 and 100")
@@ -139,4 +139,5 @@ var (
 	ErrFailedEncodeResponse       = errors.New("failed to encode response as json")
 	ErrAccessTokenCookieNotFound  = errors.New("access token cookie not found")
 	ErrRefreshTokenCookieNotFound = errors.New("refresh token cookie not found")
+	ErrInvalidPin                 = errors.New("invalid admin pin")
 )

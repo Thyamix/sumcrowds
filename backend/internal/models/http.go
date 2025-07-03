@@ -8,7 +8,7 @@ type Response struct {
 type FestivalData struct {
 	Id           int    `sql:"id"`
 	Code         string `sql:"code"`
-	Pin          int    `sql:"pin" json:"adminPin"`
+	Pin          string `sql:"pin" json:"pin"`
 	Password     string `json:"password"`
 	PasswordHash string `sql:"password"`
 	CreatedAt    int    `sql:"created_at"`

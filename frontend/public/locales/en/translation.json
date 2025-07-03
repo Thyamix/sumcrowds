@@ -14,6 +14,12 @@
 	"pwpopup_confirm": "Confirm",
 	"pwpopup_show_password": "Show Password",
 
+	"pinpopup_header": "Enter PIN",
+	"pinpopup_alert": "Invalid PIN",
+	"pinpopup_pin": "PIN",
+	"pinpopup_confirm": "Confirm",
+	"pinpopup_show_pin": "Show PIN",
+
 	"joinpopup_header": "Join",
 	"joinpopup_alert": "Invalid code",
 	"joinpopup_enter_code": "Enter session code",

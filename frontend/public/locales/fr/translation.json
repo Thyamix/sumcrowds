@@ -9,9 +9,16 @@
 	"home_welcome": "Bienvenue",
 
 	"pwpopup_header": "Entrer mot de passe",
+	"pwpopup_alert": "Mot de passe incorrect",
 	"pwpopup_password": "Mot de passe",
 	"pwpopup_confirm": "Valider",
 	"pwpopup_show_password": "Afficher le mot de passe",
+
+	"pinpopup_header": "Entrer PIN",
+	"pinpopup_alert": "PIN incorrect",
+	"pinpopup_pin": "PIN",
+	"pinpopup_confirm": "Valider",
+	"pinpopup_show_pin": "Afficher le PIN",
 	
 	"joinpopup_header": "Rejoindre",
 	"joinpopup_alert": "Code incorrect",

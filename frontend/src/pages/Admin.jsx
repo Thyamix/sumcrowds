@@ -1,19 +1,76 @@
 import { useEffect, useState } from 'react';
 import '../App.css'
-import { useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/auth';
+import { EnterPin } from '../components/enterPin';
 
 /** @type {string} */
 const APIURL = import.meta.env.VITE_APIURL;
 
 export function Admin() {
+  /** @type {[boolean, (boolean) => void]} */
+  const [loading, setLoading] = useState(true)
+  /** @type {[boolean, (boolean) => void]} */
+  const [isValid, setIsValid] = useState(null)
+  /** @type {[boolean, (boolean) => void]} */
+  const [hasAccess, setHasAccess] = useState(false)
+  /** @type {[boolean, (boolean) => void]} */
+  const [hasAdminAccess, setHasAdminAccess] = useState(false)
+
+  const { festivalCode } = useParams()
+
+  const navigate = useNavigate()
+
+
+
+  useEffect(() => {
+    const checkFestival = async () => {
+      const response = await fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/access")
+
+      if (response.ok) {
+        setHasAccess(true)
+        setHasAdminAccess(true)
+        setIsValid(true)
+      }
+      if (response.status == 422) {
+        setIsValid(true)
+        setHasAccess(true)
+      }
+      if (response.status == 404) {
+        setIsValid(false)
+      }
+      if (response.status == 403) {
+        setIsValid(true)
+        setHasAccess(false)
+      }
+      setLoading(false)
+    }
+    checkFestival()
+  }, [festivalCode, navigate])
+
+
+  if (!loading) {
+    if (!isValid) {
+      return <Navigate to="/home" replace />
+    }
+    if (!hasAccess) {
+      return <EnterPassword />
+    } else if (!hasAdminAccess) {
+      return <EnterPin />
+    }
+    return <FestivalAdminPage />
+  }
+  return <div> loading ... </div>
+}
+
+
+function FestivalAdminPage() {
   /** @type {[string, () => null]} */
   const [alert, setAlert] = useState(" ")
   /** @type {[string, () => null]} */
   const [inputValue, setInputValue] = useState("")
 
   const { festivalCode } = useParams()
-
 
   /** 
    * @param {Event} event 
@@ -92,7 +149,7 @@ export function Admin() {
                 Archive
               </button>
               <a
-                href={APIURL + "v1/festival/" + festivalCode + "/download/activecsv"}
+                href={APIURL + "v1/festival/" + festivalCode + "/admin/download/activecsv"}
                 className='admin-button admin-button--success admin-button--small'
               >
                 Get CSV
@@ -123,7 +180,7 @@ export function Admin() {
   function ArchivedData({ id, date }) {
     return (
       <a
-        href={APIURL + "v1/festival/" + festivalCode + "/download/archivedcsv/" + id}
+        href={APIURL + "v1/festival/" + festivalCode + "/admin/download/archivedcsv/" + id}
         className='archive-item'
       >
         <div className='archive-item-content'>
@@ -138,7 +195,7 @@ export function Admin() {
     const [archives, setArchives] = useState([])
 
     useEffect(() => {
-      fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/getarchivedevents")
+      fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/getarchivedevents")
         .then(res => res.json())
         .then(data => setArchives(data))
     }, [])
@@ -179,7 +236,7 @@ export function Admin() {
   */
   async function onArchivePressed(event) {
     event.preventDefault()
-    const response = await fetch(APIURL + "v1/festival/" + festivalCode + "/archivecurrentevent", {
+    const response = await fetch(APIURL + "v1/festival/" + festivalCode + "/admin/archivecurrentevent", {
       method: "get",
       headers: {
         "Content-Type": "application/json"
@@ -198,7 +255,7 @@ export function Admin() {
     const body = JSON.stringify({
       max: +newMax
     })
-    const response = await fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/setgauge", {
+    const response = await fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/setgauge", {
       method: "post",
       headers: {
         "Content-Type": "application/json",

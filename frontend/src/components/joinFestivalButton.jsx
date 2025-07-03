@@ -26,7 +26,7 @@ export function JoinPopup({ close }) {
   function handleCodeInputValue(event) {
     /** @type {string} */
     const value = event.target.value
-    if (("abcdefghijklmnopqrstuvwxyx1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(value.at(-1)) || value == "") && value.length <= 6) {
+    if (("abcdefghijklmnopqrstuvwxyxz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(value.at(-1)) || value == "") && value.length <= 6) {
       setCodeInputValue(value.toUpperCase())
     }
   }
@@ -63,7 +63,7 @@ export function JoinPopup({ close }) {
           {t("joinpopup_header")}
         </div>
         <div className="join-spacer" />
-        <div className="join-form">
+        <form className="join-form" onSubmit={handleJoin}>
           <div className="join-input-group">
             <Alert />
             <input
@@ -77,11 +77,10 @@ export function JoinPopup({ close }) {
           </div>
           <button
             className="join-button join-button--large join-button--success"
-            onClick={handleJoin}
           >
             {t("joinpopup_confirm")}
           </button>
-        </div>
+        </form>
       </div>
     </div>)
 }

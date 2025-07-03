@@ -8,9 +8,12 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/thyamix/festival-counter/internal/apperrors"
+	"github.com/thyamix/festival-counter/internal/contextkeys"
 	"github.com/thyamix/festival-counter/internal/database"
+	"github.com/thyamix/festival-counter/internal/net/http/cookieutils"
 	csvOutput "github.com/thyamix/festival-counter/internal/output/csv"
 )
 
@@ -139,4 +142,26 @@ func SetGauge(w http.ResponseWriter, r *http.Request) {
 
 	database.ChangeCurrentEventMax(r.PathValue("festivalCode"), newMax.Max)
 
+}
+
+func CheckAdminAccess(w http.ResponseWriter, r *http.Request) {
+	if r.Context().Value(contextkeys.FestivalAccess) == false {
+		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
+	}
+
+	pin := fmt.Sprintf("%v", r.Context().Value(contextkeys.AdminPIN))
+
+	festival, err := database.GetFestival(r.PathValue("festivalCode"))
+
+	if err != nil {
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+	}
+
+	if pin != festival.Pin {
+		apperrors.SendError(w, apperrors.APIErrInvalidPin)
+	}
+
+	path := fmt.Sprintf("/api/v1/festival/%v/admin", festival.Code)
+
+	cookieutils.CreatePinCookie(w, pin, path, time.Now().Add(time.Minute*5))
 }

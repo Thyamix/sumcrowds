@@ -8,12 +8,13 @@ import (
 )
 
 const (
-	AccessTokenCookieName  = "accessToken"
-	RefreshTokenCookieName = "refreshToken"
+	AccessTokenCookie  = "accessToken"
+	RefreshTokenCookie = "refreshToken"
+	AdminPinCookie     = "adminPin"
 )
 
 func GetAccessToken(r *http.Request) (string, error) {
-	cookie, err := r.Cookie(AccessTokenCookieName)
+	cookie, err := r.Cookie(AccessTokenCookie)
 	if err != nil {
 		return "", apperrors.ErrAccessTokenCookieNotFound
 	}
@@ -21,7 +22,7 @@ func GetAccessToken(r *http.Request) (string, error) {
 }
 
 func GetRefreshToken(r *http.Request) (string, error) {
-	cookie, err := r.Cookie(RefreshTokenCookieName)
+	cookie, err := r.Cookie(RefreshTokenCookie)
 	if err != nil {
 		return "", apperrors.ErrRefreshTokenCookieNotFound
 	}
@@ -30,7 +31,7 @@ func GetRefreshToken(r *http.Request) (string, error) {
 
 func CreateAccessCookie(w http.ResponseWriter, token string, path string, expires time.Time) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     AccessTokenCookieName,
+		Name:     AccessTokenCookie,
 		Value:    token,
 		Path:     path,
 		HttpOnly: true,
@@ -42,8 +43,20 @@ func CreateAccessCookie(w http.ResponseWriter, token string, path string, expire
 
 func CreateRefreshCookie(w http.ResponseWriter, token string, path string, expires time.Time) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     RefreshTokenCookieName,
+		Name:     RefreshTokenCookie,
 		Value:    token,
+		Path:     path,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  expires,
+	})
+}
+
+func CreatePinCookie(w http.ResponseWriter, pin string, path string, expires time.Time) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     AdminPinCookie,
+		Value:    pin,
 		Path:     path,
 		HttpOnly: true,
 		Secure:   true,

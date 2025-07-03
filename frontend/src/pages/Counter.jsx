@@ -35,7 +35,7 @@ export function Counter() {
       if (response.status == 404) {
         setIsValid(false)
       }
-      if (response.status == 401) {
+      if (response.status == 403) {
         setIsValid(true)
         setHasAccess(false)
       }

@@ -12,6 +12,8 @@ import (
 	"github.com/thyamix/festival-counter/internal/net/http/cookieutils"
 )
 
+const ADMINPINHEADER = "admin-pin"
+
 func RequireAccessToken(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessTokenValue, err := cookieutils.GetAccessToken(r)
@@ -52,10 +54,18 @@ func RequireAccessToken(next http.Handler) http.Handler {
 			}
 		}
 
+		pinCookie, err := r.Cookie(cookieutils.AdminPinCookie)
+
+		if err != nil {
+			r = r.WithContext(context.WithValue(r.Context(), contextkeys.AdminPIN, r.Header.Get(ADMINPINHEADER)))
+		} else {
+			r = r.WithContext(context.WithValue(r.Context(), contextkeys.AdminPIN, pinCookie.Value))
+		}
+
 		if valid {
 			next.ServeHTTP(w, r)
 		} else {
-			apperrors.SendError(w, apperrors.APIErrNoAccess)
+			apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
 			return
 		}
 	})

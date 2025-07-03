@@ -12,6 +12,7 @@ import (
 	"github.com/alexedwards/argon2id"
 	"github.com/thyamix/festival-counter/internal/apperrors"
 	"github.com/thyamix/festival-counter/internal/auth"
+	"github.com/thyamix/festival-counter/internal/contextkeys"
 	"github.com/thyamix/festival-counter/internal/database"
 	"github.com/thyamix/festival-counter/internal/models"
 	"github.com/thyamix/festival-counter/internal/net/http/cookieutils"
@@ -43,6 +44,8 @@ func CreateFestival(w http.ResponseWriter, r *http.Request) {
 
 	if festival.Password != "" {
 		festival.PasswordHash, err = argon2id.CreateHash(festival.Password, argon2id.DefaultParams)
+	} else {
+		festival.PasswordHash = ""
 	}
 	festival.CreatedAt = int(time.Now().Unix())
 	festival.ExpiresAt = int(time.Now().Add(time.Hour * 24 * 45).Unix())
@@ -118,43 +121,23 @@ func GetTotalAndGauge(w http.ResponseWriter, r *http.Request) {
 }
 
 func CheckAccess(w http.ResponseWriter, r *http.Request) {
-	accessCookie, err := cookieutils.GetAccessToken(r)
+	cookie, err := r.Cookie(cookieutils.AccessTokenCookie)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
-		return
+		apperrors.SendError(w, apperrors.APIErrNoAccessToken)
 	}
-	accessToken, err := database.GetAccessToken(accessCookie)
-	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
+	if r.Context().Value(contextkeys.FestivalAccess) == true {
+		w.WriteHeader(http.StatusOK)
 		return
+	} else {
+		festival, err := database.GetFestival(r.PathValue("festivalCode"))
+		if err != nil {
+			apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+		}
+		if festival.PasswordHash == "" {
+			database.AddFestivalAccess(cookie.Value, *festival)
+		}
+		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
 	}
-
-	if accessToken.ExpiresAt <= time.Now().Unix() {
-		apperrors.SendError(w, apperrors.APIErrExpiredAccessToken)
-		return
-	}
-
-	festivalCode := r.PathValue("festivalCode")
-	festival, err := database.GetFestival(festivalCode)
-	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidCode)
-		return
-	}
-
-	festivalAccess, err := database.GetFestivalAccess(accessToken.UserId, festival.Id)
-
-	if err != nil {
-		log.Println("Failed to get festival access", err)
-		apperrors.SendError(w, apperrors.APIErrNoAccess)
-		return
-	}
-
-	if festivalAccess.LastUsedAt <= time.Now().Add(-(time.Hour * 24 * 14)).Unix() {
-		apperrors.SendError(w, apperrors.APIErrExpiredAccess)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 type Password struct {
@@ -210,7 +193,7 @@ func CheckExists(w http.ResponseWriter, r *http.Request) {
 	festivalCode := r.PathValue("festivalCode")
 	_, err := database.GetFestival(festivalCode)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidCode)
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -235,7 +218,7 @@ func Inc(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if auth.CheckFestivalAccess(*festival, *accessToken) != nil {
-		apperrors.SendError(w, apperrors.APIErrNoAccess)
+		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
 		return
 	}
 
@@ -296,7 +279,7 @@ func Dec(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if auth.CheckFestivalAccess(*festival, *accessToken) != nil {
-		apperrors.SendError(w, apperrors.APIErrNoAccess)
+		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
 		return
 	}
 	bodyJson, err := io.ReadAll(r.Body)
