@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -67,6 +68,26 @@ func RequireAccessToken(next http.Handler) http.Handler {
 		} else {
 			apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
 			return
+		}
+	})
+}
+
+func RequiresAdminPin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Context().Value(contextkeys.FestivalAccess) == false {
+			apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
+		}
+
+		pin := fmt.Sprintf("%v", r.Context().Value(contextkeys.AdminPIN))
+
+		festival, err := database.GetFestival(r.PathValue("festivalCode"))
+
+		if err != nil {
+			apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+		}
+
+		if pin != festival.Pin {
+			apperrors.SendError(w, apperrors.APIErrInvalidPin)
 		}
 	})
 }

@@ -157,7 +157,6 @@ function FestivalAdminPage() {
             </div>
           </div>
         </form>
-
         <Archive />
       </div >
     </div >
@@ -195,9 +194,15 @@ function FestivalAdminPage() {
     const [archives, setArchives] = useState([])
 
     useEffect(() => {
-      fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/getarchivedevents")
+      response = fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/getarchivedevents")
         .then(res => res.json())
         .then(data => setArchives(data))
+      if (!response.ok) {
+        if (response.status == 422) {
+          location.reload()
+        }
+        throw new Error(`Response status:`, response.status)
+      }
     }, [])
 
     function getDateTime(timestamp) {
@@ -243,6 +248,9 @@ function FestivalAdminPage() {
       }
     })
     if (!response.ok) {
+      if (response.status == 422) {
+        location.reload()
+      }
       throw new Error(`Response status:`, response.status)
     }
     location.reload()
@@ -263,6 +271,9 @@ function FestivalAdminPage() {
       body: body,
     })
     if (!response.ok) {
+      if (response.status == 422) {
+        location.reload()
+      }
       throw new Error("Response status:", response.status)
     }
   }

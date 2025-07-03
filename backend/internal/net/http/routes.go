@@ -38,15 +38,15 @@ func getRoutes(wsServer *websockets.Server) *http.ServeMux {
 
 	routes.Handle("GET /api/v1/festival/{festivalCode}/admin/access", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.CheckAdminAccess)))
 
-	routes.Handle("GET /api/v1/festival/{festivalCode}/admin/getarchivedevents", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.GetArchivedEvents)))
+	routes.Handle("GET /api/v1/festival/{festivalCode}/admin/getarchivedevents", middleware.RequireAccessToken(middleware.RequiresAdminPin(http.HandlerFunc(api_handler_v1.GetArchivedEvents))))
 
-	routes.Handle("POST /api/v1/festival/{festivalCode}/admin/setgauge", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.SetGauge)))
+	routes.Handle("POST /api/v1/festival/{festivalCode}/admin/setgauge", middleware.RequireAccessToken(middleware.RequiresAdminPin(http.HandlerFunc(api_handler_v1.SetGauge))))
 
-	routes.Handle("GET /api/v1/festival/{festivalCode}/admin/archivecurrentevent", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.ArchiveCurrentEvent)))
+	routes.Handle("GET /api/v1/festival/{festivalCode}/admin/archivecurrentevent", middleware.RequireAccessToken(middleware.RequiresAdminPin(http.HandlerFunc(api_handler_v1.ArchiveCurrentEvent))))
 
-	routes.Handle("GET /api/v1/festival/{festivalCode}/admin/download/archivedcsv/{eventId}", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.GetArchivedCSV)))
+	routes.Handle("GET /api/v1/festival/{festivalCode}/admin/download/archivedcsv/{eventId}", middleware.RequireAccessToken(middleware.RequiresAdminPin(http.HandlerFunc(api_handler_v1.GetArchivedCSV))))
 
-	routes.Handle("GET /api/v1/festival/{festivalCode}/admin/download/activecsv", middleware.RequireAccessToken(http.HandlerFunc(api_handler_v1.GetActiveCSV)))
+	routes.Handle("GET /api/v1/festival/{festivalCode}/admin/download/activecsv", middleware.RequireAccessToken(middleware.RequiresAdminPin(http.HandlerFunc(api_handler_v1.GetActiveCSV))))
 
 	return routes
 }
