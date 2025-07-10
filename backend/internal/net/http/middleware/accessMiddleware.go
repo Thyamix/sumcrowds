@@ -76,6 +76,7 @@ func RequiresAdminPin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(contextkeys.FestivalAccess) == false {
 			apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
+			return
 		}
 
 		pin := fmt.Sprintf("%v", r.Context().Value(contextkeys.AdminPIN))
@@ -84,10 +85,13 @@ func RequiresAdminPin(next http.Handler) http.Handler {
 
 		if err != nil {
 			apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+			return
 		}
 
 		if pin != festival.Pin {
 			apperrors.SendError(w, apperrors.APIErrInvalidPin)
+			return
 		}
+		next.ServeHTTP(w, r)
 	})
 }
