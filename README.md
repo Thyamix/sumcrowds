@@ -2,7 +2,7 @@
 
 ## What is Sumcrowds?
 
-[Sumcrowds](https://sumcrowds.com) is a real-time festival attendance counter. It was designed to help the volunteers of a local music festival keep track of attendance and ensure it did not exceed the legal capacity of the venue. Unfortunately, the festival ended up getting canceled.
+[Sumcrowds](https://sumcrowds.com) is a real-time event attendance counter. It was designed to help the volunteers of a local music festival keep track of attendance and ensure it did not exceed the legal capacity of the venue. Unfortunately, the festival ended up getting canceled.
 
 ## How does it work?
 
