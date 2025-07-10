@@ -121,14 +121,14 @@ function FestivalCountedPage() {
         <LanguageSwitcher />
         <div className="counter-info-bar">
           <Link to="/home" className="corner-button corner-button--left">
-            <HomeIcon />
+            <HomeIcon className="corner-icon" />
           </Link>
           <div className="counter-info-item">
             <span className="counter-info-label">{t("counter_code")}</span>
             <span className="counter-info-value">{festivalCode}</span>
           </div>
           <Link to={`/${festivalCode}/admin`} className="corner-button corner-button--right">
-            <AdminIcon />
+            <AdminIcon className="corner-icon" />
           </Link>
         </div>
 

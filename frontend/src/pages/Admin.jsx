@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import '../App.css'
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/auth';
 import { EnterPin } from '../components/enterPin';
+import HomeIcon from '../assets/home.svg?react';
+import BackIcon from '../assets/back.svg?react';
 
 /** @type {string} */
 const APIURL = import.meta.env.VITE_APIURL;
@@ -111,10 +113,17 @@ function FestivalAdminPage() {
   return (
     <div className='admin-page'>
       <div className="admin-main-container">
-        <div className='admin-header'>
-          Admin Panel
+        <div className="counter-info-bar">
+          <Link to="/home" className="corner-button corner-button--left">
+            <HomeIcon className="corner-icon" />
+          </Link>
+          <div className='admin-header'>
+            Admin Panel
+          </div>
+          <Link to={`/${festivalCode}`} className="corner-button corner-button--right">
+            <BackIcon className="corner-icon" />
+          </Link>
         </div>
-
         <form className='admin-form'>
           <Alert />
 
@@ -206,8 +215,6 @@ function FestivalAdminPage() {
 
     function getDateTime(timestamp) {
       const time = new Date(timestamp * 1000)
-      console.log(time)
-
       return time.toLocaleString().slice(0, 24)
     }
 

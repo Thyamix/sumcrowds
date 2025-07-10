@@ -318,7 +318,7 @@
   right: 15px;
 }
 
-.corner-button svg {
+.corner-button .corner-icon {
   width: 32px;
   height: 32px;
   fill: white;
