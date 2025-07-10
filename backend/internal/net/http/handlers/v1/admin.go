@@ -94,19 +94,24 @@ func GetArchivedEvents(w http.ResponseWriter, r *http.Request) {
 		Time int `json:"time"`
 	}
 
-	response := make([]event, len(ids))
-	for i := range ids {
-		response[i] = event{
-			Id:   ids[i],
-			Time: times[i],
+	if len(ids) < 1 {
+		w.WriteHeader(http.StatusNoContent)
+	} else {
+
+		response := make([]event, len(ids))
+		for i := range ids {
+			response[i] = event{
+				Id:   ids[i],
+				Time: times[i],
+			}
 		}
-	}
 
-	w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		apperrors.SendError(w, apperrors.APIErrFailedEncodeResponse)
-		return
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			apperrors.SendError(w, apperrors.APIErrFailedEncodeResponse)
+			return
+		}
 	}
 }
 

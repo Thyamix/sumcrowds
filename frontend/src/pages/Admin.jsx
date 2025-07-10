@@ -194,14 +194,13 @@ function FestivalAdminPage() {
     const [archives, setArchives] = useState([])
 
     useEffect(() => {
-      response = fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/getarchivedevents")
+      const response = fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/getarchivedevents")
         .then(res => res.json())
         .then(data => setArchives(data))
       if (!response.ok) {
         if (response.status == 422) {
           location.reload()
         }
-        throw new Error(`Response status:`, response.status)
       }
     }, [])
 
