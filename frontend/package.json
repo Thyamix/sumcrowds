@@ -17,7 +17,8 @@
     "react-dom": "^19.1.0",
     "react-i18next": "^15.5.3",
     "react-router-dom": "^7.6.0",
-    "reactjs-popup": "^2.0.6"
+    "reactjs-popup": "^2.0.6",
+    "vite-plugin-svgr": "^4.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

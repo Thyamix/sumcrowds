@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import '../App.css'
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { EnterPassword } from '../components/enterPassword';
 import { fetchWithAuth } from '../utils/auth';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/languageSwitcher';
+import HomeIcon from '../assets/home.svg?react';
+import AdminIcon from '../assets/admin.svg?react';
 
 /** @type {string} */
 const WSURL = import.meta.env.VITE_WSURL;
@@ -118,10 +120,16 @@ function FestivalCountedPage() {
       <div className="counter-main-container">
         <LanguageSwitcher />
         <div className="counter-info-bar">
+          <Link to="/home" className="corner-button corner-button--left">
+            <HomeIcon />
+          </Link>
           <div className="counter-info-item">
             <span className="counter-info-label">{t("counter_code")}</span>
             <span className="counter-info-value">{festivalCode}</span>
           </div>
+          <Link to={`/${festivalCode}/admin`} className="corner-button corner-button--right">
+            <AdminIcon />
+          </Link>
         </div>
 
         <div className="counter-display-section" style={{ background: colour }}>
