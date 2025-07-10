@@ -15,4 +15,6 @@ The app uses a session code to sync users to events. When a session is created, 
 - Password-protected sessions for security  
 - Additional PIN protection for admin panel access  
 - Easy-to-use interface for volunteers and organizers  
-- Supports multiple simultaneous sessions  
+- Supports multiple simultaneous sessions
+- Exports data to csv
+- Support for both English and French
