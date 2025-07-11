@@ -3,10 +3,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.prod
-    environment:
-      - APP_DEPLOY=docker
-      - PORT=8080
-      - ORIGIN=https://sumcrowds.com
+    env_file:
+      - back.env.prod
     restart: unless-stopped
     networks:
       - prod_network
@@ -20,8 +18,6 @@ services:
       args:
         VITE_APIURL: "https://sumcrowds.com/api/"
         VITE_WSURL: "wss://sumcrowds.com/ws/"
-    env_file:
-      - front.env.prod
     restart: unless-stopped
     networks:
       - prod_network
