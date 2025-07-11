@@ -107,13 +107,13 @@ func ChangeMax(newMax int) {
 func IsValidFestivalId(festivalId int) bool {
 	var result int
 	DB.QueryRow("SELECT COUNT(1) FROM festival WHERE id = ?", festivalId).Scan(&result)
-	return (result != 1)
+	return (result == 1)
 }
 
 func IsValidEventId(eventId int) bool {
 	var result int
 	DB.QueryRow("SELECT COUNT(1) FROM event WHERE id = ?", eventId).Scan(&result)
-	return (result != 1)
+	return (result == 1)
 }
 
 func GetFestival(festivalCode string) (*models.FestivalData, error) {
@@ -137,14 +137,6 @@ func Reset(festivalId int) int {
 	archiveEvent(oldEventId)
 
 	return oldEventId
-}
-
-func archiveInactive() {
-	var eventId int
-	DB.QueryRow("SELECT id FROM event WHERE active = 1").Scan(&eventId)
-
-	DB.Exec("INSERT INTO archive (value, time, event_id) SELECT value, time, event_id FROM active WHERE event_id != ?", eventId)
-	DB.Exec("DELETE FROM active WHERE festival_id != ?", eventId)
 }
 
 func archiveEvent(eventId int) {
@@ -300,7 +292,7 @@ func UpdateRefreshToken(token models.RefreshToken) error {
 Update the Access token in the database, only expiresAt can be changed
 */
 func UpdateAccessToken(token models.AccessToken) error {
-	_, err := DB.Exec("UPDATE refresh_token SET expires_at = ? WHERE id = ?", token.ExpiresAt, token.Id)
+	_, err := DB.Exec("UPDATE access_token SET expires_at = ? WHERE id = ?", token.ExpiresAt, token.Id)
 	return err
 }
 
@@ -310,6 +302,9 @@ func CreateFestival(festival models.FestivalData) (int, error) {
 		return -1, err
 	}
 	id, err := result.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
 	_, err = DB.Exec("INSERT INTO event (created_at, last_used_at, festival_id, active) VALUES (?, ?, ?, ?)", festival.CreatedAt, festival.CreatedAt, id, 1)
 	if err != nil {
 		return -1, err
@@ -320,10 +315,7 @@ func CreateFestival(festival models.FestivalData) (int, error) {
 func IsNewFestivalCode(code string) bool {
 	var id int
 	err := DB.QueryRow("SELECT id FROM festival WHERE code = ?", code).Scan(id)
-	if err == sql.ErrNoRows {
-		return true
-	}
-	return false
+	return err == sql.ErrNoRows
 }
 
 func AddFestivalAccess(accessToken string, festival models.FestivalData) error {

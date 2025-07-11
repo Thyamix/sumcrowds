@@ -114,6 +114,11 @@ var (
 		Public:     "invalid pin",
 		Internal:   ErrInvalidPin,
 	}
+	APIErrFailedToHashPassword = &APIError{
+		StatusCode: http.StatusInternalServerError,
+		Public:     "internal server error",
+		Internal:   ErrFailedToHashPassword,
+	}
 )
 
 var (
@@ -140,4 +145,5 @@ var (
 	ErrAccessTokenCookieNotFound  = errors.New("access token cookie not found")
 	ErrRefreshTokenCookieNotFound = errors.New("refresh token cookie not found")
 	ErrInvalidPin                 = errors.New("invalid admin pin")
+	ErrFailedToHashPassword       = errors.New("failed to hash password")
 )

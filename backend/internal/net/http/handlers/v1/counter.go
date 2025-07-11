@@ -44,6 +44,10 @@ func CreateFestival(w http.ResponseWriter, r *http.Request) {
 
 	if festival.Password != "" {
 		festival.PasswordHash, err = argon2id.CreateHash(festival.Password, argon2id.DefaultParams)
+		if err != nil {
+			apperrors.SendError(w, apperrors.APIErrFailedToHashPassword)
+			return
+		}
 	} else {
 		festival.PasswordHash = ""
 	}
@@ -176,7 +180,7 @@ func GetAccess(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(r.Body, body, body.Password)
 
-	if allow, err := argon2id.ComparePasswordAndHash(body.Password, festival.PasswordHash); allow {
+	if allow, _ := argon2id.ComparePasswordAndHash(body.Password, festival.PasswordHash); allow {
 		err = database.AddFestivalAccess(accessCookie, *festival)
 		if err != nil {
 			log.Println(err)

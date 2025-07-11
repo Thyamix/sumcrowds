@@ -22,7 +22,7 @@ func ExportCsv(festivalCode string, eventId int, archived bool) error {
 		return apperrors.ErrInvalidFestivalCode
 	}
 
-	if database.IsValidEventId(eventId) {
+	if !database.IsValidEventId(eventId) {
 		return apperrors.ErrInvalidRequest
 	}
 

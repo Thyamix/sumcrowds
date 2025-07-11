@@ -27,6 +27,10 @@ func RequireAccessToken(next http.Handler) http.Handler {
 		}
 
 		accessToken, err := database.GetAccessToken(accessTokenValue)
+		if err != nil {
+			apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
+			return
+		}
 
 		valid, err := auth.CheckAccess(accessTokenValue)
 		if err != nil {
