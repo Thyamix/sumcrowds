@@ -24,7 +24,7 @@ func CreateFestival(w http.ResponseWriter, r *http.Request) {
 	accessTokenCookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
 		if err == http.ErrNoCookie {
-			apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
+			apperrors.SendError(w, apperrors.APIErrInvalidAccessToken(err))
 			log.Println("failed to read bytes", err)
 			return
 		}
@@ -32,32 +32,35 @@ func CreateFestival(w http.ResponseWriter, r *http.Request) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println("failed to read bytes", err)
-		apperrors.SendError(w, apperrors.APIErrInvalidRequest)
+		apperrors.SendError(w, apperrors.APIErrInvalidRequest(err))
 		return
 	}
 	err = json.Unmarshal(bodyBytes, &festival)
 	if err != nil {
 		log.Println("failed to unmarshal bytes", err)
-		apperrors.SendError(w, apperrors.APIErrInvalidJSON)
+		apperrors.SendError(w, apperrors.APIErrInvalidJSON(err))
 		return
 	}
 
 	if festival.Password != "" {
 		festival.PasswordHash, err = argon2id.CreateHash(festival.Password, argon2id.DefaultParams)
 		if err != nil {
-			apperrors.SendError(w, apperrors.APIErrFailedToHashPassword)
+			apperrors.SendError(w, apperrors.APIErrFailedToHashPassword(err))
 			return
 		}
 	} else {
 		festival.PasswordHash = ""
 	}
-	festival.CreatedAt = int(time.Now().Unix())
-	festival.ExpiresAt = int(time.Now().Add(time.Hour * 24 * 45).Unix())
-	festival.Code = getNewCode()
+	festival.CreatedAt = time.Now().Unix()
+	festival.Code, err = getNewCode()
+	if err != nil {
+		apperrors.SendError(w, apperrors.APIErrInternal(err))
+		return
+	}
 
 	id, err := database.CreateFestival(festival)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInternal)
+		apperrors.SendError(w, apperrors.APIErrInternal(err))
 		return
 	}
 	festival.Id = id
@@ -65,7 +68,7 @@ func CreateFestival(w http.ResponseWriter, r *http.Request) {
 	err = database.AddFestivalAccess(accessTokenCookie, festival)
 	if err != nil {
 		log.Println(err)
-		apperrors.SendError(w, apperrors.APIErrInternal)
+		apperrors.SendError(w, apperrors.APIErrInternal(err))
 		return
 	}
 
@@ -76,7 +79,7 @@ func CreateFestival(w http.ResponseWriter, r *http.Request) {
 
 	responseJson, err := json.Marshal(response)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrFailedMarshal)
+		apperrors.SendError(w, apperrors.APIErrFailedMarshal(err))
 		return
 	}
 
@@ -84,37 +87,41 @@ func CreateFestival(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseJson)
 }
 
-func getNewCode() string {
+func getNewCode() (string, error) {
 	result := make([]byte, 6)
 	charset := []byte("BCDFGHJKLMNPQRSTVWXZ2456789")
 	new := false
+	var err error
 	for !new {
 		for i := range result {
 			result[i] = charset[rand.Intn(len(charset))]
 		}
-		new = database.IsNewFestivalCode(string(result))
+		new, err = database.IsNewFestivalCode(string(result))
+		if err != nil {
+			return "", err
+		}
 	}
-	return string(result)
+	return string(result), nil
 
 }
 
 func GetTotalAndGauge(w http.ResponseWriter, r *http.Request) {
 	festival, err := database.GetFestival(r.PathValue("festivalCode"))
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode(err))
 		return
 	}
 
-	total, maxGauge, err := database.GetEventTotalAndMax(festival.Id)
+	total, maxGauge, err := database.GetTotalAndMax(festival.Code)
 	if err != nil {
 		log.Print(err)
-		apperrors.SendError(w, apperrors.APIErrFailedGetTotal)
+		apperrors.SendError(w, apperrors.APIErrFailedGetTotal(err))
 		return
 	}
 	totalJson, err := json.Marshal([]int{total, maxGauge})
 	if err != nil {
 		log.Print(err)
-		apperrors.SendError(w, apperrors.APIErrFailedMarshal)
+		apperrors.SendError(w, apperrors.APIErrFailedMarshal(err))
 		return
 	}
 
@@ -127,7 +134,7 @@ func GetTotalAndGauge(w http.ResponseWriter, r *http.Request) {
 func CheckAccess(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie(cookieutils.AccessTokenCookie)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrNoAccessToken)
+		apperrors.SendError(w, apperrors.APIErrNoAccessToken(err))
 	}
 	if r.Context().Value(contextkeys.FestivalAccess) == true {
 		w.WriteHeader(http.StatusOK)
@@ -135,12 +142,12 @@ func CheckAccess(w http.ResponseWriter, r *http.Request) {
 	} else {
 		festival, err := database.GetFestival(r.PathValue("festivalCode"))
 		if err != nil {
-			apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+			apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode(err))
 		}
 		if festival.PasswordHash == "" {
 			database.AddFestivalAccess(cookie.Value, *festival)
 		}
-		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
+		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess(err))
 	}
 }
 
@@ -152,20 +159,20 @@ func GetAccess(w http.ResponseWriter, r *http.Request) {
 	festival, err := database.GetFestival(r.PathValue("festivalCode"))
 	if err != nil {
 		log.Println("Failed to get festival")
-		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode(err))
 		return
 	}
 	accessCookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
 		log.Println("Failed to get access cookie")
-		apperrors.SendError(w, apperrors.APIErrNoAccessToken)
+		apperrors.SendError(w, apperrors.APIErrNoAccessToken(err))
 		return
 	}
 
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println("failed to read bytes", err)
-		apperrors.SendError(w, apperrors.APIErrInvalidRequest)
+		apperrors.SendError(w, apperrors.APIErrInvalidRequest(err))
 		return
 	}
 
@@ -174,7 +181,7 @@ func GetAccess(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(bodyBytes, &body)
 	if err != nil {
 		log.Println("failed to unmarshal bytes", err)
-		apperrors.SendError(w, apperrors.APIErrInvalidJSON)
+		apperrors.SendError(w, apperrors.APIErrInvalidJSON(err))
 		return
 	}
 
@@ -184,20 +191,20 @@ func GetAccess(w http.ResponseWriter, r *http.Request) {
 		err = database.AddFestivalAccess(accessCookie, *festival)
 		if err != nil {
 			log.Println(err)
-			apperrors.SendError(w, apperrors.APIErrInternal)
+			apperrors.SendError(w, apperrors.APIErrInternal(err))
 			return
 		}
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	apperrors.SendError(w, apperrors.APIErrInvalidPassword)
+	apperrors.SendError(w, apperrors.APIErrInvalidPassword(fmt.Errorf("invalid password")))
 }
 
 func CheckExists(w http.ResponseWriter, r *http.Request) {
 	festivalCode := r.PathValue("festivalCode")
 	_, err := database.GetFestival(festivalCode)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode(err))
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -207,53 +214,53 @@ func Inc(w http.ResponseWriter, r *http.Request) {
 	var valueChange models.ValueChange
 	festival, err := database.GetFestival(r.PathValue("festivalCode"))
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode(err))
 		return
 	}
 	cookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrNoAccessToken)
+		apperrors.SendError(w, apperrors.APIErrNoAccessToken(err))
 		return
 	}
 	accessToken, err := database.GetAccessToken(cookie)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
+		apperrors.SendError(w, apperrors.APIErrInvalidAccessToken(err))
 		return
 	}
 
 	if auth.CheckFestivalAccess(*festival, *accessToken) != nil {
-		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
+		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess(err))
 		return
 	}
 
 	bodyJson, err := io.ReadAll(r.Body)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidRequest)
+		apperrors.SendError(w, apperrors.APIErrInvalidRequest(err))
 		return
 	}
 
 	err = json.Unmarshal(bodyJson, &valueChange)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidJSON)
+		apperrors.SendError(w, apperrors.APIErrInvalidJSON(err))
 		return
 	}
 
 	amount := valueChange.Amount
 
 	if amount <= 0 || amount > 100 {
-		apperrors.SendError(w, apperrors.APIErrInvalidAmount)
+		apperrors.SendError(w, apperrors.APIErrInvalidAmount(fmt.Errorf("amount must be between 1 and 100")))
 		return
 	}
 
-	total, _, err := database.GetTotal(festival.Code)
+	total, _, err := database.GetTotalAndMax(festival.Code)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrFailedGetTotal)
+		apperrors.SendError(w, apperrors.APIErrFailedGetTotal(err))
 		return
 	}
 
 	err = database.AddValue(amount, festival.Code)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrFailedAddValue)
+		apperrors.SendError(w, apperrors.APIErrFailedAddValue(err))
 		return
 	}
 
@@ -268,52 +275,52 @@ func Dec(w http.ResponseWriter, r *http.Request) {
 	var valueChange models.ValueChange
 	festival, err := database.GetFestival(r.PathValue("festivalCode"))
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode(err))
 		return
 	}
 	cookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrNoAccessToken)
+		apperrors.SendError(w, apperrors.APIErrNoAccessToken(err))
 		return
 	}
 	accessToken, err := database.GetAccessToken(cookie)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
+		apperrors.SendError(w, apperrors.APIErrInvalidAccessToken(err))
 		return
 	}
 
 	if auth.CheckFestivalAccess(*festival, *accessToken) != nil {
-		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
+		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess(err))
 		return
 	}
 	bodyJson, err := io.ReadAll(r.Body)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidRequest)
+		apperrors.SendError(w, apperrors.APIErrInvalidRequest(err))
 		return
 	}
 
 	err = json.Unmarshal(bodyJson, &valueChange)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrInvalidJSON)
+		apperrors.SendError(w, apperrors.APIErrInvalidJSON(err))
 		return
 	}
 
 	amount := valueChange.Amount
 
 	if amount <= 0 || amount > 100 {
-		apperrors.SendError(w, apperrors.APIErrInvalidAmount)
+		apperrors.SendError(w, apperrors.APIErrInvalidAmount(fmt.Errorf("amount must be between 1 and 100")))
 		return
 	}
 
-	total, _, err := database.GetTotal(festival.Code)
+	total, _, err := database.GetTotalAndMax(festival.Code)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrFailedGetTotal)
+		apperrors.SendError(w, apperrors.APIErrFailedGetTotal(err))
 		return
 	}
 
 	err = database.AddValue(-amount, festival.Code)
 	if err != nil {
-		apperrors.SendError(w, apperrors.APIErrFailedAddValue)
+		apperrors.SendError(w, apperrors.APIErrFailedAddValue(err))
 		return
 	}
 

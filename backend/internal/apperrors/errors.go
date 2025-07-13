@@ -2,6 +2,7 @@ package apperrors
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -13,115 +14,192 @@ type APIError struct {
 
 //
 
-var (
-	APIErrInvalidAccessToken = &APIError{
+func APIErrInvalidAccessToken(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusUnauthorized,
 		Public:     "invalid access token",
-		Internal:   ErrInvalidAccessToken,
+		Internal:   fmt.Errorf("invalid access token: %w\n", err),
 	}
-	APIErrExpiredAccessToken = &APIError{
+}
+
+func APIErrExpiredAccessToken(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusUnauthorized,
 		Public:     "expired access token",
-		Internal:   ErrExpiredToken,
+		Internal:   fmt.Errorf("expired access token: %w\n", err),
 	}
-	APIErrNoAccessToken = &APIError{
+}
+
+func APIErrRevokedAccessToken(err error) *APIError {
+	return &APIError{
+		StatusCode: http.StatusUnauthorized,
+		Public:     "revoked access token",
+		Internal:   fmt.Errorf("revoked access token: %w\n", err),
+	}
+}
+
+func APIErrNoAccessToken(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusUnauthorized,
 		Public:     "no access token",
-		Internal:   ErrNoAccessToken,
+		Internal:   fmt.Errorf("no access token: %w\n", err),
 	}
-	APIErrInvalidRefreshToken = &APIError{
+}
+
+func APIErrInvalidRefreshToken(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusUnauthorized,
 		Public:     "invalid refresh token",
-		Internal:   ErrInvalidRefreshToken,
+		Internal:   fmt.Errorf("invalid refresh token: %w\n", err),
 	}
-	APIErrExpiredRefreshToken = &APIError{
+}
+
+func APIErrExpiredRefreshToken(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusUnauthorized,
 		Public:     "expired refresh token",
-		Internal:   ErrExpiredRefreshToken,
+		Internal:   fmt.Errorf("expired refresh token: %w\n", err),
 	}
-	APIErrNoRefreshToken = &APIError{
+}
+
+func APIErrNoRefreshToken(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusUnauthorized,
 		Public:     "no refresh token",
-		Internal:   ErrNoRefreshToken,
+		Internal:   fmt.Errorf("no refresh token: %w\n", err),
 	}
-	APIErrInvalidFestivalCode = &APIError{
+}
+
+func APIErrRevokedRefreshToken(err error) *APIError {
+	return &APIError{
+		StatusCode: http.StatusUnauthorized,
+		Public:     "revoked refresh token",
+		Internal:   fmt.Errorf("revoked refresh token: %w\n", err),
+	}
+}
+
+func APIErrInvalidFestivalCode(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusUnauthorized,
 		Public:     "invalid festival code",
-		Internal:   ErrInvalidFestivalCode,
+		Internal:   fmt.Errorf("invalid festival code: %w\n", err),
 	}
-	APIErrInternal = &APIError{
-		StatusCode: http.StatusInternalServerError,
-		Public:     "internal server error",
-		Internal:   errors.New("an unexpected internal error occurred"),
-	}
-	APIErrInvalidPassword = &APIError{
+}
+
+func APIErrInvalidPassword(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusForbidden,
 		Public:     "invalid password",
-		Internal:   ErrInvalidPassword,
+		Internal:   fmt.Errorf("invalid password: %w\n", err),
 	}
-	APIErrInvalidRequest = &APIError{
+}
+
+func APIErrInvalidRequest(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusBadRequest,
 		Public:     "invalid request",
-		Internal:   ErrInvalidRequest,
+		Internal:   fmt.Errorf("invalid request: %w\n", err),
 	}
-	APIErrInvalidJSON = &APIError{
+}
+
+func APIErrInvalidJSON(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusBadRequest,
 		Public:     "invalid json",
-		Internal:   ErrInvalidJSON,
+		Internal:   fmt.Errorf("invalid json: %w\n", err),
 	}
-	APIErrNoFestivalAccess = &APIError{
+}
+
+func APIErrNoFestivalAccess(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusForbidden,
 		Public:     "no access",
-		Internal:   ErrNoFestivalAccess,
+		Internal:   fmt.Errorf("no access: %w\n", err),
 	}
-	APIErrExpiredFestivalAccess = &APIError{
+}
+
+func APIErrExpiredFestivalAccess(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusForbidden,
 		Public:     "expired access",
-		Internal:   ErrExpiredFestivalAccess,
+		Internal:   fmt.Errorf("expired access: %w\n", err),
 	}
-	APIErrInvalidAmount = &APIError{
+}
+
+func APIErrInvalidAmount(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusBadRequest,
 		Public:     "amount must be between 1 and 100",
-		Internal:   ErrInvalidAmount,
+		Internal:   fmt.Errorf("amount must be between 1 and 100: %w\n", err),
 	}
-	APIErrMismatchedLengths = &APIError{
+}
+
+func APIErrMismatchedLengths(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusInternalServerError,
 		Public:     "internal server error",
-		Internal:   ErrMismatchedLengths,
+		Internal:   fmt.Errorf("mismatched lengths in archived event ids and times: %w\n", err),
 	}
-	APIErrFailedEncodeResponse = &APIError{
+}
+
+func APIErrFailedEncodeResponse(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusInternalServerError,
 		Public:     "internal server error",
-		Internal:   ErrFailedEncodeResponse,
+		Internal:   fmt.Errorf("failed to encode response as json: %w\n", err),
 	}
-	APIErrFailedMarshal = &APIError{
+}
+
+func APIErrFailedMarshal(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusInternalServerError,
 		Public:     "internal server error",
-		Internal:   ErrFailedMarshal,
+		Internal:   fmt.Errorf("failed to marshal json response: %w\n", err),
 	}
-	APIErrFailedAddValue = &APIError{
+}
+
+func APIErrFailedAddValue(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusInternalServerError,
 		Public:     "internal server error",
-		Internal:   ErrFailedAddValue,
+		Internal:   fmt.Errorf("failed to add value to database: %w\n", err),
 	}
-	APIErrFailedGetTotal = &APIError{
+}
+
+func APIErrFailedGetTotal(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusInternalServerError,
 		Public:     "internal server error",
-		Internal:   ErrFailedGetTotal,
+		Internal:   fmt.Errorf("failed to get total or maxGauge from database: %w\n", err),
 	}
-	APIErrInvalidPin = &APIError{
+}
+
+func APIErrInvalidPin(err error) *APIError {
+	return &APIError{
 		StatusCode: 422,
 		Public:     "invalid pin",
-		Internal:   ErrInvalidPin,
+		Internal:   fmt.Errorf("invalid pin: %w\n", err),
 	}
-	APIErrFailedToHashPassword = &APIError{
+}
+
+func APIErrFailedToHashPassword(err error) *APIError {
+	return &APIError{
 		StatusCode: http.StatusInternalServerError,
 		Public:     "internal server error",
-		Internal:   ErrFailedToHashPassword,
+		Internal:   fmt.Errorf("failed to hash password: %w\n", err),
 	}
-)
+}
+
+func APIErrFailedToResetFestival(err error) *APIError {
+	return &APIError{
+		StatusCode: http.StatusInternalServerError,
+		Public:     "internal server error",
+		Internal:   fmt.Errorf("failed to run reset on festival: %w\n", err),
+	}
+}
 
 var (
+	ErrFailedToResetFestival      = errors.New("failed to run reset on festival")
 	ErrExpiredToken               = errors.New("token expired")
 	ErrInvalidToken               = errors.New("token invalid")
 	ErrNoFestivalAccess           = errors.New("no access to resource")
@@ -146,4 +224,14 @@ var (
 	ErrRefreshTokenCookieNotFound = errors.New("refresh token cookie not found")
 	ErrInvalidPin                 = errors.New("invalid admin pin")
 	ErrFailedToHashPassword       = errors.New("failed to hash password")
+	ErrRevokedToken               = errors.New("token has been revoked")
 )
+
+func APIErrInternal(err error) *APIError {
+	internal := fmt.Errorf("internal error: %w\n", err)
+	return &APIError{
+		StatusCode: http.StatusInternalServerError,
+		Public:     "internal server error",
+		Internal:   internal,
+	}
+}

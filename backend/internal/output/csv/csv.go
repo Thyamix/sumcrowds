@@ -9,7 +9,7 @@ import (
 	"github.com/thyamix/festival-counter/internal/database"
 )
 
-func ExportCsv(festivalCode string, eventId int, archived bool) error {
+func ExportCsv(festivalCode string, eventId int64, archived bool) error {
 	_, err := os.Stat("./outputs")
 	if os.IsNotExist(err) {
 		os.Mkdir("./outputs", os.ModeDir|0755)
@@ -22,11 +22,15 @@ func ExportCsv(festivalCode string, eventId int, archived bool) error {
 		return apperrors.ErrInvalidFestivalCode
 	}
 
-	if !database.IsValidEventId(eventId) {
+	valid, err := database.IsValidEventId(eventId)
+	if err != nil {
+		return fmt.Errorf("failed to check id validity for event %v: %w", eventId, err)
+	}
+	if !valid {
 		return apperrors.ErrInvalidRequest
 	}
 
-	count := 0
+	count := int64(0)
 	file, err := os.Create(fmt.Sprintf("outputs/festival-%v-%v.csv", festivalCode, eventId))
 	if err != nil {
 		return apperrors.ErrFailedAddValue
@@ -37,7 +41,10 @@ func ExportCsv(festivalCode string, eventId int, archived bool) error {
 	var data [][]string
 
 	for more {
-		data, more = database.GetFestivalEventEntriesChunk(festival.Id, eventId, count, archived)
+		data, more, err = database.GetFestivalEventEntriesChunk(festival.Id, eventId, count, archived)
+		if err != nil {
+			return fmt.Errorf("failed to get festival %v event %v entries chunk %v: %w", festival.Id, eventId, count, err)
+		}
 		for row := range data {
 			if err := writer.Write(data[row]); err != nil {
 				return apperrors.ErrFailedAddValue

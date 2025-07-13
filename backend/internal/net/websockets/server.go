@@ -63,7 +63,7 @@ func (s *Server) Run() {
 }
 
 func BroadcastTotal(festivalCode string) error {
-	total, maxGauge, err := database.GetTotal(festivalCode)
+	total, maxGauge, err := database.GetTotalAndMax(festivalCode)
 	if err != nil {
 		log.Print(err)
 		return apperrors.ErrFailedGetTotal

@@ -1,24 +1,25 @@
 package models
 
 type AccessToken struct {
-	Id        int    `sql:"id"`
+	Id        int64  `sql:"id"`
 	Token     string `sql:"token"`
 	ExpiresAt int64  `sql:"expires_at"`
-	UserId    int    `sql:"user_id"`
+	UserId    int64  `sql:"user_id"`
+	Revoked   bool   `sql:"revoked"`
 }
 
 type RefreshToken struct {
-	Id         int    `sql:"id"`
-	Token      string `sql:"token"`
-	LastUsedAt int64  `sql:"last_used_at"`
-	ExpiresAt  int64  `sql:"expires_at"`
-	UserId     int    `sql:"user_id"`
-	Revoked    int    `sql:"revoked"`
+	Id        int64  `sql:"id"`
+	Token     string `sql:"token"`
+	ExpiresAt int64  `sql:"expires_at"`
+	UserId    int64  `sql:"user_id"`
+	Revoked   bool   `sql:"revoked"`
 }
 
 type FestivalAccess struct {
-	Id         int   `sql:"id"`
-	FestivalId int   `sql:"festival_id"`
-	UserId     int   `sql:"user_id"`
+	Id         int64 `sql:"id"`
+	FestivalId int64 `sql:"festival_id"`
+	UserId     int64 `sql:"user_id"`
 	LastUsedAt int64 `sql:"last_used_at"`
+	Revoked    bool  `sql:"revoked"`
 }

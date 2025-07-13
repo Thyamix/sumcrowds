@@ -4,17 +4,14 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"log"
 	"time"
 
+	"github.com/thyamix/festival-counter/internal/apperrors"
 	"github.com/thyamix/festival-counter/internal/database"
 	"github.com/thyamix/festival-counter/internal/models"
 )
-
-var ErrExpiredToken = errors.New("token expired")
-var ErrInvalidToken = errors.New("token invalid")
 
 func generateToken() (string, error) {
 	randomBytes := make([]byte, 32)
@@ -26,7 +23,7 @@ func generateToken() (string, error) {
 	return hex.EncodeToString(randomBytes), nil
 }
 
-func newAccessToken(userId int) (*models.AccessToken, error) {
+func newAccessToken(userId int64) (*models.AccessToken, error) {
 	expireTime := time.Now().Add(time.Minute * 15).Unix()
 	token, err := generateToken()
 	if err != nil {
@@ -40,8 +37,7 @@ func newAccessToken(userId int) (*models.AccessToken, error) {
 	}, nil
 }
 
-func newRefreshToken(userId int) (*models.RefreshToken, error) {
-	createdTime := time.Now().Unix()
+func newRefreshToken(userId int64) (*models.RefreshToken, error) {
 	expireTime := time.Now().Add(time.Hour * 24 * 30).Unix()
 	token, err := generateToken()
 	if err != nil {
@@ -49,11 +45,10 @@ func newRefreshToken(userId int) (*models.RefreshToken, error) {
 	}
 
 	return &models.RefreshToken{
-		Token:      token,
-		UserId:     userId,
-		LastUsedAt: createdTime,
-		ExpiresAt:  expireTime,
-		Revoked:    0,
+		Token:     token,
+		UserId:    userId,
+		ExpiresAt: expireTime,
+		Revoked:   false,
 	}, nil
 }
 
@@ -89,13 +84,13 @@ func CheckAccess(token string) (bool, error) {
 	accessToken, err := database.GetAccessToken(token)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return false, ErrInvalidToken
+			return false, apperrors.ErrInvalidToken
 		}
 		return false, err
 	}
 
 	if accessToken.ExpiresAt < time.Now().Unix() {
-		return false, ErrExpiredToken
+		return false, apperrors.ErrExpiredToken
 	}
 
 	return true, nil
@@ -105,14 +100,14 @@ func RefreshToken(token string) (*models.RefreshToken, *models.AccessToken, erro
 	refreshToken, err := database.GetRefreshToken(token)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil, ErrInvalidToken
+			return nil, nil, apperrors.ErrInvalidToken
 		}
 		log.Println("failed to get refresh token", err)
 		return nil, nil, err
 	}
 
 	if refreshToken.ExpiresAt < time.Now().Unix() {
-		return nil, nil, ErrExpiredToken
+		return nil, nil, apperrors.ErrExpiredToken
 	}
 
 	accessToken, err := newAccessToken(refreshToken.UserId)
@@ -128,7 +123,6 @@ func RefreshToken(token string) (*models.RefreshToken, *models.AccessToken, erro
 	}
 
 	refreshToken.ExpiresAt = time.Now().Add(time.Minute).Unix()
-	refreshToken.LastUsedAt = time.Now().Unix()
 
 	err = database.UpdateRefreshToken(*refreshToken)
 	if err != nil {

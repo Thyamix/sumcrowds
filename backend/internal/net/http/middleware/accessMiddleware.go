@@ -21,29 +21,33 @@ func RequireAccessToken(next http.Handler) http.Handler {
 		festivalCode := r.PathValue("festivalCode")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				apperrors.SendError(w, apperrors.APIErrNoAccessToken)
+				apperrors.SendError(w, apperrors.APIErrNoAccessToken(err))
 				return
 			}
 		}
 
 		accessToken, err := database.GetAccessToken(accessTokenValue)
 		if err != nil {
-			apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
+			apperrors.SendError(w, apperrors.APIErrInvalidAccessToken(err))
 			return
 		}
 
 		valid, err := auth.CheckAccess(accessTokenValue)
 		if err != nil {
-			if err == auth.ErrInvalidToken {
+			if err == apperrors.ErrInvalidToken {
 				log.Println(accessTokenValue)
-				apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
+				apperrors.SendError(w, apperrors.APIErrInvalidAccessToken(err))
 				return
 			}
-			if err == auth.ErrExpiredToken {
-				apperrors.SendError(w, apperrors.APIErrExpiredAccessToken)
+			if err == apperrors.ErrExpiredToken {
+				apperrors.SendError(w, apperrors.APIErrExpiredAccessToken(err))
 				return
 			}
-			apperrors.SendError(w, apperrors.APIErrInternal)
+			if err == apperrors.ErrRevokedToken {
+				apperrors.SendError(w, apperrors.APIErrRevokedAccessToken(err))
+				return
+			}
+			apperrors.SendError(w, apperrors.APIErrInternal(err))
 			return
 		}
 
@@ -70,7 +74,7 @@ func RequireAccessToken(next http.Handler) http.Handler {
 		if valid {
 			next.ServeHTTP(w, r)
 		} else {
-			apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
+			apperrors.SendError(w, apperrors.APIErrNoFestivalAccess(fmt.Errorf("no festival access")))
 			return
 		}
 	})
@@ -79,7 +83,7 @@ func RequireAccessToken(next http.Handler) http.Handler {
 func RequiresAdminPin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(contextkeys.FestivalAccess) == false {
-			apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
+			apperrors.SendError(w, apperrors.APIErrNoFestivalAccess(fmt.Errorf("no festival access")))
 			return
 		}
 
@@ -88,12 +92,12 @@ func RequiresAdminPin(next http.Handler) http.Handler {
 		festival, err := database.GetFestival(r.PathValue("festivalCode"))
 
 		if err != nil {
-			apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode)
+			apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode(err))
 			return
 		}
 
 		if pin != festival.Pin {
-			apperrors.SendError(w, apperrors.APIErrInvalidPin)
+			apperrors.SendError(w, apperrors.APIErrInvalidPin(fmt.Errorf("invalid pin")))
 			return
 		}
 		next.ServeHTTP(w, r)

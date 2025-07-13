@@ -15,23 +15,23 @@ func ValidateAccess(w http.ResponseWriter, r *http.Request) {
 	accessTokenCookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
 		if err == http.ErrNoCookie {
-			apperrors.SendError(w, apperrors.APIErrNoAccessToken)
+			apperrors.SendError(w, apperrors.APIErrNoAccessToken(err))
 			return
 		}
 	}
 
 	valid, err := auth.CheckAccess(accessTokenCookie)
 	if err != nil {
-		if err == auth.ErrInvalidToken {
+		if err == apperrors.ErrInvalidToken {
 			log.Println(accessTokenCookie)
-			apperrors.SendError(w, apperrors.APIErrInvalidAccessToken)
+			apperrors.SendError(w, apperrors.APIErrInvalidAccessToken(err))
 			return
 		}
-		if err == auth.ErrExpiredToken {
-			apperrors.SendError(w, apperrors.APIErrExpiredAccessToken)
+		if err == apperrors.ErrExpiredToken {
+			apperrors.SendError(w, apperrors.APIErrExpiredAccessToken(err))
 			return
 		}
-		apperrors.SendError(w, apperrors.APIErrInternal)
+		apperrors.SendError(w, apperrors.APIErrInternal(err))
 		return
 	}
 
@@ -41,14 +41,14 @@ func ValidateAccess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apperrors.SendError(w, apperrors.APIErrNoFestivalAccess)
+	apperrors.SendError(w, apperrors.APIErrNoFestivalAccess(fmt.Errorf("no festival access")))
 }
 
 func RefreshAccess(w http.ResponseWriter, r *http.Request) {
 	refreshTokenCookie, err := cookieutils.GetRefreshToken(r)
 	if err != nil {
 		if err == http.ErrNoCookie {
-			apperrors.SendError(w, apperrors.APIErrNoRefreshToken)
+			apperrors.SendError(w, apperrors.APIErrNoRefreshToken(err))
 			return
 		}
 	}
@@ -57,7 +57,7 @@ func RefreshAccess(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Failed to refresh token", err)
-		apperrors.SendError(w, apperrors.APIErrInternal)
+		apperrors.SendError(w, apperrors.APIErrInternal(err))
 		return
 	}
 

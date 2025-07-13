@@ -6,21 +6,21 @@ type Response struct {
 }
 
 type FestivalData struct {
-	Id           int    `sql:"id"`
+	Id           int64  `sql:"id"`
 	Code         string `sql:"code"`
 	Pin          string `sql:"pin" json:"pin"`
 	Password     string `json:"password"`
 	PasswordHash string `sql:"password"`
-	CreatedAt    int    `sql:"created_at"`
-	ExpiresAt    int    `sql:"expires_at"`
+	CreatedAt    int64  `sql:"created_at"`
+	LastUsedAt   int64  `sql:"last_used_at"`
 }
 
 type Event struct {
-	Id         int `sql:"id"`
-	FestivalId int `sql:"festival_id"`
-	CreatedAt  int `sql:"created_at"`
-	LastUsedAt int `sql:"last_used_at"`
-	Active     int `sql:"active"`
+	Id         int64 `sql:"id"`
+	FestivalId int64 `sql:"festival_id"`
+	CreatedAt  int64 `sql:"created_at"`
+	LastUsedAt int64 `sql:"last_used_at"`
+	Active     bool  `sql:"active"`
 }
 
 type ValueChange struct {
