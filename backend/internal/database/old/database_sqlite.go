@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/thyamix/festival-counter/internal/models"
 )
 
