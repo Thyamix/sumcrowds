@@ -8,8 +8,6 @@ services:
     restart: unless-stopped
     networks:
       - dev_network
-    volumes:
-      - dev_backend_data:/app/data 
 
   frontend_devapp:
     build:
@@ -39,6 +37,3 @@ services:
 networks:
   dev_network:
     driver: bridge
-
-volumes:
-  dev_backend_data:
