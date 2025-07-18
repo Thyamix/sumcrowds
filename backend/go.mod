@@ -1,6 +1,8 @@
 module github.com/thyamix/festival-counter
 
-go 1.22.2
+go 1.23.0
+
+toolchain go1.24.5
 
 require (
 	github.com/alexedwards/argon2id v1.0.0

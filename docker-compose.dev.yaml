@@ -2,7 +2,7 @@ services:
   backend_devapp:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     env_file:
       - back.env.dev
     restart: unless-stopped
