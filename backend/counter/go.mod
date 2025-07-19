@@ -1,4 +1,4 @@
-module github.com/thyamix/festival-counter
+module github.com/thyamix/sumcrowds/backend/counter
 
 go 1.23.0
 

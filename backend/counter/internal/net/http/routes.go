@@ -3,9 +3,9 @@ package http
 import (
 	"net/http"
 
-	api_handler_v1 "github.com/thyamix/festival-counter/internal/net/http/handlers/v1"
-	"github.com/thyamix/festival-counter/internal/net/http/middleware"
-	"github.com/thyamix/festival-counter/internal/net/websockets"
+	api_handler_v1 "github.com/thyamix/sumcrowds/backend/counter/internal/net/http/handlers/v1"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http/middleware"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/websockets"
 )
 
 func getRoutes(wsServer *websockets.Server) *http.ServeMux {

@@ -8,9 +8,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/thyamix/festival-counter/internal/apperrors"
-	"github.com/thyamix/festival-counter/internal/database"
-	"github.com/thyamix/festival-counter/internal/models"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/models"
 )
 
 func generateToken() (string, error) {

@@ -10,13 +10,13 @@ import (
 	"time"
 
 	"github.com/alexedwards/argon2id"
-	"github.com/thyamix/festival-counter/internal/apperrors"
-	"github.com/thyamix/festival-counter/internal/auth"
-	"github.com/thyamix/festival-counter/internal/contextkeys"
-	"github.com/thyamix/festival-counter/internal/database"
-	"github.com/thyamix/festival-counter/internal/models"
-	"github.com/thyamix/festival-counter/internal/net/http/cookieutils"
-	"github.com/thyamix/festival-counter/internal/net/websockets"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/auth"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/contextkeys"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/models"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http/cookieutils"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/websockets"
 )
 
 func CreateFestival(w http.ResponseWriter, r *http.Request) {

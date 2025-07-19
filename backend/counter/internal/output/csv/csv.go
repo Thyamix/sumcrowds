@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/thyamix/festival-counter/internal/apperrors"
-	"github.com/thyamix/festival-counter/internal/database"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
 )
 
 func ExportCsv(festivalCode string, eventId int64, archived bool) error {

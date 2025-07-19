@@ -1,7 +1,8 @@
 frontend/.env
 frontend/node_modules/
-backend/.env
-backend/data/
-backend/outputs/
-backend/tmp/
+backend/*/.env
+backend/*/data/*
+backend/*/outputs/*
+*/.env
+*tmp/*
 *.env.*

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/thyamix/festival-counter/internal/models"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/models"
 )
 
 func GetFestival(festivalCode string) (*models.FestivalData, error) {

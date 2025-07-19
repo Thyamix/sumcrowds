@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/thyamix/festival-counter/internal/apperrors"
-	"github.com/thyamix/festival-counter/internal/contextkeys"
-	"github.com/thyamix/festival-counter/internal/database"
-	"github.com/thyamix/festival-counter/internal/net/http/cookieutils"
-	csvOutput "github.com/thyamix/festival-counter/internal/output/csv"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/contextkeys"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http/cookieutils"
+	csvOutput "github.com/thyamix/sumcrowds/backend/counter/internal/output/csv"
 )
 
 func GetArchivedCSV(w http.ResponseWriter, r *http.Request) {

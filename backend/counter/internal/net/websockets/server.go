@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/thyamix/festival-counter/internal/apperrors"
-	"github.com/thyamix/festival-counter/internal/database"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
 )
 
 type Server struct {

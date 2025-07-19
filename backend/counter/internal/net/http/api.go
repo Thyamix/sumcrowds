@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/rs/cors"
-	"github.com/thyamix/festival-counter/internal/net/websockets"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/websockets"
 )
 
 func StartAPI() {

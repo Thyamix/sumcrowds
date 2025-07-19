@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/thyamix/festival-counter/internal/apperrors"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
 )
 
 const (

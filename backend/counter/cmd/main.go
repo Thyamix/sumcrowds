@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/joho/godotenv"
-	"github.com/thyamix/festival-counter/internal/database"
-	"github.com/thyamix/festival-counter/internal/net/http"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http"
 	"log"
 )
 

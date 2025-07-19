@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
-	"github.com/thyamix/festival-counter/internal/apperrors"
-	"github.com/thyamix/festival-counter/internal/models"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/models"
 )
 
 type Client struct {

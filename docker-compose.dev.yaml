@@ -9,6 +9,16 @@ services:
     networks:
       - dev_network
 
+  cleanup:
+    build:
+      context: ./cleanup
+      dockerfile: Dockerfile
+    env_file:
+      - cleanup.env.dev
+    restart: unless-stopped
+    networks:
+      - dev_network
+
   frontend_devapp:
     build:
       context: ./frontend
