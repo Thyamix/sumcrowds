@@ -1,7 +1,7 @@
 services:
-  backend_app:
+  backend_counter_app:
     build:
-      context: ./backend
+      context: ./backend/counter
       dockerfile: Dockerfile
     env_file:
       - back.env.prod
@@ -30,7 +30,7 @@ services:
     networks:
       - prod_network
     depends_on:
-      - backend_app
+      - backend_counter_app
       - frontend_app
     command: ["nginx", "-g", "daemon off;"]
 

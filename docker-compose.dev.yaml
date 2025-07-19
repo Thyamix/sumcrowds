@@ -1,20 +1,10 @@
 services:
-  backend_devapp:
+  backend_counter_devapp:
     build:
-      context: ./backend
+      context: ./backend/counter
       dockerfile: Dockerfile
     env_file:
       - back.env.dev
-    restart: unless-stopped
-    networks:
-      - dev_network
-
-  cleanup:
-    build:
-      context: ./cleanup
-      dockerfile: Dockerfile
-    env_file:
-      - cleanup.env.dev
     restart: unless-stopped
     networks:
       - dev_network
@@ -40,7 +30,7 @@ services:
     networks:
       - dev_network
     depends_on:
-      - backend_devapp
+      - backend_counter_devapp
       - frontend_devapp
     command: ["nginx", "-g", "daemon off;"]
 
