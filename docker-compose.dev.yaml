@@ -1,8 +1,8 @@
 services:
   backend_counter_devapp:
     build:
-      context: ./backend/counter
-      dockerfile: Dockerfile
+      context: ./backend/
+      dockerfile: ./counter/Dockerfile
     env_file:
       - back.env.dev
     restart: unless-stopped
@@ -11,8 +11,8 @@ services:
 
   backend_cleanup_devapp:
     build:
-      context: ./backend/cleanup
-      dockerfile: Dockerfile
+      context: ./backend/
+      dockerfile: ./cleanup/Dockerfile
     env_file:
       - cleanup.env.dev
     restart: unless-stopped

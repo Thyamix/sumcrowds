@@ -1,18 +1,14 @@
-FROM golang:1.22-alpine AS builder
-
-ENV CGO_ENABLED=0 \
-    GOOS=linux
-
+FROM golang:1.24.5-alpine AS builder
 
 RUN apk add --no-cache build-base
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY . .
+
+WORKDIR /app/counter
 
 RUN go mod download
-
-COPY . .
 
 RUN go build -o go-backend -ldflags="-s -w" ./cmd/main.go
 
@@ -20,8 +16,7 @@ FROM alpine:3.20
 
 WORKDIR /app
 
-COPY --from=builder /app/go-backend .
-COPY --from=builder /app/static ./static
+COPY --from=builder /app/counter/go-backend .
 
 RUN chmod +x /app/go-backend
 

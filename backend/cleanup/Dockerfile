@@ -1,16 +1,25 @@
-FROM golang:1.22-alpine AS builder
-WORKDIR /build
-COPY . .
-RUN go build -o cleanup
+FROM golang:1.24.5-alpine AS builder
 
-FROM alpine:3.19
-RUN apk add --no-cache cron
+RUN apk add --no-cache build-base
+
 WORKDIR /app
-COPY --from=builder /build/cleanup /app/cleanup
 
-COPY cleanup-crontab /etc/crontabs/root
+COPY . .
 
-COPY start-cron.sh /app/start-cron.sh
-RUN chmod +x /app/start-cron.sh
+WORKDIR /app/cleanup
 
-ENTRYPOINT ["/app/start-cron.sh"]
+RUN go mod download
+
+RUN go build -o go-cleanup -ldflags="-s -w" ./cmd/main.go
+
+FROM alpine:3.20
+
+WORKDIR /app
+
+COPY --from=builder /app/cleanup/go-cleanup .
+
+RUN chmod +x /app/go-cleanup
+
+EXPOSE 8080
+
+CMD ["./go-cleanup"]
