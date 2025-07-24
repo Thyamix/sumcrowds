@@ -17,10 +17,11 @@ import (
 	"github.com/thyamix/sumcrowds/backend/counter/internal/models"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http/cookieutils"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/net/websockets"
+	counterModels "github.com/thyamix/sumcrowds/backend/sharedlib/models"
 )
 
 func CreateFestival(w http.ResponseWriter, r *http.Request) {
-	var festival models.FestivalData
+	var festival counterModels.FestivalData
 	accessTokenCookie, err := cookieutils.GetAccessToken(r)
 	if err != nil {
 		if err == http.ErrNoCookie {

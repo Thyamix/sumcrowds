@@ -4,14 +4,14 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
-	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http"
 	db "github.com/thyamix/sumcrowds/backend/sharedlib/database"
+	"github.com/thyamix/sumcrowds/cleanup/internal/cleanup"
 )
 
 func main() {
 	getEnv()
 	db.InitDB()
-	http.StartAPI()
+	cleanup.Clean()
 }
 
 func getEnv() {

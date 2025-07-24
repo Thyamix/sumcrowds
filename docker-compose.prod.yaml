@@ -9,6 +9,17 @@ services:
     networks:
       - prod_network
 
+  backend_cleanup_app:
+    build:
+      context: ./backend/cleanup
+      dockerfile: Dockerfile
+    env_file:
+      - cleanup.env.prod
+    restart: unless-stopped
+    networks:
+      - prod_network
+
+
   frontend_app:
     build:
       context: ./frontend

@@ -1,8 +1,9 @@
-package database
+package db
 
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +11,9 @@ import (
 
 	"github.com/lib/pq"
 )
+
+//go:embed init.sql
+var InitSQL string
 
 var DB *sql.DB
 
@@ -48,13 +52,7 @@ func InitDB() {
 }
 
 func initTables() error {
-
-	sqlBytes, err := os.ReadFile("static/init.sql")
-	if err != nil {
-		return fmt.Errorf("failed to read init.sql: %v", err)
-	}
-
-	_, err = DB.Exec(string(sqlBytes))
+	_, err := DB.Exec(InitSQL)
 	if err != nil {
 		if pgErr, ok := err.(*pq.Error); ok {
 			return fmt.Errorf("PostgreSQL error during initTables: Code=%s, Detail=%s, %w", pgErr.Code.Name(), pgErr.Detail, err)

@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/thyamix/sumcrowds/backend/counter/internal/models"
+	db "github.com/thyamix/sumcrowds/backend/sharedlib/database"
+	counterModels "github.com/thyamix/sumcrowds/backend/sharedlib/models"
 )
 
-func GetFestival(festivalCode string) (*models.FestivalData, error) {
-	var festival models.FestivalData
-	err := DB.QueryRow("SELECT id, last_used_at, created_at, pin, password, code FROM festival WHERE code = $1", festivalCode).Scan(
+func GetFestival(festivalCode string) (*counterModels.FestivalData, error) {
+	var festival counterModels.FestivalData
+	err := db.DB.QueryRow("SELECT id, last_used_at, created_at, pin, password, code FROM festival WHERE code = $1", festivalCode).Scan(
 		&festival.Id,
 		&festival.LastUsedAt,
 		&festival.CreatedAt,
@@ -24,8 +25,8 @@ func GetFestival(festivalCode string) (*models.FestivalData, error) {
 	return &festival, nil
 }
 
-func CreateFestival(festival models.FestivalData) (int64, error) {
-	tx, err := DB.BeginTx(context.Background(), nil)
+func CreateFestival(festival counterModels.FestivalData) (int64, error) {
+	tx, err := db.DB.BeginTx(context.Background(), nil)
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction for create festival: %w", err)
 	}
@@ -72,7 +73,7 @@ func CreateFestival(festival models.FestivalData) (int64, error) {
 
 func IsNewFestivalCode(code string) (bool, error) {
 	var id int
-	err := DB.QueryRow("SELECT id FROM festival WHERE code = $1 LIMIT 1", code).Scan(&id)
+	err := db.DB.QueryRow("SELECT id FROM festival WHERE code = $1 LIMIT 1", code).Scan(&id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return true, nil
@@ -80,4 +81,13 @@ func IsNewFestivalCode(code string) (bool, error) {
 		return false, fmt.Errorf("failed to check for event with code %v: %w", code, err)
 	}
 	return false, nil
+}
+
+func UpdateFestivalLastUsedAt(festival *counterModels.FestivalData) error {
+	time := time.Now().Unix()
+	_, err := db.DB.Exec("UPDATE festival SET last_used_at = $1 WHERE id = $2", time, festival.Id)
+	if err != nil {
+		return fmt.Errorf("failed to update last_used_at for festival: %v: %w", festival.Code, err)
+	}
+	return nil
 }

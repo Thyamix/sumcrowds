@@ -10,7 +10,7 @@ import (
 
 	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
-	"github.com/thyamix/sumcrowds/backend/counter/internal/models"
+	counterModels "github.com/thyamix/sumcrowds/backend/sharedlib/models"
 )
 
 func generateToken() (string, error) {
@@ -23,28 +23,28 @@ func generateToken() (string, error) {
 	return hex.EncodeToString(randomBytes), nil
 }
 
-func newAccessToken(userId int64) (*models.AccessToken, error) {
+func newAccessToken(userId int64) (*counterModels.AccessToken, error) {
 	expireTime := time.Now().Add(time.Minute * 15).Unix()
 	token, err := generateToken()
 	if err != nil {
 		return nil, err
 	}
 
-	return &models.AccessToken{
+	return &counterModels.AccessToken{
 		UserId:    userId,
 		ExpiresAt: expireTime,
 		Token:     token,
 	}, nil
 }
 
-func newRefreshToken(userId int64) (*models.RefreshToken, error) {
-	expireTime := time.Now().Add(time.Hour * 24 * 30).Unix()
+func newRefreshToken(userId int64) (*counterModels.RefreshToken, error) {
+	expireTime := time.Now().Add(time.Hour * 24 * 14).Unix()
 	token, err := generateToken()
 	if err != nil {
 		return nil, err
 	}
 
-	return &models.RefreshToken{
+	return &counterModels.RefreshToken{
 		Token:     token,
 		UserId:    userId,
 		ExpiresAt: expireTime,
@@ -52,7 +52,7 @@ func newRefreshToken(userId int64) (*models.RefreshToken, error) {
 	}, nil
 }
 
-func NewAuth() (*models.RefreshToken, *models.AccessToken, error) {
+func NewAuth() (*counterModels.RefreshToken, *counterModels.AccessToken, error) {
 	userId, err := database.CreateUser()
 	if err != nil {
 		return nil, nil, err
@@ -90,13 +90,14 @@ func CheckAccess(token string) (bool, error) {
 	}
 
 	if accessToken.ExpiresAt < time.Now().Unix() {
+		go database.DeleteAccessToken(token)
 		return false, apperrors.ErrExpiredToken
 	}
 
 	return true, nil
 }
 
-func RefreshToken(token string) (*models.RefreshToken, *models.AccessToken, error) {
+func RefreshToken(token string) (*counterModels.RefreshToken, *counterModels.AccessToken, error) {
 	refreshToken, err := database.GetRefreshToken(token)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -107,6 +108,7 @@ func RefreshToken(token string) (*models.RefreshToken, *models.AccessToken, erro
 	}
 
 	if refreshToken.ExpiresAt < time.Now().Unix() {
+		go database.DeleteRefreshToken(token)
 		return nil, nil, apperrors.ErrExpiredToken
 	}
 
@@ -122,7 +124,8 @@ func RefreshToken(token string) (*models.RefreshToken, *models.AccessToken, erro
 		return nil, nil, err
 	}
 
-	refreshToken.ExpiresAt = time.Now().Add(time.Minute).Unix()
+	refreshToken.ExpiresAt = time.Now().Add(time.Hour * 24).Unix()
+	refreshToken.Revoked = true
 
 	err = database.UpdateRefreshToken(*refreshToken)
 	if err != nil {
@@ -143,7 +146,7 @@ func RefreshToken(token string) (*models.RefreshToken, *models.AccessToken, erro
 	return newRefreshToken, accessToken, nil
 }
 
-func CheckFestivalAccess(festival models.FestivalData, accessToken models.AccessToken) error {
+func CheckFestivalAccess(festival counterModels.FestivalData, accessToken counterModels.AccessToken) error {
 	_, err := CheckAccess(accessToken.Token)
 
 	if err != nil {

@@ -74,10 +74,26 @@ CREATE TABLE IF NOT EXISTS festival_access (
 		);
 
 CREATE INDEX IF NOT EXISTS idx_festival_code ON festival (code);
+CREATE INDEX IF NOT EXISTS idx_festival_last_used_at ON festival (last_used_at);
+
 CREATE INDEX IF NOT EXISTS idx_event_festival_id ON event (festival_id);
 CREATE INDEX IF NOT EXISTS idx_event_active ON event (active);
+CREATE INDEX IF NOT EXISTS idx_event_last_used_at ON event (last_used_at);
+
 CREATE INDEX IF NOT EXISTS idx_active_event_id ON active (event_id);
+
+CREATE INDEX IF NOT EXISTS idx_archived_event_id ON archive (event_id);
+
 CREATE INDEX IF NOT EXISTS idx_gauge_max_event_id_time ON gauge_max (event_id, time DESC);
+
 CREATE INDEX IF NOT EXISTS idx_refresh_token_user_id ON refresh_token (user_id);
+CREATE INDEX IF NOT EXISTS idx_refresh_token_token ON refresh_token (token);
+CREATE INDEX IF NOT EXISTS idx_refresh_token_expires_at ON refresh_token (expires_at);
+
 CREATE INDEX IF NOT EXISTS idx_access_token_user_id ON access_token (user_id);
-CREATE INDEX IF NOT EXISTS idx_festival_access_user_id_festival_id ON festival_access (user_id, festival_id);
+CREATE INDEX IF NOT EXISTS idx_access_token_token ON access_token (token);
+CREATE INDEX IF NOT EXISTS idx_access_token_expires_at ON access_token (expires_at);
+
+CREATE INDEX IF NOT EXISTS idx_festival_access_festival_id ON festival_access (festival_id);
+CREATE INDEX IF NOT EXISTS idx_festival_access_user_id ON festival_access (user_id);
+CREATE INDEX IF NOT EXISTS idx_festival_access_last_used_at ON festival_access (last_used_at);
