@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { auth, fetchWithAuth } from "../utils/auth"
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 /** @type {string} */
 const APIURL = import.meta.env.VITE_APIURL;
@@ -17,6 +18,8 @@ export function CreatePopup({ close }) {
   const [pinInputValue, setPinInputValue] = useState("")
   /** @type {[boolean, () => null]} */
   const [showPassword, setShowPassword] = useState(false);
+
+  const { t } = useTranslation()
 
   const navigate = useNavigate()
   /** 
@@ -72,7 +75,7 @@ export function CreatePopup({ close }) {
         <button className="create-close-button" onClick={close}>
           <b>×</b>
         </button>
-        <div className="create-header">Create</div>
+        <div className="create-header">{t("createpopup_header")}</div>
         <div className="create-spacer" />
         <form className="create-form">
           <input
@@ -91,7 +94,7 @@ export function CreatePopup({ close }) {
               name="pin"
               value={pinInputValue}
               onChange={handlePinInputValue}
-              placeholder="Admin PIN"
+              placeholder={t("createpopup_admin_pin")}
               className="create-input"
             />
           </div>
@@ -105,7 +108,7 @@ export function CreatePopup({ close }) {
               name="password"
               value={passwordInputValue}
               onChange={handlePasswordInputValue}
-              placeholder="Password"
+              placeholder={t("createpopup_password")}
               className="create-input"
             />
           </div>
@@ -118,7 +121,7 @@ export function CreatePopup({ close }) {
                 onChange={togglePasswordVisibility}
                 name="show-password"
               />
-              <span className="create-checkbox-text">Show Password</span>
+              <span className="create-checkbox-text">{t("createpopup_show_password")}</span>
             </label>
           </div>
         </form>
@@ -127,7 +130,7 @@ export function CreatePopup({ close }) {
           className="create-button create-button--large create-button--primary"
           onClick={handleCreate}
         >
-          Create Session
+          {t("createpopup_confirm")}
         </button>
       </div>
     </div>

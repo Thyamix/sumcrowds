@@ -8,6 +8,14 @@
 	"home_create_button": "Nouvelle Session",
 	"home_welcome": "Bienvenue",
 
+	"admin_title": "Panneau d'administration",
+	"admin_max_gauge": "Jauge maximale",
+	"admin_set_gauge": "Définir la Jauge",
+	"admin_current_event": "Événement en cours",
+	"admin_archived_data": "Données archivées",
+	"admin_archive": "Archiver",
+	"admin_get_csv": "Obtenir CSV",
+
 	"pwpopup_header": "Entrer mot de passe",
 	"pwpopup_alert": "Mot de passe incorrect",
 	"pwpopup_password": "Mot de passe",

@@ -8,6 +8,14 @@
 	"home_create_button": "Create Session",
 	"home_welcome": "Welcome",
 
+	"admin_title": "Admin Panel",
+	"admin_max_gauge": "Max Gauge",
+	"admin_set_gauge": "Set Gauge",
+	"admin_current_event": "Current Event",
+	"admin_archived_data": "Archived Data",
+	"admin_archive": "Archive",
+	"admin_get_csv": "Get CSV",
+
 	"pwpopup_header": "Enter Password",
 	"pwpopup_alert": "Invalid password",
 	"pwpopup_password": "Password",
@@ -23,5 +31,11 @@
 	"joinpopup_header": "Join",
 	"joinpopup_alert": "Invalid code",
 	"joinpopup_enter_code": "Enter session code",
-	"joinpopup_confirm": "Join Session"
+	"joinpopup_confirm": "Join Session",
+	
+	"createpopup_header": "Créer",
+	"createpopup_admin_pin": "Code Admin",
+	"createpopup_password": "Mot de passe",
+	"createpopup_show_password": "Afficher le mot de passe",
+	"createpopup_confirm": "Créer une session"
 }

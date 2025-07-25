@@ -5,6 +5,8 @@ import { fetchWithAuth } from '../utils/auth';
 import { EnterPin } from '../components/enterPin';
 import HomeIcon from '../assets/home.svg?react';
 import BackIcon from '../assets/back.svg?react';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../components/languageSwitcher';
 
 /** @type {string} */
 const APIURL = import.meta.env.VITE_APIURL;
@@ -72,6 +74,8 @@ function FestivalAdminPage() {
   /** @type {[string, () => null]} */
   const [inputValue, setInputValue] = useState("")
 
+  const { t } = useTranslation()
+
   const { festivalCode } = useParams()
 
   /** 
@@ -113,12 +117,13 @@ function FestivalAdminPage() {
   return (
     <div className='admin-page'>
       <div className="admin-main-container">
+        <LanguageSwitcher />
         <div className="counter-info-bar">
           <Link to="/home" className="corner-button corner-button--left">
             <HomeIcon className="corner-icon" />
           </Link>
           <div className='admin-header'>
-            Admin Panel
+            {t("admin_title")}
           </div>
           <Link to={`/${festivalCode}`} className="corner-button corner-button--right">
             <BackIcon className="corner-icon" />
@@ -133,14 +138,14 @@ function FestivalAdminPage() {
               name='maxGauge'
               value={inputValue}
               onChange={handleInputValue}
-              placeholder='Max Gauge'
+              placeholder={t("admin_max_gauge")}
               className='admin-input'
             />
             <button
               className='admin-button admin-button--primary admin-button--large'
               onClick={handleClick}
             >
-              Set Gauge
+              {t("admin_set_gauge")}
             </button>
           </div>
 
@@ -148,20 +153,20 @@ function FestivalAdminPage() {
 
           <div className='admin-section'>
             <div className='admin-section-title'>
-              Current Event
+              {t("admin_current_event")}
             </div>
             <div className="admin-button-group">
               <button
                 className='admin-button admin-button--danger admin-button--small'
                 onClick={onArchivePressed}
               >
-                Archive
+                {t("admin_archive")}
               </button>
               <a
                 href={APIURL + "v1/festival/" + festivalCode + "/admin/download/activecsv"}
                 className='admin-button admin-button--success admin-button--small'
               >
-                Get CSV
+                {t("admin_get_csv")}
               </a>
             </div>
           </div>
@@ -221,7 +226,7 @@ function FestivalAdminPage() {
     return (
       <div className='archive-section'>
         <div className='archive-header'>
-          Archived Data
+          {t("admin_archived_data")}
         </div>
         <div className='archive-divider' />
         <div className='archive-list'>
