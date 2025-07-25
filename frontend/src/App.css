@@ -19,7 +19,6 @@
 
 /* Header */
 .admin-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 24px 32px;
   font-size: 48px;
@@ -236,11 +235,6 @@
   .admin-form,
   .archive-section {
     padding: 20px;
-  }
-  
-  .admin-header {
-    padding: 20px;
-    font-size: 40px;
   }
   
   .admin-button-group {
