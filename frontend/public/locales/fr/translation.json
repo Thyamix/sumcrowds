@@ -31,6 +31,12 @@
 	"joinpopup_header": "Rejoindre",
 	"joinpopup_alert": "Code incorrect",
 	"joinpopup_enter_code": "Entrer code de session",
-	"joinpopup_confirm": "Rejoindre session"
+	"joinpopup_confirm": "Rejoindre session",
+	
+	"createpopup_header": "Créer",
+	"createpopup_admin_pin": "Code Admin",
+	"createpopup_password": "Mot de passe",
+	"createpopup_show_password": "Afficher le mot de passe",
+	"createpopup_confirm": "Créer une session"
 }
 

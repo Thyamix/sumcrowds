@@ -33,9 +33,10 @@
 	"joinpopup_enter_code": "Enter session code",
 	"joinpopup_confirm": "Join Session",
 	
-	"createpopup_header": "Créer",
-	"createpopup_admin_pin": "Code Admin",
-	"createpopup_password": "Mot de passe",
-	"createpopup_show_password": "Afficher le mot de passe",
-	"createpopup_confirm": "Créer une session"
+	"createpopup_header": "Create",
+	"createpopup_admin_pin": "Admin Pin",
+	"createpopup_password": "Password",
+	"createpopup_show_password": "Show Password",
+	"createpopup_confirm": "Create Session"
+
 }
