@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http"
@@ -15,8 +16,10 @@ func main() {
 }
 
 func getEnv() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("No .env file found (set APP_DEPLOY to 'docker' if deployed with docker)")
+	if os.Getenv("APP_DEPLOY") != "docker" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Println("No .env file found (set APP_DEPLOY to 'docker' if deployed with docker)")
+		}
 	}
 }

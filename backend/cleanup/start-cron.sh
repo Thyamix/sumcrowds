@@ -1,5 +1,9 @@
 #!/bin/sh
 
-crond
+mkdir -p /var/log
 
-tail -f /var/log/cleanup.log
+touch /var/log/cleanup.log
+
+crond -l 2 -f &
+
+tail -F /var/log/cleanup.log
