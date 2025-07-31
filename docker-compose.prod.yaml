@@ -25,8 +25,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
       args:
-        VITE_APIURL: "https://sumcrowds.com/api/"
-        VITE_WSURL: "wss://sumcrowds.com/ws/"
+        VITE_APIURL: "https://app.sumcrowds.com/api/"
+        VITE_WSURL: "wss://app.sumcrowds.com/ws/"
     restart: unless-stopped
     networks:
       - prod_network

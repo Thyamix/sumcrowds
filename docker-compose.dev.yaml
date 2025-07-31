@@ -24,8 +24,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.dev
       args:
-        VITE_APIURL: "https://testing.sumcrowds.com/api/"
-        VITE_WSURL: "wss://testing.sumcrowds.com/ws/"
+        VITE_APIURL: "https://testingapp.sumcrowds.com/api/"
+        VITE_WSURL: "wss://testingapp.sumcrowds.com/ws/"
     restart: unless-stopped
     networks:
       - dev_network
