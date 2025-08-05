@@ -147,6 +147,10 @@ func RefreshToken(token string) (*counterModels.RefreshToken, *counterModels.Acc
 }
 
 func CheckFestivalAccess(festival counterModels.FestivalData, accessToken counterModels.AccessToken) error {
+	if festival.PasswordHash == "" {
+		return nil //allow access if no password
+	}
+
 	_, err := CheckAccess(accessToken.Token)
 
 	if err != nil {
