@@ -2,55 +2,38 @@ import { useEffect, useState } from "react"
 import { auth, fetchWithAuth } from "../utils/auth"
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Plus, Eye, EyeOff } from "lucide-react";
 
-/** @type {string} */
 const APIURL = import.meta.env.VITE_APIURL;
 
-/**
- * @param {Object} param0 
- * @param {() => null} param0.close 
-*/
 export function CreatePopup({ close }) {
   useEffect(() => { auth() }, [])
-  /** @type {[string, () => null]} */
+
   const [passwordInputValue, setPasswordInputValue] = useState("")
-  /** @type {[string, () => null]} */
   const [pinInputValue, setPinInputValue] = useState("")
-  /** @type {[boolean, () => null]} */
-  const [showPassword, setShowPassword] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false)
   const { t } = useTranslation()
-
   const navigate = useNavigate()
-  /** 
-   * @param {Event} event 
-  */
+
   function handlePinInputValue(event) {
-    /** @type {string} */
     const value = event.target.value
     if (("1234567890".includes(value.at(-1)) || value == "") && value.length <= 4) {
       setPinInputValue(value)
     }
   }
 
-  function togglePasswordVisibility() {
-    setShowPassword(!showPassword);
-  };
-
-  /** 
-   * @param {Event} event 
-  */
   function handlePasswordInputValue(event) {
-    /** @type {string} */
     const value = event.target.value
     if ("abcdefghijklmnopqrstuvwxyx1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-+_*".includes(value.at(-1)) || value == "") {
       setPasswordInputValue(value)
     }
   }
 
-  /**
-   * @param {Event} event 
-  */
   async function handleCreate(event) {
     event.preventDefault()
     const body = JSON.stringify({
@@ -69,71 +52,76 @@ export function CreatePopup({ close }) {
   }
 
   return (
-    <div className="create-modal">
-      <div className="create-main-container">
-        <div className="create-space" />
-        <button className="create-close-button" onClick={close}>
-          <b>×</b>
-        </button>
-        <div className="create-header">{t("createpopup_header")}</div>
-        <div className="create-spacer" />
-        <form className="create-form">
+    <Dialog open={true} onOpenChange={() => close()}>
+      <DialogContent onClose={close} className="sm:max-w-md border-0 shadow-2xl overflow-hidden p-0">
+        {/* Colored header */}
+        <div className="bg-primary px-6 py-6 text-center">
+          <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
+            <Plus className="w-7 h-7 text-white" />
+          </div>
+          <DialogTitle className="text-2xl font-bold text-white">
+            {t("createpopup_header")}
+          </DialogTitle>
+        </div>
+
+        <form onSubmit={handleCreate} className="p-6 space-y-5">
           <input
             type="text"
             name="email"
             autoComplete="username email"
-            style={{ display: "none" }}
+            className="hidden"
           />
 
-          <div className="create-input-group">
-            <input
+          <div>
+            <Label htmlFor="pin" className="text-sm font-medium text-muted-foreground mb-2 block">
+              Admin PIN (4 digits)
+            </Label>
+            <Input
+              id="pin"
               type="text"
               min={0}
               maxLength={4}
-              step={1}
               name="pin"
               value={pinInputValue}
               onChange={handlePinInputValue}
               placeholder={t("createpopup_admin_pin")}
-              className="create-input"
+              className="text-center text-2xl h-14 tracking-[0.5em] font-mono font-bold"
+              autoFocus
             />
           </div>
 
-          <div className="create-input-group">
-            <input
-              id="create-password"
-              type={showPassword ? 'text' : 'password'}
-              maxLength={50}
-              autoComplete="new-password"
-              name="password"
-              value={passwordInputValue}
-              onChange={handlePasswordInputValue}
-              placeholder={t("createpopup_password")}
-              className="create-input"
-            />
-          </div>
-
-          <div className="create-checkbox-container">
-            <label className="create-checkbox-label">
-              <input
-                className="create-checkbox"
-                type="checkbox"
-                onChange={togglePasswordVisibility}
-                name="show-password"
+          <div>
+            <Label htmlFor="create-password" className="text-sm font-medium text-muted-foreground mb-2 block">
+              Access Password (optional)
+            </Label>
+            <div className="relative">
+              <Input
+                id="create-password"
+                type={showPassword ? 'text' : 'password'}
+                maxLength={50}
+                autoComplete="new-password"
+                name="password"
+                value={passwordInputValue}
+                onChange={handlePasswordInputValue}
+                placeholder={t("createpopup_password")}
+                className="h-12 pr-12"
               />
-              <span className="create-checkbox-text">{t("createpopup_show_password")}</span>
-            </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
-        </form>
 
-        <button
-          className="create-button create-button--large create-button--primary"
-          onClick={handleCreate}
-        >
-          {t("createpopup_confirm")}
-        </button>
-      </div>
-    </div>
+          <Button type="submit" size="xl" className="w-full shadow-lg hover:shadow-glow-primary">
+            <Plus className="w-5 h-5 mr-2" />
+            {t("createpopup_confirm")}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
-

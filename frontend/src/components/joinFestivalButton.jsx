@@ -2,46 +2,29 @@ import { useEffect, useState } from "react"
 import { auth, fetchWithAuth } from "../utils/auth"
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Users, LogIn } from "lucide-react";
 
-/** @type {string} */
 const APIURL = import.meta.env.VITE_APIURL;
 
-/**
- * @param {Object} param0 
- * @param {() => null} param0.close 
-*/
 export function JoinPopup({ close }) {
   const { t } = useTranslation()
-
   useEffect(() => { auth() }, [])
-  /** @type {[string, () => null]} */
-  const [codeInputValue, setCodeInputValue] = useState("")
-  const [alert, setAlert] = useState(" ")
 
+  const [codeInputValue, setCodeInputValue] = useState("")
+  const [alert, setAlert] = useState("")
   const navigate = useNavigate()
 
-  /** 
-   * @param {Event} event 
-  */
   function handleCodeInputValue(event) {
-    /** @type {string} */
     const value = event.target.value
     if (("abcdefghijklmnopqrstuvwxyxz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(value.at(-1)) || value == "") && value.length <= 6) {
       setCodeInputValue(value.toUpperCase())
     }
   }
 
-  function Alert() {
-    if (alert != " ") {
-      return (<div className='admin-alert'>
-        {alert}
-      </div>)
-    }
-  }
-
-  /**
-   * @param {Event} event 
-  */
   async function handleJoin(event) {
     event.preventDefault()
     const response = await fetchWithAuth(APIURL + "v1/festival/" + codeInputValue + "/exists")
@@ -53,34 +36,47 @@ export function JoinPopup({ close }) {
   }
 
   return (
-    <div className="join-modal">
-      <div className="join-main-container">
-        <div className="join-space" />
-        <button className="join-close-button" onClick={close}>
-          <b>×</b>
-        </button>
-        <div className="join-header">
-          {t("joinpopup_header")}
+    <Dialog open={true} onOpenChange={() => close()}>
+      <DialogContent onClose={close} className="sm:max-w-md border-0 shadow-2xl overflow-hidden p-0">
+        {/* Colored header */}
+        <div className="bg-success px-6 py-6 text-center">
+          <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
+            <Users className="w-7 h-7 text-white" />
+          </div>
+          <DialogTitle className="text-2xl font-bold text-white">
+            {t("joinpopup_header")}
+          </DialogTitle>
         </div>
-        <div className="join-spacer" />
-        <form className="join-form" onSubmit={handleJoin}>
-          <div className="join-input-group">
-            <Alert />
-            <input
+
+        <form onSubmit={handleJoin} className="p-6 space-y-4">
+          {alert && (
+            <Alert variant="destructive">
+              <AlertDescription>{alert}</AlertDescription>
+            </Alert>
+          )}
+
+          <div>
+            <label className="text-sm font-medium text-muted-foreground mb-2 block">
+              Festival Code
+            </label>
+            <Input
               type="text"
               name="Code"
               value={codeInputValue}
               onChange={handleCodeInputValue}
               placeholder={t("joinpopup_enter_code")}
-              className="join-input"
+              className="text-center text-2xl h-14 uppercase tracking-[0.3em] font-mono font-bold"
+              maxLength={6}
+              autoFocus
             />
           </div>
-          <button
-            className="join-button join-button--large join-button--success"
-          >
+
+          <Button type="submit" variant="success" size="xl" className="w-full shadow-lg hover:shadow-glow-success">
+            <LogIn className="w-5 h-5 mr-2" />
             {t("joinpopup_confirm")}
-          </button>
+          </Button>
         </form>
-      </div>
-    </div>)
+      </DialogContent>
+    </Dialog>
+  )
 }

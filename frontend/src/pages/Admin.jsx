@@ -1,31 +1,23 @@
 import { useEffect, useState } from 'react';
-import '../App.css'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/auth';
 import { EnterPin } from '../components/enterPin';
-import HomeIcon from '../assets/home.svg?react';
-import BackIcon from '../assets/back.svg?react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/languageSwitcher';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Home, ArrowLeft, Download, Archive, Settings, FileDown } from 'lucide-react';
 
-/** @type {string} */
 const APIURL = import.meta.env.VITE_APIURL;
 
 export function Admin() {
-  /** @type {[boolean, (boolean) => void]} */
   const [loading, setLoading] = useState(true)
-  /** @type {[boolean, (boolean) => void]} */
   const [isValid, setIsValid] = useState(null)
-  /** @type {[boolean, (boolean) => void]} */
   const [hasAccess, setHasAccess] = useState(false)
-  /** @type {[boolean, (boolean) => void]} */
   const [hasAdminAccess, setHasAdminAccess] = useState(false)
-
   const { festivalCode } = useParams()
-
-  const navigate = useNavigate()
-
-
 
   useEffect(() => {
     const checkFestival = async () => {
@@ -50,8 +42,7 @@ export function Admin() {
       setLoading(false)
     }
     checkFestival()
-  }, [festivalCode, navigate])
-
+  }, [festivalCode])
 
   if (!loading) {
     if (!isValid) {
@@ -64,37 +55,31 @@ export function Admin() {
     }
     return <FestivalAdminPage />
   }
-  return <div> loading ... </div>
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="animate-pulse text-primary text-lg font-medium">Loading...</div>
+    </div>
+  )
 }
 
-
 function FestivalAdminPage() {
-  /** @type {[string, () => null]} */
-  const [alert, setAlert] = useState(" ")
-  /** @type {[string, () => null]} */
+  const [alert, setAlert] = useState("")
   const [inputValue, setInputValue] = useState("")
-
   const { t } = useTranslation()
-
   const { festivalCode } = useParams()
 
-  /** 
-   * @param {Event} event 
-  */
   function handleClick(event) {
     event.preventDefault()
 
     let valid = true
-
     for (let i = 0; i < inputValue.length; i++) {
-      if (!("1234567890".includes(inputValue.at(i)))) {
+      if (!"1234567890".includes(inputValue.at(i))) {
         valid = false
         break
       }
     }
-    if (inputValue.length == 0) {
-      valid = false
-    }
+    if (inputValue.length == 0) valid = false
 
     if (!valid) {
       playAlert("Please only use numbers", setAlert)
@@ -104,9 +89,6 @@ function FestivalAdminPage() {
     }
   }
 
-  /** 
-   * @param {Event} event 
-  */
   function handleInputValue(event) {
     const value = event.target.value
     if ("1234567890".includes(value.at(-1)) || value == "") {
@@ -115,178 +97,174 @@ function FestivalAdminPage() {
   }
 
   return (
-    <div className='admin-page'>
-      <div className="admin-main-container">
-        <LanguageSwitcher />
-        <div className="counter-info-bar">
-          <Link to="/home" className="corner-button corner-button--left">
-            <HomeIcon className="corner-icon" />
+    <div className="min-h-screen bg-background p-4 flex items-start justify-center pt-8">
+      <Card className="w-full max-w-2xl overflow-hidden shadow-xl border-0">
+        {/* Header */}
+        <div className="bg-accent px-6 py-5 flex items-center justify-between">
+          <Link to="/home">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+              <Home className="h-5 w-5" />
+            </Button>
           </Link>
-          <div className='admin-header'>
-            {t("admin_title")}
+
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <Settings className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-white">
+              {t("admin_title")}
+            </h1>
           </div>
-          <Link to={`/${festivalCode}`} className="corner-button corner-button--right">
-            <BackIcon className="corner-icon" />
-          </Link>
+
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <Link to={`/${festivalCode}`}>
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
         </div>
-        <form className='admin-form'>
-          <Alert />
 
-          <div className='admin-input-group'>
-            <input
-              type='text'
-              name='maxGauge'
-              value={inputValue}
-              onChange={handleInputValue}
-              placeholder={t("admin_max_gauge")}
-              className='admin-input'
-            />
-            <button
-              className='admin-button admin-button--primary admin-button--large'
-              onClick={handleClick}
-            >
-              {t("admin_set_gauge")}
-            </button>
+        <CardContent className="p-6 space-y-6">
+          {alert && (
+            <Alert variant="destructive">
+              <AlertDescription>{alert}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Set Gauge Section */}
+          <div className="bg-primary/5 rounded-xl p-5 border border-primary/20">
+            <h3 className="text-sm font-semibold text-primary uppercase tracking-wide mb-4">
+              Set Maximum Capacity
+            </h3>
+            <form onSubmit={handleClick} className="flex gap-3">
+              <Input
+                type="text"
+                name="maxGauge"
+                value={inputValue}
+                onChange={handleInputValue}
+                placeholder={t("admin_max_gauge")}
+                className="text-lg h-12 font-mono"
+              />
+              <Button type="submit" size="lg" className="px-8 shadow-lg hover:shadow-glow-primary">
+                {t("admin_set_gauge")}
+              </Button>
+            </form>
           </div>
 
-          <div className='admin-divider' />
-
-          <div className='admin-section'>
-            <div className='admin-section-title'>
+          {/* Current Event Actions */}
+          <div className="bg-muted rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide mb-4">
               {t("admin_current_event")}
-            </div>
-            <div className="admin-button-group">
-              <button
-                className='admin-button admin-button--danger admin-button--small'
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                variant="destructive"
+                size="lg"
                 onClick={onArchivePressed}
+                className="shadow-lg hover:shadow-glow-destructive"
               >
+                <Archive className="h-5 w-5 mr-2" />
                 {t("admin_archive")}
-              </button>
-              <a
-                href={APIURL + "v1/festival/" + festivalCode + "/admin/download/activecsv"}
-                className='admin-button admin-button--success admin-button--small'
+              </Button>
+              <Button
+                variant="success"
+                size="lg"
+                asChild
+                className="shadow-lg hover:shadow-glow-success"
               >
-                {t("admin_get_csv")}
-              </a>
+                <a href={APIURL + "v1/festival/" + festivalCode + "/admin/download/activecsv"}>
+                  <Download className="h-5 w-5 mr-2" />
+                  {t("admin_get_csv")}
+                </a>
+              </Button>
             </div>
           </div>
-        </form>
-        <Archive />
-      </div >
-    </div >
+
+          {/* Archives */}
+          <ArchiveSection festivalCode={festivalCode} t={t} />
+        </CardContent>
+      </Card>
+    </div>
   )
 
-  function Alert() {
-    if (alert != " ") {
-      return (<div className='admin-alert'>
-        {alert}
-      </div>)
-    }
-
-  }
-
-  /**
-   * @param {Object} param0 
-   * @param {int} param0.id 
-   * @param {int} param0.date 
-   */
-  function ArchivedData({ id, date }) {
-    return (
-      <a
-        href={APIURL + "v1/festival/" + festivalCode + "/admin/download/archivedcsv/" + id}
-        className='archive-item'
-      >
-        <div className='archive-item-content'>
-          <span className='archive-item-id'>ID: {id}</span>
-          <span className='archive-item-date'>{date}</span>
-        </div>
-      </a>
-    )
-  }
-
-  function Archive() {
-    const [archives, setArchives] = useState([])
-
-    useEffect(() => {
-      const response = fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/getarchivedevents")
-        .then(res => res.json())
-        .then(data => setArchives(data))
-      if (!response.ok) {
-        if (response.status == 422) {
-          location.reload()
-        }
-      }
-    }, [])
-
-    function getDateTime(timestamp) {
-      const time = new Date(timestamp * 1000)
-      return time.toLocaleString().slice(0, 24)
-    }
-
-    return (
-      <div className='archive-section'>
-        <div className='archive-header'>
-          {t("admin_archived_data")}
-        </div>
-        <div className='archive-divider' />
-        <div className='archive-list'>
-          {archives.map((item) =>
-            <ArchivedData key={item.id} id={item.id} date={getDateTime(item.time)} />
-          )}
-        </div>
-      </div>
-    )
-  }
-  /**
-   * @param {string} alert 
-   * @param {() => null} setAlert 
-  */
-  async function playAlert(alert, setAlert) {
-    setAlert(alert)
-    await new Promise(resolve => setTimeout(resolve, 7500))
-    setAlert(" ")
-  }
-
-  /**
-   * @param {Event} event
-  */
   async function onArchivePressed(event) {
     event.preventDefault()
     const response = await fetch(APIURL + "v1/festival/" + festivalCode + "/admin/archivecurrentevent", {
       method: "get",
-      headers: {
-        "Content-Type": "application/json"
-      }
+      headers: { "Content-Type": "application/json" }
     })
     if (!response.ok) {
-      if (response.status == 422) {
-        location.reload()
-      }
+      if (response.status == 422) location.reload()
       throw new Error(`Response status:`, response.status)
     }
     location.reload()
   }
 
-  /**
-   * @param {() => null} newMax 
-  */
   async function onSetGaugePressed(newMax) {
-    const body = JSON.stringify({
-      max: +newMax
-    })
+    const body = JSON.stringify({ max: +newMax })
     const response = await fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/setgauge", {
       method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: body,
+      headers: { "Content-Type": "application/json" },
+      body,
     })
     if (!response.ok) {
-      if (response.status == 422) {
-        location.reload()
-      }
+      if (response.status == 422) location.reload()
       throw new Error("Response status:", response.status)
     }
   }
+}
 
+function ArchiveSection({ festivalCode, t }) {
+  const [archives, setArchives] = useState([])
+
+  useEffect(() => {
+    fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/getarchivedevents")
+      .then(res => res.json())
+      .then(data => setArchives(data))
+  }, [festivalCode])
+
+  function getDateTime(timestamp) {
+    const time = new Date(timestamp * 1000)
+    return time.toLocaleString().slice(0, 24)
+  }
+
+  return (
+    <div className="bg-secondary/50 rounded-xl p-5">
+      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide mb-4">
+        {t("admin_archived_data")}
+      </h3>
+
+      {archives.length === 0 ? (
+        <p className="text-muted-foreground text-sm text-center py-6">
+          No archived data available
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {archives.map((item) => (
+            <a
+              key={item.id}
+              href={APIURL + "v1/festival/" + festivalCode + "/admin/download/archivedcsv/" + item.id}
+              className="flex items-center justify-between p-4 rounded-lg bg-card border hover:border-primary hover:shadow-md transition-all group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <FileDown className="w-5 h-5 text-primary" />
+                </div>
+                <span className="font-semibold">Archive #{item.id}</span>
+              </div>
+              <span className="text-muted-foreground text-sm font-mono">{getDateTime(item.time)}</span>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+async function playAlert(alert, setAlert) {
+  setAlert(alert)
+  await new Promise(resolve => setTimeout(resolve, 7500))
+  setAlert("")
 }

@@ -1,30 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
-import '../App.css'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { EnterPassword } from '../components/enterPassword';
 import { fetchWithAuth } from '../utils/auth';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/languageSwitcher';
-import HomeIcon from '../assets/home.svg?react';
-import AdminIcon from '../assets/admin.svg?react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Home, Settings, Minus, Plus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-/** @type {string} */
 const WSURL = import.meta.env.VITE_WSURL;
-/** @type {string} */
 const APIURL = import.meta.env.VITE_APIURL;
 
 export function Counter() {
-  /** @type {[boolean, (boolean) => void]} */
   const [loading, setLoading] = useState(true)
-  /** @type {[boolean, (boolean) => void]} */
   const [isValid, setIsValid] = useState(null)
-  /** @type {[boolean, (boolean) => void]} */
   const [hasAccess, setHasAccess] = useState(false)
-
-  /** @type {string} */
   const { festivalCode } = useParams()
-
-  const navigate = useNavigate()
 
   useEffect(() => {
     const checkFestival = async () => {
@@ -44,7 +36,7 @@ export function Counter() {
       setLoading(false)
     }
     checkFestival()
-  }, [festivalCode, navigate])
+  }, [festivalCode])
 
   if (!loading) {
     if (!isValid) {
@@ -55,26 +47,21 @@ export function Counter() {
     }
     return <FestivalCountedPage />
   }
-  return <div> loading ... </div>
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="animate-pulse text-primary text-lg font-medium">Loading...</div>
+    </div>
+  )
 }
 
 function FestivalCountedPage() {
   const { t } = useTranslation()
-
-  /** @type {[int, () => null]} */
-  const [total, setTotal] = useState("Loading...")
-  /** @type {[int, () => null]} */
+  const [total, setTotal] = useState("...")
   const [maxJauge, setMaxJauge] = useState(0)
-
-  /** @type {[string, () => null]} */
-  const [colour, setColour] = useState("#ffffff")
-
-  /** @type {string} */
+  const [status, setStatus] = useState("normal")
   const { festivalCode } = useParams()
-
-  /** @type {React.RefObject < WebSocket >} */
   const socketRef = useRef(null)
-  /** @type {NodeJS.Timeout} */
   let heartbeat
 
   useEffect(() => {
@@ -82,13 +69,11 @@ function FestivalCountedPage() {
 
     socketRef.current.onopen = () => {
       getTotal(socketRef.current)
-      console.log("Open")
       heartbeat = setInterval(() => {
         if (socketRef.current.readyState == WebSocket.OPEN) {
           socketRef.current.send(JSON.stringify({ type: "ping" }))
         }
       }, 10000)
-
     }
 
     socketRef.current.onmessage = (event) => {
@@ -98,193 +83,208 @@ function FestivalCountedPage() {
     socketRef.current.onclose = () => {
       setTotal("Disconnected")
       clearInterval(heartbeat)
-      console.log("Closed")
+    }
+
+    return () => {
+      clearInterval(heartbeat)
+      socketRef.current?.close()
     }
   }, [])
 
-  function ColourSelector() {
-    useEffect(() => {
+  useEffect(() => {
+    if (typeof total === 'number' && maxJauge > 0) {
       if (total >= maxJauge) {
-        setColour("#ffa6a6")
-      } else if (total >= (maxJauge * 0.9)) {
-        setColour("#ffff87")
+        setStatus("danger")
+      } else if (total >= maxJauge * 0.9) {
+        setStatus("warning")
       } else {
-        setColour("#ffffff")
+        setStatus("normal")
       }
-    })
-  }
+    }
+  }, [total, maxJauge])
+
+  const percentage = maxJauge > 0 ? Math.min((total / maxJauge) * 100, 100) : 0
 
   return (
-    <div className='counter-page'>
-      <ColourSelector />
-      <div className="counter-main-container">
-        <LanguageSwitcher />
-        <div className="counter-info-bar">
-          <Link to="/home" className="corner-button corner-button--left">
-            <HomeIcon className="corner-icon" />
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      <Card className="w-full max-w-2xl overflow-hidden shadow-xl border-0">
+        {/* Header */}
+        <div className="bg-primary px-6 py-5 flex items-center justify-between">
+          <Link to="/home">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+              <Home className="h-5 w-5" />
+            </Button>
           </Link>
-          <div className="counter-info-item">
-            <span className="counter-info-label">{t("counter_code")}</span>
-            <span className="counter-info-value">{festivalCode}</span>
+
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-widest text-white/70 mb-1">{t("counter_code")}</p>
+            <p className="text-2xl font-bold text-white font-mono tracking-wider">{festivalCode}</p>
           </div>
-          <Link to={`/${festivalCode}/admin`} className="corner-button corner-button--right">
-            <AdminIcon className="corner-icon" />
-          </Link>
+
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <Link to={`/${festivalCode}/admin`}>
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+                <Settings className="h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        <div className="counter-display-section" style={{ background: colour }}>
-          <div className="counter-current-value">{total}</div>
-          <div className="counter-gauge-info">
-            <span className="counter-gauge-label">{t("counter_gauge")}</span>
-            <span className="counter-gauge-value">{maxJauge}</span>
-          </div>
-        </div>
+        {/* Counter Display */}
+        <div className={cn(
+          "py-12 px-6 text-center transition-colors duration-500",
+          status === "danger" && "bg-destructive/10",
+          status === "warning" && "bg-warning/10",
+          status === "normal" && "bg-card"
+        )}>
+          <p className={cn(
+            "text-8xl md:text-9xl font-black font-mono tabular-nums transition-colors",
+            status === "danger" && "text-destructive",
+            status === "warning" && "text-warning",
+            status === "normal" && "text-foreground"
+          )}>
+            {total}
+          </p>
 
-        <div className="counter-controls">
-          <div className="counter-column counter-column--decrease">
-            <div className="counter-small-buttons">
-              <button
-                id="reduceThree"
-                className="counter-button counter-button--small counter-button--decrease"
-                onClick={() => {
-                  handleMinus(3, festivalCode)
-                  if (total < 3) {
-                    setTotal(0)
-                  } else {
-                    setTotal(total - 3)
-                  }
-                }}
-              >
-                −3
-              </button>
-              <button
-                id="reduceTwo"
-                className="counter-button counter-button--small counter-button--decrease"
-                onClick={() => {
-                  handleMinus(2, festivalCode)
-                  if (total < 2) {
-                    setTotal(0)
-                  } else {
-                    setTotal(total - 2)
-                  }
-                }}
-              >
-                −2
-              </button>
+          {/* Progress bar */}
+          <div className="mt-8 max-w-md mx-auto">
+            <div className="flex justify-between text-sm text-muted-foreground mb-2">
+              <span>{t("counter_gauge")}</span>
+              <span className="font-mono font-bold">{typeof total === 'number' ? total : 0} / {maxJauge}</span>
             </div>
-            <div className="counter-small-buttons">
-              <button
-                id="reduceOne"
-                className="counter-button counter-button--large counter-button--decrease"
+            <div className="h-3 bg-muted rounded-full overflow-hidden">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-all duration-500",
+                  status === "danger" && "bg-destructive",
+                  status === "warning" && "bg-warning",
+                  status === "normal" && "bg-success"
+                )}
+                style={{ width: `${percentage}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="grid grid-cols-2 gap-0 border-t">
+          {/* Decrease column */}
+          <div className="bg-destructive/5 p-6 border-r">
+            <p className="text-center text-sm font-medium text-destructive mb-4 uppercase tracking-wide">Exit</p>
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex gap-2">
+                <Button
+                  variant="destructive"
+                  size="counter"
+                  className="shadow-lg hover:shadow-glow-destructive"
+                  onClick={() => {
+                    handleMinus(2, festivalCode)
+                    setTotal(prev => Math.max(0, prev - 2))
+                  }}
+                >
+                  −2
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="counter"
+                  className="shadow-lg hover:shadow-glow-destructive"
+                  onClick={() => {
+                    handleMinus(3, festivalCode)
+                    setTotal(prev => Math.max(0, prev - 3))
+                  }}
+                >
+                  −3
+                </Button>
+              </div>
+              <Button
+                variant="destructive"
+                size="counterLg"
+                className="shadow-lg hover:shadow-glow-destructive"
                 onClick={() => {
                   handleMinus(1, festivalCode)
-                  if (total < 1) {
-                    setTotal(0)
-                  } else {
-                    setTotal(total - 1)
-                  }
+                  setTotal(prev => Math.max(0, prev - 1))
                 }}
               >
-                −1
-              </button>
+                <Minus className="w-6 h-6 mr-2" />
+                1
+              </Button>
             </div>
           </div>
 
-          <div className="counter-column counter-column--increase">
-            <div className="counter-small-buttons">
-              <button
-                id="addTwo"
-                className="counter-button counter-button--small counter-button--increase"
-                onClick={() => {
-                  handlePlus(2, festivalCode)
-                  setTotal(total + 2)
-                }}
-              >
-                +2
-              </button>
-              <button
-                id="addThree"
-                className="counter-button counter-button--small counter-button--increase"
-                onClick={() => {
-                  handlePlus(3, festivalCode)
-                  setTotal(total + 3)
-                }}
-              >
-                +3
-              </button>
-            </div>
-            <div className="counter-small-buttons">
-              <button
-                id="addOne"
-                className="counter-button counter-button--large counter-button--increase"
+          {/* Increase column */}
+          <div className="bg-success/5 p-6">
+            <p className="text-center text-sm font-medium text-success mb-4 uppercase tracking-wide">Enter</p>
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex gap-2">
+                <Button
+                  variant="success"
+                  size="counter"
+                  className="shadow-lg hover:shadow-glow-success"
+                  onClick={() => {
+                    handlePlus(2, festivalCode)
+                    setTotal(prev => prev + 2)
+                  }}
+                >
+                  +2
+                </Button>
+                <Button
+                  variant="success"
+                  size="counter"
+                  className="shadow-lg hover:shadow-glow-success"
+                  onClick={() => {
+                    handlePlus(3, festivalCode)
+                    setTotal(prev => prev + 3)
+                  }}
+                >
+                  +3
+                </Button>
+              </div>
+              <Button
+                variant="success"
+                size="counterLg"
+                className="shadow-lg hover:shadow-glow-success"
                 onClick={() => {
                   handlePlus(1, festivalCode)
-                  setTotal(total + 1)
+                  setTotal(prev => prev + 1)
                 }}
               >
-                +1
-              </button>
+                <Plus className="w-6 h-6 mr-2" />
+                1
+              </Button>
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="counter-spacer" />
+      </Card>
     </div>
   )
 }
 
-/**
- * @param {int} amount
-*/
 async function handlePlus(amount, festivalCode) {
-  const body = JSON.stringify({
-    amount: amount
-  })
+  const body = JSON.stringify({ amount })
   fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/inc", {
     method: "post",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: body,
+    headers: { "Content-Type": "application/json" },
+    body,
   })
 }
 
-/**
- * @param {int} amount
-*/
 async function handleMinus(amount, festivalCode) {
-  const body = JSON.stringify({
-    amount: amount
-  })
+  const body = JSON.stringify({ amount })
   fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/dec", {
     method: "post",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: body,
+    headers: { "Content-Type": "application/json" },
+    body,
   })
 }
 
-/**
-        * @param {WebSocket} socket
-        */
 async function getTotal(socket) {
-  socket.send(JSON.stringify({
-    type: "getTotal",
-  }))
+  socket.send(JSON.stringify({ type: "getTotal" }))
 }
 
-/**
-        * @param {Event} event
-        * @param {() => null} setJauge
-        * @param {() => null} setTotal
-        **/
 function handleMessage(event, setTotal, setJauge) {
   let result = JSON.parse(event.data)
-  if (result.type == "pong") {
-    return
-  }
+  if (result.type == "pong") return
   setTotal(result.total)
   setJauge(result.jauge)
 }
