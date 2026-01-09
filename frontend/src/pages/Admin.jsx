@@ -83,7 +83,7 @@ function FestivalAdminPage() {
     if (inputValue.length === 0) valid = false
 
     if (!valid) {
-      playAlert("Please only use numbers", setAlert)
+      playAlert(t("admin_numbers_only"), setAlert)
     } else {
       onSetGaugePressed(inputValue)
       setInputValue("")
@@ -137,7 +137,7 @@ function FestivalAdminPage() {
           {/* Set Gauge Section */}
           <div className="bg-primary/5 rounded-xl p-5 border border-primary/20">
             <h3 className="text-sm font-semibold text-primary uppercase tracking-wide mb-4">
-              Set Maximum Capacity
+              {t("admin_set_capacity")}
             </h3>
             <form onSubmit={handleClick} className="flex gap-3">
               <Input
@@ -239,7 +239,7 @@ function ArchiveSection({ festivalCode, t }) {
 
       {archives.length === 0 ? (
         <p className="text-muted-foreground text-sm text-center py-6">
-          No archived data available
+          {t("admin_no_archives")}
         </p>
       ) : (
         <div className="space-y-2">

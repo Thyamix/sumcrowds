@@ -1,6 +1,8 @@
 {
 	"counter_gauge": "Jauge",
 	"counter_code": "code",
+	"counter_exit": "Sortie",
+	"counter_enter": "Entrée",
 
 	"home_home": "Accueil",
 	"home_select_option": "Selectionnez une option pour commencer",
@@ -11,32 +13,42 @@
 	"admin_title": "Panneau d'administration",
 	"admin_max_gauge": "Jauge maximale",
 	"admin_set_gauge": "Définir la Jauge",
+	"admin_set_capacity": "Définir la capacité maximale",
 	"admin_current_event": "Événement en cours",
 	"admin_archived_data": "Données archivées",
 	"admin_archive": "Archiver",
 	"admin_get_csv": "Obtenir CSV",
+	"admin_no_archives": "Aucune donnée archivée disponible",
+	"admin_numbers_only": "Veuillez utiliser uniquement des chiffres",
 
 	"pwpopup_header": "Entrer mot de passe",
 	"pwpopup_alert": "Mot de passe incorrect",
 	"pwpopup_password": "Mot de passe",
 	"pwpopup_confirm": "Valider",
 	"pwpopup_show_password": "Afficher le mot de passe",
+	"pwpopup_festival": "Festival",
 
 	"pinpopup_header": "Entrer PIN",
 	"pinpopup_alert": "PIN incorrect",
 	"pinpopup_pin": "PIN",
 	"pinpopup_confirm": "Valider",
 	"pinpopup_show_pin": "Afficher le PIN",
-	
+	"pinpopup_label": "Entrez votre PIN à 4 chiffres",
+	"pinpopup_admin_access": "Accès administrateur",
+
 	"joinpopup_header": "Rejoindre",
 	"joinpopup_alert": "Code incorrect",
 	"joinpopup_enter_code": "Entrer code de session",
 	"joinpopup_confirm": "Rejoindre session",
-	
+	"joinpopup_code_label": "Code du festival",
+
 	"createpopup_header": "Créer",
 	"createpopup_admin_pin": "Code Admin",
+	"createpopup_pin_label": "PIN Admin (4 chiffres)",
 	"createpopup_password": "Mot de passe",
+	"createpopup_password_label": "Mot de passe d'accès (optionnel)",
 	"createpopup_show_password": "Afficher le mot de passe",
-	"createpopup_confirm": "Créer une session"
-}
+	"createpopup_confirm": "Créer une session",
 
+	"error_generic": "Une erreur s'est produite. Veuillez réessayer plus tard."
+}

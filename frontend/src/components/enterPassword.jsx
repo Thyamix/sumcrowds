@@ -50,7 +50,7 @@ export function EnterPassword() {
         location.reload()
       }
     } catch (error) {
-      setPasswordError("An error occurred. Please try again later.");
+      setPasswordError(t("error_generic"));
     }
   }
 
@@ -78,7 +78,7 @@ export function EnterPassword() {
           <h1 className="text-2xl font-bold text-white">
             {t("pwpopup_header")}
           </h1>
-          <p className="text-white/70 text-sm mt-1">Festival: {festivalCode}</p>
+          <p className="text-white/70 text-sm mt-1">{t("pwpopup_festival")}: {festivalCode}</p>
         </div>
 
         <CardContent className="p-6">
@@ -98,7 +98,7 @@ export function EnterPassword() {
 
             <div>
               <Label htmlFor="password" className="text-sm font-medium text-muted-foreground mb-2 block">
-                Password
+                {t("pwpopup_password")}
               </Label>
               <div className="relative">
                 <Input

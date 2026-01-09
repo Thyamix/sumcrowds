@@ -73,7 +73,7 @@ export function CreatePopup({ close }) {
 
           <div>
             <Label htmlFor="pin" className="text-sm font-medium text-muted-foreground mb-2 block">
-              Admin PIN (4 digits)
+              {t("createpopup_pin_label")}
             </Label>
             <Input
               id="pin"
@@ -91,7 +91,7 @@ export function CreatePopup({ close }) {
 
           <div>
             <Label htmlFor="create-password" className="text-sm font-medium text-muted-foreground mb-2 block">
-              Access Password (optional)
+              {t("createpopup_password_label")}
             </Label>
             <div className="relative">
               <Input

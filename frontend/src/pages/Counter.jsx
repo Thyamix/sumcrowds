@@ -62,14 +62,14 @@ function FestivalCountedPage() {
   const [status, setStatus] = useState("normal")
   const { festivalCode } = useParams()
   const socketRef = useRef(null)
-  let heartbeat
+  const heartbeatRef = useRef(null)
 
   useEffect(() => {
     socketRef.current = new WebSocket(WSURL + festivalCode)
 
     socketRef.current.onopen = () => {
       getTotal(socketRef.current)
-      heartbeat = setInterval(() => {
+      heartbeatRef.current = setInterval(() => {
         if (socketRef.current.readyState === WebSocket.OPEN) {
           socketRef.current.send(JSON.stringify({ type: "ping" }))
         }
@@ -82,14 +82,14 @@ function FestivalCountedPage() {
 
     socketRef.current.onclose = () => {
       setTotal("Disconnected")
-      clearInterval(heartbeat)
+      clearInterval(heartbeatRef.current)
     }
 
     return () => {
-      clearInterval(heartbeat)
+      clearInterval(heartbeatRef.current)
       socketRef.current?.close()
     }
-  }, [])
+  }, [festivalCode])
 
   useEffect(() => {
     if (typeof total === 'number' && maxJauge > 0) {
@@ -103,7 +103,7 @@ function FestivalCountedPage() {
     }
   }, [total, maxJauge])
 
-  const percentage = maxJauge > 0 ? Math.min((total / maxJauge) * 100, 100) : 0
+  const percentage = (typeof total === 'number' && maxJauge > 0) ? Math.min((total / maxJauge) * 100, 100) : 0
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
@@ -171,7 +171,7 @@ function FestivalCountedPage() {
         <div className="grid grid-cols-2 gap-0 border-t">
           {/* Decrease column */}
           <div className="bg-destructive/5 p-6 border-r">
-            <p className="text-center text-sm font-medium text-destructive mb-4 uppercase tracking-wide">Exit</p>
+            <p className="text-center text-sm font-medium text-destructive mb-4 uppercase tracking-wide">{t("counter_exit")}</p>
             <div className="flex flex-col items-center gap-3">
               <div className="flex gap-2">
                 <Button
@@ -214,7 +214,7 @@ function FestivalCountedPage() {
 
           {/* Increase column */}
           <div className="bg-success/5 p-6">
-            <p className="text-center text-sm font-medium text-success mb-4 uppercase tracking-wide">Enter</p>
+            <p className="text-center text-sm font-medium text-success mb-4 uppercase tracking-wide">{t("counter_enter")}</p>
             <div className="flex flex-col items-center gap-3">
               <div className="flex gap-2">
                 <Button
@@ -262,20 +262,28 @@ function FestivalCountedPage() {
 
 async function handlePlus(amount, festivalCode) {
   const body = JSON.stringify({ amount })
-  fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/inc", {
-    method: "post",
-    headers: { "Content-Type": "application/json" },
-    body,
-  })
+  try {
+    await fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/inc", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body,
+    })
+  } catch (error) {
+    console.error("Failed to increment:", error)
+  }
 }
 
 async function handleMinus(amount, festivalCode) {
   const body = JSON.stringify({ amount })
-  fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/dec", {
-    method: "post",
-    headers: { "Content-Type": "application/json" },
-    body,
-  })
+  try {
+    await fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/dec", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body,
+    })
+  } catch (error) {
+    console.error("Failed to decrement:", error)
+  }
 }
 
 async function getTotal(socket) {

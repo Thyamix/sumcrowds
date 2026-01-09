@@ -1,11 +1,12 @@
 package api_handler_v1
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
-	"math/rand"
+	"math/big"
 	"net/http"
 	"time"
 
@@ -91,19 +92,23 @@ func CreateFestival(w http.ResponseWriter, r *http.Request) {
 func getNewCode() (string, error) {
 	result := make([]byte, 6)
 	charset := []byte("BCDFGHJKLMNPQRSTVWXZ2456789")
-	new := false
+	charsetLen := big.NewInt(int64(len(charset)))
+	isNew := false
 	var err error
-	for !new {
+	for !isNew {
 		for i := range result {
-			result[i] = charset[rand.Intn(len(charset))]
+			idx, err := rand.Int(rand.Reader, charsetLen)
+			if err != nil {
+				return "", fmt.Errorf("failed to generate secure random number: %w", err)
+			}
+			result[i] = charset[idx.Int64()]
 		}
-		new, err = database.IsNewFestivalCode(string(result))
+		isNew, err = database.IsNewFestivalCode(string(result))
 		if err != nil {
 			return "", err
 		}
 	}
 	return string(result), nil
-
 }
 
 func GetTotalAndGauge(w http.ResponseWriter, r *http.Request) {
@@ -136,20 +141,22 @@ func CheckAccess(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie(cookieutils.AccessTokenCookie)
 	if err != nil {
 		apperrors.SendError(w, apperrors.APIErrNoAccessToken(err))
+		return
 	}
 	if r.Context().Value(contextkeys.FestivalAccess) == true {
 		w.WriteHeader(http.StatusOK)
 		return
-	} else {
-		festival, err := database.GetFestival(r.PathValue("festivalCode"))
-		if err != nil {
-			apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode(err))
-		}
-		if festival.PasswordHash == "" {
-			database.AddFestivalAccess(cookie.Value, *festival)
-		}
-		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess(err))
 	}
+
+	festival, err := database.GetFestival(r.PathValue("festivalCode"))
+	if err != nil {
+		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode(err))
+		return
+	}
+	if festival.PasswordHash == "" {
+		database.AddFestivalAccess(cookie.Value, *festival)
+	}
+	apperrors.SendError(w, apperrors.APIErrNoFestivalAccess(err))
 }
 
 type Password struct {
@@ -185,8 +192,6 @@ func GetAccess(w http.ResponseWriter, r *http.Request) {
 		apperrors.SendError(w, apperrors.APIErrInvalidJSON(err))
 		return
 	}
-
-	fmt.Println(r.Body, body, body.Password)
 
 	if allow, _ := argon2id.ComparePasswordAndHash(body.Password, festival.PasswordHash); allow {
 		err = database.AddFestivalAccess(accessCookie, *festival)
@@ -326,7 +331,7 @@ func Dec(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("-", amount)
-	fmt.Println("New total of", total+amount)
+	fmt.Println("New total of", total-amount)
 
 	websockets.BroadcastTotal(festival.Code)
 }
