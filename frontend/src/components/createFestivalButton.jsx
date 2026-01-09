@@ -2,10 +2,9 @@ import { useEffect, useState } from "react"
 import { auth, fetchWithAuth } from "../utils/auth"
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Plus, Eye, EyeOff } from "lucide-react";
 
@@ -22,14 +21,14 @@ export function CreatePopup({ close }) {
 
   function handlePinInputValue(event) {
     const value = event.target.value
-    if (("1234567890".includes(value.at(-1)) || value == "") && value.length <= 4) {
+    if (("1234567890".includes(value.at(-1)) || value === "") && value.length <= 4) {
       setPinInputValue(value)
     }
   }
 
   function handlePasswordInputValue(event) {
     const value = event.target.value
-    if ("abcdefghijklmnopqrstuvwxyx1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-+_*".includes(value.at(-1)) || value == "") {
+    if ("abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-+_*".includes(value.at(-1)) || value === "") {
       setPasswordInputValue(value)
     }
   }
@@ -45,7 +44,7 @@ export function CreatePopup({ close }) {
       body: body,
     }).then(response => response.json())
       .then(data => {
-        if (data.type == "festival code" && data.content != null) {
+        if (data.type === "festival code" && data.content !== null) {
           navigate("/" + data.content, { replace: true })
         }
       })

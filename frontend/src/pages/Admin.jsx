@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/auth';
+import { EnterPassword } from '../components/enterPassword';
 import { EnterPin } from '../components/enterPin';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/languageSwitcher';
@@ -28,14 +29,14 @@ export function Admin() {
         setHasAdminAccess(true)
         setIsValid(true)
       }
-      if (response.status == 422) {
+      if (response.status === 422) {
         setIsValid(true)
         setHasAccess(true)
       }
-      if (response.status == 404) {
+      if (response.status === 404) {
         setIsValid(false)
       }
-      if (response.status == 403) {
+      if (response.status === 403) {
         setIsValid(true)
         setHasAccess(false)
       }
@@ -79,7 +80,7 @@ function FestivalAdminPage() {
         break
       }
     }
-    if (inputValue.length == 0) valid = false
+    if (inputValue.length === 0) valid = false
 
     if (!valid) {
       playAlert("Please only use numbers", setAlert)
@@ -91,7 +92,7 @@ function FestivalAdminPage() {
 
   function handleInputValue(event) {
     const value = event.target.value
-    if ("1234567890".includes(value.at(-1)) || value == "") {
+    if ("1234567890".includes(value.at(-1)) || value === "") {
       setInputValue(value)
     }
   }
@@ -196,7 +197,7 @@ function FestivalAdminPage() {
       headers: { "Content-Type": "application/json" }
     })
     if (!response.ok) {
-      if (response.status == 422) location.reload()
+      if (response.status === 422) location.reload()
       throw new Error(`Response status:`, response.status)
     }
     location.reload()
@@ -210,7 +211,7 @@ function FestivalAdminPage() {
       body,
     })
     if (!response.ok) {
-      if (response.status == 422) location.reload()
+      if (response.status === 422) location.reload()
       throw new Error("Response status:", response.status)
     }
   }

@@ -26,10 +26,10 @@ export function Counter() {
         setHasAccess(true)
         setIsValid(true)
       }
-      if (response.status == 404) {
+      if (response.status === 404) {
         setIsValid(false)
       }
-      if (response.status == 403) {
+      if (response.status === 403) {
         setIsValid(true)
         setHasAccess(false)
       }
@@ -70,7 +70,7 @@ function FestivalCountedPage() {
     socketRef.current.onopen = () => {
       getTotal(socketRef.current)
       heartbeat = setInterval(() => {
-        if (socketRef.current.readyState == WebSocket.OPEN) {
+        if (socketRef.current.readyState === WebSocket.OPEN) {
           socketRef.current.send(JSON.stringify({ type: "ping" }))
         }
       }, 10000)
@@ -283,8 +283,8 @@ async function getTotal(socket) {
 }
 
 function handleMessage(event, setTotal, setJauge) {
-  let result = JSON.parse(event.data)
-  if (result.type == "pong") return
+  const result = JSON.parse(event.data)
+  if (result.type === "pong") return
   setTotal(result.total)
   setJauge(result.jauge)
 }

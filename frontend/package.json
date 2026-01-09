@@ -12,7 +12,6 @@
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "dotenv": "^17.0.0",
     "i18next": "^25.2.1",
     "i18next-http-backend": "^3.0.2",
     "lucide-react": "^0.562.0",
@@ -20,7 +19,6 @@
     "react-dom": "^19.1.0",
     "react-i18next": "^15.5.3",
     "react-router-dom": "^7.6.0",
-    "reactjs-popup": "^2.0.6",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "vite-plugin-svgr": "^4.3.0"

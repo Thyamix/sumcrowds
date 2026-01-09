@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { auth, fetchWithAuth } from "../utils/auth"
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -20,7 +20,7 @@ export function JoinPopup({ close }) {
 
   function handleCodeInputValue(event) {
     const value = event.target.value
-    if (("abcdefghijklmnopqrstuvwxyxz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(value.at(-1)) || value == "") && value.length <= 6) {
+    if (("abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(value.at(-1)) || value === "") && value.length <= 6) {
       setCodeInputValue(value.toUpperCase())
     }
   }
