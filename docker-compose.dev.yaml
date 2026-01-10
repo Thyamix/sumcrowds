@@ -58,7 +58,7 @@ services:
         VITE_APIURL: "http://localhost:8080/api/"
         VITE_WSURL: "ws://localhost:8080/ws/"
     ports:
-      - "5173:5173"
+      - "3000:80"
     restart: unless-stopped
     networks:
       - dev_network
