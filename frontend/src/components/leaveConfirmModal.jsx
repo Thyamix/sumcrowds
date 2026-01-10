@@ -24,7 +24,7 @@ export function LeaveConfirmModal({ open, onClose }) {
           <DialogDescription className="text-center text-base text-muted-foreground mb-4">
             {t("leave_confirm_message")}
           </DialogDescription>
-          <DialogFooter className="flex gap-3 sm:justify-center">
+          <DialogFooter className="flex flex-row gap-3 justify-center">
             <Button
               variant="outline"
               size="lg"
