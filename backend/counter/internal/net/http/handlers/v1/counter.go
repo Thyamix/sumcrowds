@@ -324,6 +324,17 @@ func Dec(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Prevent negative counter: if total is 0, do nothing
+	if total == 0 {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	// If amount would go negative, just go to 0
+	if amount > total {
+		amount = total
+	}
+
 	err = database.AddValue(-amount, festival.Code)
 	if err != nil {
 		apperrors.SendError(w, apperrors.APIErrFailedAddValue(err))

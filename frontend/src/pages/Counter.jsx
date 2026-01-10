@@ -183,10 +183,7 @@ function FestivalCountedPage() {
                   variant="destructive"
                   size="counter"
                   className="shadow-lg hover:shadow-glow-destructive"
-                  onClick={() => {
-                    handleMinus(2, festivalCode)
-                    setTotal(prev => Math.max(0, prev - 2))
-                  }}
+                  onClick={() => handleMinus(2, festivalCode)}
                 >
                   −2
                 </Button>
@@ -194,10 +191,7 @@ function FestivalCountedPage() {
                   variant="destructive"
                   size="counter"
                   className="shadow-lg hover:shadow-glow-destructive"
-                  onClick={() => {
-                    handleMinus(3, festivalCode)
-                    setTotal(prev => Math.max(0, prev - 3))
-                  }}
+                  onClick={() => handleMinus(3, festivalCode)}
                 >
                   −3
                 </Button>
@@ -206,10 +200,7 @@ function FestivalCountedPage() {
                 variant="destructive"
                 size="counterLg"
                 className="shadow-lg hover:shadow-glow-destructive"
-                onClick={() => {
-                  handleMinus(1, festivalCode)
-                  setTotal(prev => Math.max(0, prev - 1))
-                }}
+                onClick={() => handleMinus(1, festivalCode)}
               >
                 <Minus className="w-6 h-6 mr-2" />
                 1
@@ -226,10 +217,7 @@ function FestivalCountedPage() {
                   variant="success"
                   size="counter"
                   className="shadow-lg hover:shadow-glow-success"
-                  onClick={() => {
-                    handlePlus(2, festivalCode)
-                    setTotal(prev => prev + 2)
-                  }}
+                  onClick={() => handlePlus(2, festivalCode)}
                 >
                   +2
                 </Button>
@@ -237,10 +225,7 @@ function FestivalCountedPage() {
                   variant="success"
                   size="counter"
                   className="shadow-lg hover:shadow-glow-success"
-                  onClick={() => {
-                    handlePlus(3, festivalCode)
-                    setTotal(prev => prev + 3)
-                  }}
+                  onClick={() => handlePlus(3, festivalCode)}
                 >
                   +3
                 </Button>
@@ -249,10 +234,7 @@ function FestivalCountedPage() {
                 variant="success"
                 size="counterLg"
                 className="shadow-lg hover:shadow-glow-success"
-                onClick={() => {
-                  handlePlus(1, festivalCode)
-                  setTotal(prev => prev + 1)
-                }}
+                onClick={() => handlePlus(1, festivalCode)}
               >
                 <Plus className="w-6 h-6 mr-2" />
                 1
