@@ -80,8 +80,8 @@ func APIErrRevokedRefreshToken(err error) *APIError {
 
 func APIErrInvalidFestivalCode(err error) *APIError {
 	return &APIError{
-		StatusCode: http.StatusUnauthorized,
-		Public:     "invalid festival code",
+		StatusCode: http.StatusNotFound,
+		Public:     "festival not found",
 		Internal:   fmt.Errorf("invalid festival code: %w\n", err),
 	}
 }

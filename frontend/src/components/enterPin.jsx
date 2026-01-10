@@ -47,7 +47,7 @@ export function EnterPin() {
         location.reload()
       }
     } catch (error) {
-      setPinError("An error occurred. Please try again later.");
+      setPinError(t("error_generic"));
     }
   }
 
@@ -75,7 +75,7 @@ export function EnterPin() {
           <h1 className="text-2xl font-bold text-white">
             {t("pinpopup_header")}
           </h1>
-          <p className="text-white/70 text-sm mt-1">Admin Access</p>
+          <p className="text-white/70 text-sm mt-1">{t("pinpopup_admin_access")}</p>
         </div>
 
         <CardContent className="p-6">
@@ -95,7 +95,7 @@ export function EnterPin() {
 
             <div>
               <Label htmlFor="pin" className="text-sm font-medium text-muted-foreground mb-2 block">
-                Enter your 4-digit PIN
+                {t("pinpopup_label")}
               </Label>
               <div className="relative">
                 <Input

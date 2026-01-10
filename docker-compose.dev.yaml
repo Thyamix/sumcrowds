@@ -1,48 +1,72 @@
 services:
-  backend_counter_devapp:
+  postgres_dev:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sumcrowds
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: sumcrowds
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - dev_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sumcrowds -d sumcrowds"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend_counter_dev:
     build:
       context: ./backend/
       dockerfile: ./counter/Dockerfile
     env_file:
       - back.env.dev
+    environment:
+      DATABASE_URL: "postgres://sumcrowds:devpassword@postgres_dev:5432/sumcrowds?sslmode=disable"
+    ports:
+      - "8080:8080"
     restart: unless-stopped
     networks:
       - dev_network
+    depends_on:
+      postgres_dev:
+        condition: service_healthy
 
-  backend_cleanup_devapp:
+  backend_cleanup_dev:
     build:
       context: ./backend/
       dockerfile: ./cleanup/Dockerfile
     env_file:
       - cleanup.env.dev
-    restart: unless-stopped
-    networks:
-      - dev_network
-
-  frontend_devapp:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.dev
-      args:
-        VITE_APIURL: "https://testingapp.sumcrowds.com/api/"
-        VITE_WSURL: "wss://testingapp.sumcrowds.com/ws/"
-    restart: unless-stopped
-    networks:
-      - dev_network
-
-  nginx_devproxy:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile.dev
-    ports:
-      - "40000:80"
+    environment:
+      DATABASE_URL: "postgres://sumcrowds:devpassword@postgres_dev:5432/sumcrowds?sslmode=disable"
     restart: unless-stopped
     networks:
       - dev_network
     depends_on:
-      - backend_counter_devapp
-      - frontend_devapp
-    command: ["nginx", "-g", "daemon off;"]
+      postgres_dev:
+        condition: service_healthy
+
+  frontend_dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+      args:
+        VITE_APIURL: "http://localhost:8080/api/"
+        VITE_WSURL: "ws://localhost:8080/ws/"
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+    networks:
+      - dev_network
+    depends_on:
+      - backend_counter_dev
+
+volumes:
+  postgres_data:
 
 networks:
   dev_network:

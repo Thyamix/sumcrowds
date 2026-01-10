@@ -57,7 +57,7 @@ export function JoinPopup({ close }) {
 
           <div>
             <label className="text-sm font-medium text-muted-foreground mb-2 block">
-              Festival Code
+              {t("joinpopup_code_label")}
             </label>
             <Input
               type="text"

@@ -23,7 +23,6 @@ func ValidateAccess(w http.ResponseWriter, r *http.Request) {
 	valid, err := auth.CheckAccess(accessTokenCookie)
 	if err != nil {
 		if err == apperrors.ErrInvalidToken {
-			log.Println(accessTokenCookie)
 			apperrors.SendError(w, apperrors.APIErrInvalidAccessToken(err))
 			return
 		}

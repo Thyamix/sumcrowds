@@ -1,6 +1,8 @@
 {
 	"counter_gauge": "Gauge",
 	"counter_code": "code",
+	"counter_exit": "Exit",
+	"counter_enter": "Enter",
 
 	"home_home": "Home",
 	"home_select_option": "Choose an option to get started",
@@ -11,37 +13,47 @@
 	"admin_title": "Admin Panel",
 	"admin_max_gauge": "Max Gauge",
 	"admin_set_gauge": "Set Gauge",
+	"admin_set_capacity": "Set Maximum Capacity",
 	"admin_current_event": "Current Event",
 	"admin_archived_data": "Archived Data",
 	"admin_archive": "Archive",
 	"admin_get_csv": "Get CSV",
+	"admin_no_archives": "No archived data available",
+	"admin_numbers_only": "Please only use numbers",
 
 	"pwpopup_header": "Enter Password",
 	"pwpopup_alert": "Invalid password",
 	"pwpopup_password": "Password",
 	"pwpopup_confirm": "Confirm",
 	"pwpopup_show_password": "Show Password",
+	"pwpopup_festival": "Festival",
 
 	"pinpopup_header": "Enter PIN",
 	"pinpopup_alert": "Invalid PIN",
 	"pinpopup_pin": "PIN",
 	"pinpopup_confirm": "Confirm",
 	"pinpopup_show_pin": "Show PIN",
+	"pinpopup_label": "Enter your 4-digit PIN",
+	"pinpopup_admin_access": "Admin Access",
 
 	"joinpopup_header": "Join",
 	"joinpopup_alert": "Invalid code",
 	"joinpopup_enter_code": "Enter session code",
 	"joinpopup_confirm": "Join Session",
-	
+	"joinpopup_code_label": "Festival Code",
+
 	"createpopup_header": "Create",
 	"createpopup_admin_pin": "Admin Pin",
+	"createpopup_pin_label": "Admin PIN (4 digits)",
 	"createpopup_password": "Password",
+	"createpopup_password_label": "Access Password (optional)",
 	"createpopup_show_password": "Show Password",
 	"createpopup_confirm": "Create Session",
 
 	"leave_confirm_title": "Leave Session?",
 	"leave_confirm_message": "Are you sure you want to leave the current session? You will need to re-enter the session code to return.",
 	"leave_confirm_cancel": "Stay",
-	"leave_confirm_leave": "Leave"
+	"leave_confirm_leave": "Leave",
 
+	"error_generic": "An error occurred. Please try again later."
 }

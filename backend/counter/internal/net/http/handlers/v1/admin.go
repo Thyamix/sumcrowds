@@ -21,7 +21,7 @@ func GetArchivedCSV(w http.ResponseWriter, r *http.Request) {
 	festivalCode := r.PathValue("festivalCode")
 	eventId, err := strconv.ParseInt(r.PathValue("eventId"), 10, 64)
 	if err != nil {
-		log.Println(err)
+		apperrors.SendError(w, apperrors.APIErrInvalidRequest(err))
 		return
 	}
 
@@ -146,25 +146,34 @@ func SetGauge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	database.ChangeCurrentEventMax(r.PathValue("festivalCode"), newMax.Max)
-
+	err = database.ChangeCurrentEventMax(r.PathValue("festivalCode"), newMax.Max)
+	if err != nil {
+		apperrors.SendError(w, apperrors.APIErrInternal(err))
+		return
+	}
 }
 
 func CheckAdminAccess(w http.ResponseWriter, r *http.Request) {
 	if r.Context().Value(contextkeys.FestivalAccess) == false {
 		apperrors.SendError(w, apperrors.APIErrNoFestivalAccess(fmt.Errorf("no access")))
+		return
 	}
 
-	pin := fmt.Sprintf("%v", r.Context().Value(contextkeys.AdminPIN))
+	pin, ok := r.Context().Value(contextkeys.AdminPIN).(string)
+	if !ok {
+		apperrors.SendError(w, apperrors.APIErrInvalidPin(fmt.Errorf("invalid pin format")))
+		return
+	}
 
 	festival, err := database.GetFestival(r.PathValue("festivalCode"))
-
 	if err != nil {
 		apperrors.SendError(w, apperrors.APIErrInvalidFestivalCode(err))
+		return
 	}
 
 	if pin != festival.Pin {
 		apperrors.SendError(w, apperrors.APIErrInvalidPin(fmt.Errorf("invalid pin")))
+		return
 	}
 
 	path := fmt.Sprintf("/api/v1/festival/%v/admin", festival.Code)
