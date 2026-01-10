@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/auth';
 import { EnterPassword } from '../components/enterPassword';
 import { EnterPin } from '../components/enterPin';
+import { LeaveConfirmModal } from '../components/leaveConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/languageSwitcher';
 import { Card, CardContent } from '@/components/ui/card';
@@ -67,6 +68,7 @@ export function Admin() {
 function FestivalAdminPage() {
   const [alert, setAlert] = useState("")
   const [inputValue, setInputValue] = useState("")
+  const [showLeaveModal, setShowLeaveModal] = useState(false)
   const { t } = useTranslation()
   const { festivalCode } = useParams()
 
@@ -102,11 +104,14 @@ function FestivalAdminPage() {
       <Card className="w-full max-w-2xl overflow-hidden shadow-xl border-0">
         {/* Header */}
         <div className="bg-accent px-6 py-5 flex items-center justify-between">
-          <Link to="/home">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
-              <Home className="h-5 w-5" />
-            </Button>
-          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-white/20"
+            onClick={() => setShowLeaveModal(true)}
+          >
+            <Home className="h-5 w-5" />
+          </Button>
 
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
@@ -187,6 +192,11 @@ function FestivalAdminPage() {
           <ArchiveSection festivalCode={festivalCode} t={t} />
         </CardContent>
       </Card>
+
+      <LeaveConfirmModal
+        open={showLeaveModal}
+        onClose={() => setShowLeaveModal(false)}
+      />
     </div>
   )
 

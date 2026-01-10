@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { EnterPassword } from '../components/enterPassword';
+import { LeaveConfirmModal } from '../components/leaveConfirmModal';
 import { fetchWithAuth } from '../utils/auth';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/languageSwitcher';
@@ -60,6 +61,7 @@ function FestivalCountedPage() {
   const [total, setTotal] = useState("...")
   const [maxJauge, setMaxJauge] = useState(0)
   const [status, setStatus] = useState("normal")
+  const [showLeaveModal, setShowLeaveModal] = useState(false)
   const { festivalCode } = useParams()
   const socketRef = useRef(null)
   let heartbeat
@@ -110,11 +112,14 @@ function FestivalCountedPage() {
       <Card className="w-full max-w-2xl overflow-hidden shadow-xl border-0">
         {/* Header */}
         <div className="bg-primary px-6 py-5 flex items-center justify-between">
-          <Link to="/home">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
-              <Home className="h-5 w-5" />
-            </Button>
-          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-white/20"
+            onClick={() => setShowLeaveModal(true)}
+          >
+            <Home className="h-5 w-5" />
+          </Button>
 
           <div className="text-center">
             <p className="text-xs uppercase tracking-widest text-white/70 mb-1">{t("counter_code")}</p>
@@ -256,6 +261,11 @@ function FestivalCountedPage() {
           </div>
         </div>
       </Card>
+
+      <LeaveConfirmModal
+        open={showLeaveModal}
+        onClose={() => setShowLeaveModal(false)}
+      />
     </div>
   )
 }

@@ -37,6 +37,11 @@
 	"createpopup_admin_pin": "Code Admin",
 	"createpopup_password": "Mot de passe",
 	"createpopup_show_password": "Afficher le mot de passe",
-	"createpopup_confirm": "Créer une session"
+	"createpopup_confirm": "Créer une session",
+
+	"leave_confirm_title": "Quitter la session?",
+	"leave_confirm_message": "Êtes-vous sûr de vouloir quitter la session en cours? Vous devrez ressaisir le code de session pour revenir.",
+	"leave_confirm_cancel": "Rester",
+	"leave_confirm_leave": "Quitter"
 }
 

@@ -37,6 +37,11 @@
 	"createpopup_admin_pin": "Admin Pin",
 	"createpopup_password": "Password",
 	"createpopup_show_password": "Show Password",
-	"createpopup_confirm": "Create Session"
+	"createpopup_confirm": "Create Session",
+
+	"leave_confirm_title": "Leave Session?",
+	"leave_confirm_message": "Are you sure you want to leave the current session? You will need to re-enter the session code to return.",
+	"leave_confirm_cancel": "Stay",
+	"leave_confirm_leave": "Leave"
 
 }
