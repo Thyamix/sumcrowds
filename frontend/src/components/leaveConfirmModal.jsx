@@ -15,13 +15,13 @@ export function LeaveConfirmModal({ open, onClose }) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent onClose={onClose} className="sm:max-w-md border-0 shadow-2xl overflow-hidden p-0">
-        <div className="bg-muted px-6 py-5 text-center">
-          <DialogTitle className="text-xl font-semibold text-foreground">
+        <div className="bg-primary px-6 py-5 text-center">
+          <DialogTitle className="text-xl font-semibold text-white">
             {t("leave_confirm_title")}
           </DialogTitle>
         </div>
-        <div className="p-6 space-y-4">
-          <DialogDescription className="text-center text-base text-muted-foreground">
+        <div className="px-6 pt-4 pb-6">
+          <DialogDescription className="text-center text-base text-muted-foreground mb-4">
             {t("leave_confirm_message")}
           </DialogDescription>
           <DialogFooter className="flex gap-3 sm:justify-center">
