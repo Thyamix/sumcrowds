@@ -24,12 +24,12 @@ export function LeaveConfirmModal({ open, onClose }) {
           <DialogDescription className="text-center text-base text-muted-foreground mb-4">
             {t("leave_confirm_message")}
           </DialogDescription>
-          <DialogFooter className="flex flex-row gap-3 justify-center">
+          <DialogFooter className="!flex-row gap-3 sm:justify-center">
             <Button
               variant="outline"
               size="lg"
               onClick={onClose}
-              className="flex-1"
+              className="flex-1 min-h-12 text-base"
             >
               {t("leave_confirm_cancel")}
             </Button>
@@ -37,7 +37,7 @@ export function LeaveConfirmModal({ open, onClose }) {
               variant="destructive"
               size="lg"
               onClick={handleConfirm}
-              className="flex-1"
+              className="flex-1 min-h-12 text-base"
             >
               {t("leave_confirm_leave")}
             </Button>
