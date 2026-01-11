@@ -65,7 +65,7 @@ export function JoinPopup({ close }) {
               value={codeInputValue}
               onChange={handleCodeInputValue}
               placeholder={t("joinpopup_enter_code")}
-              className="text-center text-2xl h-14 uppercase tracking-[0.3em] font-mono font-bold"
+              className="text-center text-xl h-12 uppercase tracking-[0.15em] font-semibold"
               maxLength={6}
               autoFocus
             />

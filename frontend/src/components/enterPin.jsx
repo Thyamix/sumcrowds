@@ -106,7 +106,7 @@ export function EnterPin() {
                   value={pinInputValue}
                   onChange={handlePinInputValue}
                   placeholder="••••"
-                  className="text-center text-3xl h-16 tracking-[0.5em] font-mono font-bold pr-12"
+                  className="text-center text-3xl h-16 tracking-[0.3em] font-bold pr-12"
                   autoFocus
                 />
                 <button

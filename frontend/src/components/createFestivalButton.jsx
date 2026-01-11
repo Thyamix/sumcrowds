@@ -84,7 +84,7 @@ export function CreatePopup({ close }) {
               value={pinInputValue}
               onChange={handlePinInputValue}
               placeholder={t("createpopup_admin_pin")}
-              className="text-center text-2xl h-14 tracking-[0.5em] font-mono font-bold"
+              className="text-center text-2xl h-14 tracking-[0.3em] font-bold"
               autoFocus
             />
           </div>
