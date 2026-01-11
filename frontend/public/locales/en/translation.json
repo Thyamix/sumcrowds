@@ -3,6 +3,8 @@
 	"counter_code": "code",
 	"counter_exit": "Exit",
 	"counter_enter": "Enter",
+	"counter_disconnected": "Disconnected",
+	"counter_reconnect": "Reconnect",
 
 	"home_home": "Home",
 	"home_select_option": "Choose an option to get started",

@@ -51,8 +51,8 @@ export function EnterPin() {
     }
   }
 
-  function goHome() {
-    navigate("/", { replace: true })
+  function goBack() {
+    navigate(`/${festivalCode}`, { replace: true })
   }
 
   return (
@@ -64,7 +64,7 @@ export function EnterPin() {
             variant="ghost"
             size="icon"
             className="absolute top-4 right-4 text-white hover:bg-white/20"
-            onClick={goHome}
+            onClick={goBack}
           >
             <X className="h-5 w-5" />
           </Button>

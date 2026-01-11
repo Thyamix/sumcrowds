@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/languageSwitcher';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Home, Settings, Minus, Plus } from 'lucide-react';
+import { Home, Settings, Minus, Plus, WifiOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const WSURL = import.meta.env.VITE_WSURL;
@@ -62,14 +62,22 @@ function FestivalCountedPage() {
   const [maxJauge, setMaxJauge] = useState(0)
   const [status, setStatus] = useState("normal")
   const [showLeaveModal, setShowLeaveModal] = useState(false)
+  const [isConnected, setIsConnected] = useState(false)
   const { festivalCode } = useParams()
   const socketRef = useRef(null)
   const heartbeatRef = useRef(null)
 
-  useEffect(() => {
+  const connectWebSocket = () => {
+    if (socketRef.current) {
+      socketRef.current.close()
+    }
+    clearInterval(heartbeatRef.current)
+    setTotal("...")
+
     socketRef.current = new WebSocket(WSURL + festivalCode)
 
     socketRef.current.onopen = () => {
+      setIsConnected(true)
       getTotal(socketRef.current)
       heartbeatRef.current = setInterval(() => {
         if (socketRef.current.readyState === WebSocket.OPEN) {
@@ -83,9 +91,13 @@ function FestivalCountedPage() {
     }
 
     socketRef.current.onclose = () => {
-      setTotal("Disconnected")
+      setIsConnected(false)
       clearInterval(heartbeatRef.current)
     }
+  }
+
+  useEffect(() => {
+    connectWebSocket()
 
     return () => {
       clearInterval(heartbeatRef.current)
@@ -139,37 +151,56 @@ function FestivalCountedPage() {
         {/* Counter Display */}
         <div className={cn(
           "py-12 px-6 text-center transition-colors duration-500",
-          status === "danger" && "bg-destructive/10",
-          status === "warning" && "bg-warning/10",
-          status === "normal" && "bg-card"
+          !isConnected && "bg-muted/50",
+          isConnected && status === "danger" && "bg-destructive/10",
+          isConnected && status === "warning" && "bg-warning/10",
+          isConnected && status === "normal" && "bg-card"
         )}>
-          <p className={cn(
-            "text-8xl md:text-9xl font-black font-mono tabular-nums transition-colors",
-            status === "danger" && "text-destructive",
-            status === "warning" && "text-warning",
-            status === "normal" && "text-foreground"
-          )}>
-            {total}
-          </p>
+          {!isConnected ? (
+            <div className="flex flex-col items-center gap-4">
+              <WifiOff className="w-16 h-16 text-muted-foreground" />
+              <p className="text-2xl font-semibold text-muted-foreground">{t("counter_disconnected")}</p>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={connectWebSocket}
+                className="gap-2"
+              >
+                <RefreshCw className="w-4 h-4" />
+                {t("counter_reconnect")}
+              </Button>
+            </div>
+          ) : (
+            <>
+              <p className={cn(
+                "text-8xl md:text-9xl font-black font-mono tabular-nums transition-colors",
+                status === "danger" && "text-destructive",
+                status === "warning" && "text-warning",
+                status === "normal" && "text-foreground"
+              )}>
+                {total}
+              </p>
 
-          {/* Progress bar */}
-          <div className="mt-8 max-w-md mx-auto">
-            <div className="flex justify-between text-sm text-muted-foreground mb-2">
-              <span>{t("counter_gauge")}</span>
-              <span className="font-mono font-bold">{typeof total === 'number' ? total : 0} / {maxJauge}</span>
-            </div>
-            <div className="h-3 bg-muted rounded-full overflow-hidden">
-              <div
-                className={cn(
-                  "h-full rounded-full transition-all duration-500",
-                  status === "danger" && "bg-destructive",
-                  status === "warning" && "bg-warning",
-                  status === "normal" && "bg-success"
-                )}
-                style={{ width: `${percentage}%` }}
-              />
-            </div>
-          </div>
+              {/* Progress bar */}
+              <div className="mt-8 max-w-md mx-auto">
+                <div className="flex justify-between text-sm text-muted-foreground mb-2">
+                  <span>{t("counter_gauge")}</span>
+                  <span className="font-mono font-bold">{typeof total === 'number' ? total : 0} / {maxJauge}</span>
+                </div>
+                <div className="h-3 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className={cn(
+                      "h-full rounded-full transition-all duration-500",
+                      status === "danger" && "bg-destructive",
+                      status === "warning" && "bg-warning",
+                      status === "normal" && "bg-success"
+                    )}
+                    style={{ width: `${percentage}%` }}
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Controls */}
