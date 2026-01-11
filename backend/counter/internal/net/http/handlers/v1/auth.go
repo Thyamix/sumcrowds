@@ -1,15 +1,28 @@
 package api_handler_v1
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/auth"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http/cookieutils"
 )
+
+// AuthResponse is returned in JSON body for mobile apps
+type AuthResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresAt    int64  `json:"expires_at"`
+}
+
+func isSecureCookie() bool {
+	return os.Getenv("APP_DEPLOY") != "docker"
+}
 
 func ValidateAccess(w http.ResponseWriter, r *http.Request) {
 	accessTokenCookie, err := cookieutils.GetAccessToken(r)
@@ -60,11 +73,18 @@ func RefreshAccess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookieutils.CreateAccessCookie(w, accessToken.Token, "/", time.Unix(accessToken.ExpiresAt, 0))
-	cookieutils.CreateRefreshCookie(w, refreshToken.Token, "/api/v1/auth/refreshaccess", time.Unix(refreshToken.ExpiresAt, 0))
+	// Set cookies for web clients
+	cookieutils.CreateAccessCookie(w, accessToken.Token, "/", time.Unix(accessToken.ExpiresAt, 0), isSecureCookie())
+	cookieutils.CreateRefreshCookie(w, refreshToken.Token, "/api/v1/auth/refreshaccess", time.Unix(refreshToken.ExpiresAt, 0), isSecureCookie())
 
-	w.WriteHeader(http.StatusNoContent)
-	w.Write([]byte("ok"))
+	// Return JSON for mobile clients
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(AuthResponse{
+		AccessToken:  accessToken.Token,
+		RefreshToken: refreshToken.Token,
+		ExpiresAt:    accessToken.ExpiresAt,
+	})
 }
 
 func InitAccess(w http.ResponseWriter, r *http.Request) {
@@ -76,11 +96,18 @@ func InitAccess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookieutils.CreateAccessCookie(w, accessToken.Token, "/", time.Unix(accessToken.ExpiresAt, 0))
-	cookieutils.CreateRefreshCookie(w, refreshToken.Token, "/api/v1/auth/refreshaccess", time.Unix(refreshToken.ExpiresAt, 0))
+	// Set cookies for web clients
+	cookieutils.CreateAccessCookie(w, accessToken.Token, "/", time.Unix(accessToken.ExpiresAt, 0), isSecureCookie())
+	cookieutils.CreateRefreshCookie(w, refreshToken.Token, "/api/v1/auth/refreshaccess", time.Unix(refreshToken.ExpiresAt, 0), isSecureCookie())
 
 	fmt.Println("Sent new cookies")
 
-	w.WriteHeader(http.StatusNoContent)
-	w.Write([]byte("ok"))
+	// Return JSON for mobile clients
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(AuthResponse{
+		AccessToken:  accessToken.Token,
+		RefreshToken: refreshToken.Token,
+		ExpiresAt:    accessToken.ExpiresAt,
+	})
 }
