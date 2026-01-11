@@ -7,9 +7,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Pull and deploy
+      - name: Deploy via SSH
         run: |
-          cd /home/thyamix/Programming/project/sumcrowds
-          git pull origin master && \
-          docker compose -f docker-compose.prod.yaml down && \
-          docker compose -f docker-compose.prod.yaml up --build -d
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no thyamix@172.17.0.1 "\
+            cd /home/thyamix/Programming/project/sumcrowds && \
+            git pull origin master && \
+            docker compose -f docker-compose.prod.yaml down && \
+            docker compose -f docker-compose.prod.yaml up --build -d"
