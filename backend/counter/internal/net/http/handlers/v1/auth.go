@@ -57,16 +57,35 @@ func ValidateAccess(w http.ResponseWriter, r *http.Request) {
 }
 
 func RefreshAccess(w http.ResponseWriter, r *http.Request) {
-	refreshTokenCookie, err := cookieutils.GetRefreshToken(r)
-	if err != nil {
-		if err == http.ErrNoCookie {
-			apperrors.SendError(w, apperrors.APIErrNoRefreshToken(err))
+	var refreshTokenString string
+	var err error
+
+	// Try to get token from header first for mobile clients
+	headerToken := auth.GetTokenFromHeader(r)
+
+	if headerToken != "" {
+		refreshTokenString = headerToken
+	} else {
+		// Fallback to cookie for web clients
+		refreshTokenString, err = cookieutils.GetRefreshToken(r)
+		if err != nil {
+			if err == http.ErrNoCookie {
+				apperrors.SendError(w, apperrors.APIErrNoRefreshToken(err))
+				return
+			}
+			// For other errors, you might want to log them and send a generic error
+			log.Printf("Error getting refresh token from cookie: %v", err)
+			apperrors.SendError(w, apperrors.APIErrInternal(err))
 			return
 		}
 	}
 
-	refreshToken, accessToken, err := auth.RefreshToken(refreshTokenCookie)
+	if refreshTokenString == "" {
+		apperrors.SendError(w, apperrors.APIErrNoRefreshToken(fmt.Errorf("no refresh token provided")))
+		return
+	}
 
+	refreshToken, accessToken, err := auth.RefreshToken(refreshTokenString)
 	if err != nil {
 		log.Println("Failed to refresh token", err)
 		apperrors.SendError(w, apperrors.APIErrInternal(err))

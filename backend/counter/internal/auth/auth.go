@@ -6,12 +6,30 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
 	counterModels "github.com/thyamix/sumcrowds/backend/sharedlib/models"
 )
+
+// GetTokenFromHeader extracts the token from the Authorization header.
+func GetTokenFromHeader(r *http.Request) string {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		return ""
+	}
+
+	// The header should be in the format "Bearer <token>"
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+		return ""
+	}
+
+	return parts[1]
+}
 
 func generateToken() (string, error) {
 	randomBytes := make([]byte, 32)
