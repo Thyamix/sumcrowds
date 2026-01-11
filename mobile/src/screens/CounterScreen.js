@@ -3,11 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   StatusBar,
+  Platform,
   TouchableOpacity,
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {Button} from '../components/ui';
 import {
   LanguageSwitcher,
@@ -17,6 +18,8 @@ import {
 import {fetchWithAuth, auth} from '../utils/auth';
 import {WS_URL} from '../config';
 import {colors, spacing, fontSize, fontWeight, borderRadius} from '../utils/theme';
+
+const STATUSBAR_HEIGHT = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
 
 export const CounterScreen = ({route, navigation}) => {
   const {festivalCode} = route.params;
@@ -183,8 +186,8 @@ export const CounterScreen = ({route, navigation}) => {
   };
 
   return (
-    <SafeAreaView style={[styles.container, {backgroundColor: getStatusColor()}]}>
-      <StatusBar barStyle="light-content" backgroundColor={getStatusColor()} />
+    <SafeAreaView style={[styles.container, {backgroundColor: getStatusColor()}]} edges={['left', 'right', 'bottom']}>
+      <StatusBar barStyle="light-content" backgroundColor={getStatusColor()} translucent />
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => setShowLeaveModal(true)}>
@@ -288,7 +291,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: spacing.lg,
-    paddingTop: spacing.xl,
+    paddingTop: STATUSBAR_HEIGHT + spacing.md,
   },
   homeButton: {
     fontSize: fontSize.lg,

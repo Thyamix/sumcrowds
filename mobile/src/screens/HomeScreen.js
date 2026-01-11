@@ -1,9 +1,12 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, SafeAreaView, StatusBar} from 'react-native';
+import {View, Text, StyleSheet, StatusBar, Platform} from 'react-native';
 import {useTranslation} from 'react-i18next';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {Button, Card, CardContent} from '../components/ui';
 import {LanguageSwitcher, JoinModal, CreateModal} from '../components';
 import {colors, spacing, fontSize, fontWeight} from '../utils/theme';
+
+const STATUSBAR_HEIGHT = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
 
 export const HomeScreen = ({navigation}) => {
   const {t} = useTranslation();
@@ -19,7 +22,7 @@ export const HomeScreen = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       <View style={styles.header}>
@@ -79,7 +82,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: spacing.lg,
-    paddingTop: spacing.xl,
+    paddingTop: STATUSBAR_HEIGHT + spacing.md,
   },
   headerTitle: {
     fontSize: fontSize.xl,

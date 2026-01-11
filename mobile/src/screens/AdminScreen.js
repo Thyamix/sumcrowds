@@ -3,18 +3,21 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   StatusBar,
+  Platform,
   ScrollView,
   TouchableOpacity,
   Linking,
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {Button, Input, Card, CardContent, Alert} from '../components/ui';
 import {LanguageSwitcher, PinModal} from '../components';
 import {fetchWithAuth, auth, getAccessToken} from '../utils/auth';
 import {API_URL} from '../config';
 import {colors, spacing, fontSize, fontWeight, borderRadius} from '../utils/theme';
+
+const STATUSBAR_HEIGHT = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
 
 export const AdminScreen = ({route, navigation}) => {
   const {festivalCode} = route.params;
@@ -153,7 +156,7 @@ export const AdminScreen = ({route, navigation}) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       <View style={styles.header}>
@@ -262,7 +265,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: spacing.lg,
-    paddingTop: spacing.xl,
+    paddingTop: STATUSBAR_HEIGHT + spacing.md,
   },
   backButton: {
     fontSize: fontSize.md,
