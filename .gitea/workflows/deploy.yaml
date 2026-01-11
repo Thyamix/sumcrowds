@@ -1,0 +1,15 @@
+name: Deploy to Server
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull and deploy
+        run: |
+          cd /home/thyamix/Programming/project/sumcrowds
+          git pull origin master && \
+          docker compose -f docker-compose.prod.yaml down && \
+          docker compose -f docker-compose.prod.yaml up --build -d
