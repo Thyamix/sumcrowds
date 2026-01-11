@@ -178,5 +178,5 @@ func CheckAdminAccess(w http.ResponseWriter, r *http.Request) {
 
 	path := fmt.Sprintf("/api/v1/festival/%v/admin", festival.Code)
 
-	cookieutils.CreatePinCookie(w, pin, path, time.Now().Add(time.Minute*5))
+	cookieutils.CreatePinCookie(w, pin, path, time.Now().Add(time.Minute*5), isSecureCookie())
 }
