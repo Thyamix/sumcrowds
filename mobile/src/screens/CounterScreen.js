@@ -41,7 +41,7 @@ export const CounterScreen = ({route, navigation}) => {
     if (max === 0) return 'normal';
     const percentage = (currentTotal / max) * 100;
     if (percentage >= 100) return 'danger';
-    if (percentage >= 75) return 'warning';
+    if (percentage >= 90) return 'warning';
     return 'normal';
   }, []);
 
@@ -428,6 +428,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.3)',
     borderRadius: borderRadius.full,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.5)',
   },
   gaugeBarFill: {
     height: '100%',
