@@ -7,10 +7,11 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
-  Linking,
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import ReactNativeBlobUtil from 'react-native-blob-util';
+import Share from 'react-native-share';
 import {Button, Input, Card, CardContent, Alert} from '../components/ui';
 import {LanguageSwitcher, PinModal} from '../components';
 import {fetchWithAuth, auth, getAccessToken} from '../utils/auth';
@@ -126,24 +127,52 @@ export const AdminScreen = ({route, navigation}) => {
     }
   };
 
-  const handleDownloadCurrent = async () => {
+  const downloadAndShareCSV = async (url, filename) => {
+    setLoading(true);
     try {
       const token = await getAccessToken();
-      const url = `${API_URL}v1/festival/${festivalCode}/admin/download/activecsv`;
-      Linking.openURL(url + (token ? `?token=${token}` : ''));
+      const {dirs} = ReactNativeBlobUtil.fs;
+      const filePath = `${dirs.CacheDir}/${filename}`;
+
+      const response = await ReactNativeBlobUtil.config({
+        fileCache: true,
+        path: filePath,
+      }).fetch('GET', url, {
+        Authorization: `Bearer ${token}`,
+      });
+
+      const status = response.info().status;
+      if (status !== 200) {
+        setAlert(t('error_generic'));
+        return;
+      }
+
+      await Share.open({
+        url: Platform.OS === 'android' ? `file://${response.path()}` : response.path(),
+        type: 'text/csv',
+        filename: filename,
+      });
     } catch (err) {
-      setAlert(t('error_generic'));
+      // User cancelled share - not an error
+      if (err.message !== 'User did not share') {
+        console.error('Download error:', err);
+        setAlert(t('error_generic'));
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleDownloadCurrent = async () => {
+    const url = `${API_URL}v1/festival/${festivalCode}/admin/download/activecsv`;
+    const filename = `festival-${festivalCode}-current.csv`;
+    await downloadAndShareCSV(url, filename);
+  };
+
   const handleDownloadArchive = async id => {
-    try {
-      const token = await getAccessToken();
-      const url = `${API_URL}v1/festival/${festivalCode}/admin/download/archivedcsv/${id}`;
-      Linking.openURL(url + (token ? `?token=${token}` : ''));
-    } catch (err) {
-      setAlert(t('error_generic'));
-    }
+    const url = `${API_URL}v1/festival/${festivalCode}/admin/download/archivedcsv/${id}`;
+    const filename = `festival-${festivalCode}-${id}.csv`;
+    await downloadAndShareCSV(url, filename);
   };
 
   const handlePinSuccess = () => {
