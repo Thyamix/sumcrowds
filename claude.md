@@ -13,6 +13,16 @@ The `wiki/` folder contains project documentation that must stay synchronized wi
 
 ## Git Workflow
 
+### Before Starting Any Work
+
+Always ensure all branches are up to date before doing any work:
+
+```bash
+git fetch origin
+git checkout master
+git pull origin master
+```
+
 ### Check for Remote Changes
 
 Before starting work and frequently during development, check for remote changes:
