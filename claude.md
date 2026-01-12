@@ -83,6 +83,23 @@ tea pr create --title "type(scope): description" --description "Detailed descrip
 
 This project uses Gitea at `git.thyamix.com`, not GitHub.
 
+## Linear Workflow
+
+When working on Linear issues:
+
+1. **Assign yourself** to the issue when starting work
+2. **Mark as "In Progress"** when you begin working on the issue
+3. **Mark as "Awaiting Review"** once the PR is created
+4. **Link the PR** to the issue using the `links` field
+
+Example workflow:
+```
+1. Update issue: assignee=me, state="In Progress"
+2. Create branch and implement fix
+3. Create PR
+4. Update issue: state="Awaiting Review", add PR link
+```
+
 ## Communication
 
 ### "Remember" Instructions
