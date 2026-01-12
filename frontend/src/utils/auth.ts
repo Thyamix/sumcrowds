@@ -1,6 +1,5 @@
-export async function auth() {
-	/** @type {string} */
-	const APIURL = import.meta.env.VITE_APIURL;
+export async function auth(): Promise<void> {
+	const APIURL = import.meta.env.VITE_APIURL as string;
 
 	const response = await fetch(APIURL + "v1/auth/refreshaccess", { credentials: "include" })
 	if (response.ok) {
@@ -12,11 +11,8 @@ export async function auth() {
 
 /**
  * Make a fetch request with auto reauthenticate and retry
- * @param {string} url 
- * @param {{}} [options={}] 
- * @returns {Promise<Response>}
-*/
-export async function fetchWithAuth(url, options = {}) {
+ */
+export async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
 	let response = await fetch(url, {
 		...options,
 		credentials: 'include'
