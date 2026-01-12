@@ -233,36 +233,60 @@ export const CounterScreen = ({route, navigation}) => {
       </View>
 
       <View style={styles.controls}>
-        <View style={styles.controlRow}>
-          <Text style={styles.controlLabel}>{t('counter_exit')}</Text>
-          <View style={styles.buttonGroup}>
-            {[1, 2, 3].map(n => (
-              <Button
-                key={`dec-${n}`}
-                onPress={() => handleDecrement(n)}
-                variant="destructive"
-                size="counter"
-                style={styles.counterButton}>
-                -{n}
-              </Button>
-            ))}
+        {/* Exit column */}
+        <View style={styles.controlColumn}>
+          <Text style={[styles.controlLabel, {color: colors.destructive}]}>{t('counter_exit')}</Text>
+          <View style={styles.smallButtonRow}>
+            <Button
+              onPress={() => handleDecrement(2)}
+              variant="destructive"
+              size="counter"
+              style={styles.smallButton}>
+              -2
+            </Button>
+            <Button
+              onPress={() => handleDecrement(3)}
+              variant="destructive"
+              size="counter"
+              style={styles.smallButton}>
+              -3
+            </Button>
           </View>
+          <Button
+            onPress={() => handleDecrement(1)}
+            variant="destructive"
+            size="counterLg"
+            style={styles.largeButton}>
+            -1
+          </Button>
         </View>
 
-        <View style={styles.controlRow}>
-          <Text style={styles.controlLabel}>{t('counter_enter')}</Text>
-          <View style={styles.buttonGroup}>
-            {[1, 2, 3].map(n => (
-              <Button
-                key={`inc-${n}`}
-                onPress={() => handleIncrement(n)}
-                variant="success"
-                size="counter"
-                style={styles.counterButton}>
-                +{n}
-              </Button>
-            ))}
+        {/* Enter column */}
+        <View style={styles.controlColumn}>
+          <Text style={[styles.controlLabel, {color: colors.success}]}>{t('counter_enter')}</Text>
+          <View style={styles.smallButtonRow}>
+            <Button
+              onPress={() => handleIncrement(2)}
+              variant="success"
+              size="counter"
+              style={styles.smallButton}>
+              +2
+            </Button>
+            <Button
+              onPress={() => handleIncrement(3)}
+              variant="success"
+              size="counter"
+              style={styles.smallButton}>
+              +3
+            </Button>
           </View>
+          <Button
+            onPress={() => handleIncrement(1)}
+            variant="success"
+            size="counterLg"
+            style={styles.largeButton}>
+            +1
+          </Button>
         </View>
       </View>
 
@@ -373,26 +397,34 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   controls: {
+    flexDirection: 'row',
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
-    gap: spacing.lg,
-  },
-  controlRow: {
-    alignItems: 'center',
     gap: spacing.md,
+  },
+  controlColumn: {
+    flex: 1,
+    alignItems: 'center',
+    gap: spacing.sm,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
   },
   controlLabel: {
-    fontSize: fontSize.md,
-    color: colors.white,
+    fontSize: fontSize.sm,
     fontWeight: fontWeight.semibold,
-    opacity: 0.9,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
-  buttonGroup: {
+  smallButtonRow: {
     flexDirection: 'row',
-    gap: spacing.md,
+    gap: spacing.sm,
   },
-  counterButton: {
-    minWidth: 80,
+  smallButton: {
+    minWidth: 60,
+    minHeight: 50,
+  },
+  largeButton: {
+    minWidth: 130,
     minHeight: 60,
   },
 });

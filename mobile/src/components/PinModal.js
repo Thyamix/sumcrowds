@@ -36,9 +36,8 @@ export const PinModal = ({visible, onClose, festivalCode, onSuccess}) => {
       });
 
       if (response.ok) {
-        onSuccess();
         setPin('');
-        onClose();
+        onSuccess();
       } else if (response.status === 403 || response.status === 422) {
         setError(t('pinpopup_alert'));
       } else {

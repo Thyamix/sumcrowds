@@ -73,6 +73,16 @@ Always commit and push changes when finished with a task, unless explicitly told
 
 Never push directly to `main` or `master` branch unless the user specifically tells you to. Always create a feature branch and push to that instead.
 
+### Creating Pull Requests
+
+Use the Gitea CLI (`tea`) to create pull requests automatically:
+
+```bash
+tea pr create --title "type(scope): description" --description "Detailed description of changes"
+```
+
+This project uses Gitea at `git.thyamix.com`, not GitHub.
+
 ## Communication
 
 ### "Remember" Instructions

@@ -69,9 +69,16 @@ const sizes = {
   counter: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
+    fontSize: fontSize.xl,
+    minWidth: 60,
+    minHeight: 50,
+  },
+  counterLg: {
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xl,
     fontSize: fontSize.xxl,
-    minWidth: 80,
-    minHeight: 80,
+    minWidth: 130,
+    minHeight: 60,
   },
 };
 

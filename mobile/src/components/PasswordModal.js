@@ -28,9 +28,8 @@ export const PasswordModal = ({visible, onClose, festivalCode, onSuccess}) => {
       });
 
       if (response.ok) {
-        onSuccess();
         setPassword('');
-        onClose();
+        onSuccess();
       } else if (response.status === 403) {
         setError(t('pwpopup_alert'));
       } else {

@@ -28,7 +28,7 @@ export const Modal = ({
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
             <KeyboardAvoidingView
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+              behavior="padding">
               <View style={styles.modalContainer}>
                 <View style={styles.header}>
                   {title && <Text style={styles.title}>{title}</Text>}
