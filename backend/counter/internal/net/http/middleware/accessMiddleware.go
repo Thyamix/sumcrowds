@@ -21,10 +21,8 @@ func RequireAccess(next http.Handler) http.Handler {
 		accessTokenValue, err := cookieutils.GetAccessToken(r)
 		festivalCode := r.PathValue("festivalCode")
 		if err != nil {
-			if err == http.ErrNoCookie {
-				apperrors.SendError(w, apperrors.APIErrNoAccessToken(err))
-				return
-			}
+			apperrors.SendError(w, apperrors.APIErrNoAccessToken(err))
+			return
 		}
 
 		accessToken, err := database.GetAccessToken(accessTokenValue)
