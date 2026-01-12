@@ -123,6 +123,12 @@ func ArchiveCurrentEvent(w http.ResponseWriter, r *http.Request) {
 	_, err = database.Reset(festival.Id)
 	if err != nil {
 		apperrors.SendError(w, apperrors.APIErrFailedToResetFestival(err))
+		return
+	}
+
+	// Broadcast the reset counter to all connected clients
+	if err := websockets.BroadcastTotal(festival.Code); err != nil {
+		log.Printf("Failed to broadcast archive update: %v", err)
 	}
 }
 
