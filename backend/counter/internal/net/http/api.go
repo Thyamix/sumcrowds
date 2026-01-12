@@ -15,8 +15,16 @@ func StartAPI() {
 	wsServer := websockets.NewHub()
 	router := getRoutes(wsServer)
 
+	allowedOrigin := os.Getenv("ORIGIN")
 	handler := cors.New(cors.Options{
-		AllowedOrigins:   []string{os.Getenv("ORIGIN")},
+		AllowOriginFunc: func(origin string) bool {
+			// Allow requests with no Origin header (mobile apps)
+			if origin == "" {
+				return true
+			}
+			// Allow the configured origin (web app)
+			return origin == allowedOrigin
+		},
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
