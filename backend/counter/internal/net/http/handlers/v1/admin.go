@@ -14,6 +14,7 @@ import (
 	"github.com/thyamix/sumcrowds/backend/counter/internal/contextkeys"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http/cookieutils"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/websockets"
 	csvOutput "github.com/thyamix/sumcrowds/backend/counter/internal/output/csv"
 )
 
@@ -146,10 +147,16 @@ func SetGauge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = database.ChangeCurrentEventMax(r.PathValue("festivalCode"), newMax.Max)
+	festivalCode := r.PathValue("festivalCode")
+	err = database.ChangeCurrentEventMax(festivalCode, newMax.Max)
 	if err != nil {
 		apperrors.SendError(w, apperrors.APIErrInternal(err))
 		return
+	}
+
+	// Broadcast the updated gauge to all connected clients
+	if err := websockets.BroadcastTotal(festivalCode); err != nil {
+		log.Printf("Failed to broadcast gauge update: %v", err)
 	}
 }
 
