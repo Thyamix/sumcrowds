@@ -4,7 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {Button, Card, CardContent} from '../components/ui';
-import {LanguageSwitcher, JoinModal, CreateModal} from '../components';
+import {LanguageSwitcher, JoinModal, CreateModal, RecentSessionsModal} from '../components';
 import {colors, spacing, fontSize, fontWeight} from '../utils/theme';
 import type {RootStackParamList} from '../navigation';
 
@@ -18,12 +18,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   const {t} = useTranslation();
   const [joinOpen, setJoinOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [recentOpen, setRecentOpen] = useState(false);
 
   const handleJoin = (code: string): void => {
     navigation.navigate('Counter', {festivalCode: code});
   };
 
   const handleCreated = (code: string): void => {
+    navigation.navigate('Counter', {festivalCode: code});
+  };
+
+  const handleSelectRecent = (code: string): void => {
     navigation.navigate('Counter', {festivalCode: code});
   };
 
@@ -58,6 +63,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                 style={styles.button}>
                 {t('home_create_button')}
               </Button>
+
+              <Button
+                onPress={() => setRecentOpen(true)}
+                size="lg"
+                variant="secondary"
+                style={styles.button}>
+                {t('home_recent_button')}
+              </Button>
             </View>
           </CardContent>
         </Card>
@@ -73,6 +86,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
         visible={createOpen}
         onClose={() => setCreateOpen(false)}
         onCreated={handleCreated}
+      />
+
+      <RecentSessionsModal
+        visible={recentOpen}
+        onClose={() => setRecentOpen(false)}
+        onSelect={handleSelectRecent}
       />
     </SafeAreaView>
   );

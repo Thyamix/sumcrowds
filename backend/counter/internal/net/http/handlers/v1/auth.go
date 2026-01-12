@@ -10,6 +10,8 @@ import (
 
 	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/auth"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/contextkeys"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http/cookieutils"
 )
 
@@ -129,4 +131,27 @@ func InitAccess(w http.ResponseWriter, r *http.Request) {
 		RefreshToken: refreshToken.Token,
 		ExpiresAt:    accessToken.ExpiresAt,
 	})
+}
+
+func GetRecentSessions(w http.ResponseWriter, r *http.Request) {
+	userId, ok := r.Context().Value(contextkeys.UserID).(int64)
+	if !ok {
+		apperrors.SendError(w, apperrors.APIErrInternal(fmt.Errorf("user ID not found in context")))
+		return
+	}
+
+	sessions, err := database.GetUserRecentSessions(userId, 10)
+	if err != nil {
+		log.Printf("Failed to get recent sessions: %v", err)
+		apperrors.SendError(w, apperrors.APIErrInternal(err))
+		return
+	}
+
+	if sessions == nil {
+		sessions = []database.RecentSession{}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(sessions)
 }

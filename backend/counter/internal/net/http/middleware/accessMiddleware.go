@@ -49,6 +49,9 @@ func RequireAccess(next http.Handler) http.Handler {
 			return
 		}
 
+		// Add user ID to context for user-specific endpoints
+		r = r.WithContext(context.WithValue(r.Context(), contextkeys.UserID, accessToken.UserId))
+
 		if festivalCode != "" {
 			festival, err := database.GetFestival(festivalCode)
 			if err == nil {

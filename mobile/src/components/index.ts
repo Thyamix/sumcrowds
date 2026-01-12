@@ -4,3 +4,4 @@ export {CreateModal} from './CreateModal';
 export {PasswordModal} from './PasswordModal';
 export {PinModal} from './PinModal';
 export {LeaveConfirmModal} from './LeaveConfirmModal';
+export {RecentSessionsModal} from './RecentSessionsModal';
