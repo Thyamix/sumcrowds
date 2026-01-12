@@ -75,7 +75,7 @@ func CreateFestival(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := models.Response{
-		Type:    "festival code",
+		Type:    "success",
 		Content: festival.Code,
 	}
 

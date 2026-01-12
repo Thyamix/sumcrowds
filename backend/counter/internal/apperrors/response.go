@@ -10,8 +10,9 @@ func SendError(w http.ResponseWriter, appError *APIError) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(appError.StatusCode)
 
-	jsonErr := json.NewEncoder(w).Encode(map[string]string{
+	jsonErr := json.NewEncoder(w).Encode(map[string]interface{}{
 		"error": appError.Public,
+		"code":  appError.Code,
 	})
 
 	if jsonErr != nil {

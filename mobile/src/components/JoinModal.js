@@ -37,7 +37,13 @@ export const JoinModal = ({visible, onClose, onJoin}) => {
         setCode('');
         onClose();
       } else {
-        setError(t('error_generic'));
+        try {
+          const errorData = await response.json();
+          const errorCode = errorData.code ? ` (${errorData.code})` : '';
+          setError(t('error_generic') + errorCode);
+        } catch {
+          setError(t('error_generic'));
+        }
       }
     } catch (err) {
       setError(t('error_generic'));

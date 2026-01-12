@@ -42,7 +42,13 @@ export const PinModal = ({visible, onClose, festivalCode, onSuccess}) => {
       } else if (response.status === 403 || response.status === 422) {
         setError(t('pinpopup_alert'));
       } else {
-        setError(t('error_generic'));
+        try {
+          const errorData = await response.json();
+          const errorCode = errorData.code ? ` (${errorData.code})` : '';
+          setError(t('error_generic') + errorCode);
+        } catch {
+          setError(t('error_generic'));
+        }
       }
     } catch (err) {
       setError(t('error_generic'));

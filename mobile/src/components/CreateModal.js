@@ -50,7 +50,13 @@ export const CreateModal = ({visible, onClose, onCreated}) => {
           setError(t('error_generic'));
         }
       } else {
-        setError(t('error_generic'));
+        try {
+          const errorData = await response.json();
+          const errorCode = errorData.code ? ` (${errorData.code})` : '';
+          setError(t('error_generic') + errorCode);
+        } catch {
+          setError(t('error_generic'));
+        }
       }
     } catch (err) {
       setError(t('error_generic'));
