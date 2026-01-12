@@ -1,4 +1,4 @@
-import i18n from 'i18next';
+import i18n, {i18n as I18nInstance} from 'i18next';
 import {initReactI18next} from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -10,13 +10,15 @@ const LANGUAGE_KEY = 'lang';
 const resources = {
   en: {translation: en},
   fr: {translation: fr},
-};
+} as const;
 
-const initI18n = async () => {
-  let savedLanguage = 'en';
+export type SupportedLanguage = keyof typeof resources;
+
+const initI18n = async (): Promise<I18nInstance> => {
+  let savedLanguage: SupportedLanguage = 'en';
   try {
     const stored = await AsyncStorage.getItem(LANGUAGE_KEY);
-    if (stored) {
+    if (stored && (stored === 'en' || stored === 'fr')) {
       savedLanguage = stored;
     }
   } catch (error) {
@@ -38,7 +40,7 @@ const initI18n = async () => {
   return i18n;
 };
 
-export const changeLanguage = async lng => {
+export const changeLanguage = async (lng: SupportedLanguage): Promise<void> => {
   try {
     await AsyncStorage.setItem(LANGUAGE_KEY, lng);
     await i18n.changeLanguage(lng);

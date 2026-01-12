@@ -5,21 +5,26 @@ import {Modal, Input, Button, Alert} from './ui';
 import {fetchWithAuth} from '../utils/auth';
 import {spacing} from '../utils/theme';
 
-export const JoinModal = ({visible, onClose, onJoin}) => {
+interface JoinModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onJoin: (code: string) => void;
+}
+
+export const JoinModal: React.FC<JoinModalProps> = ({visible, onClose, onJoin}) => {
   const {t} = useTranslation();
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleCodeChange = text => {
-    // Only allow alphanumeric, max 6 characters
+  const handleCodeChange = (text: string): void => {
     const filtered = text.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
     if (filtered.length <= 6) {
       setCode(filtered);
     }
   };
 
-  const handleJoin = async () => {
+  const handleJoin = async (): Promise<void> => {
     if (code.length !== 6) {
       setError(t('joinpopup_alert'));
       return;
@@ -41,18 +46,19 @@ export const JoinModal = ({visible, onClose, onJoin}) => {
           const errorData = await response.json();
           const errorCode = errorData.code ? ` (${errorData.code})` : '';
           setError(t('error_generic') + errorCode);
-        } catch (parseErr) {
+        } catch {
           setError(`${t('error_generic')} (HTTP ${response.status})`);
         }
       }
     } catch (err) {
-      setError(`${t('error_generic')} (${err.message || 'Network error'})`);
+      const message = err instanceof Error ? err.message : 'Network error';
+      setError(`${t('error_generic')} (${message})`);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     setCode('');
     setError('');
     onClose();

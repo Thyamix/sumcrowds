@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import type {RouteProp} from '@react-navigation/native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import Share from 'react-native-share';
 import {Button, Input, Card, CardContent, Alert} from '../components/ui';
@@ -17,23 +19,33 @@ import {LanguageSwitcher, PinModal} from '../components';
 import {fetchWithAuth, auth, getAccessToken} from '../utils/auth';
 import {API_URL} from '../config';
 import {colors, spacing, fontSize, fontWeight, borderRadius} from '../utils/theme';
+import type {RootStackParamList} from '../navigation';
 
-const STATUSBAR_HEIGHT = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
+const STATUSBAR_HEIGHT: number = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
 
-export const AdminScreen = ({route, navigation}) => {
+interface Archive {
+  id: number;
+}
+
+interface AdminScreenProps {
+  route: RouteProp<RootStackParamList, 'Admin'>;
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Admin'>;
+}
+
+export const AdminScreen: React.FC<AdminScreenProps> = ({route, navigation}) => {
   const {festivalCode} = route.params;
   const {t} = useTranslation();
 
-  const [alert, setAlert] = useState('');
-  const [inputValue, setInputValue] = useState('');
-  const [archives, setArchives] = useState([]);
-  const [showPinModal, setShowPinModal] = useState(false);
-  const [hasAccess, setHasAccess] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>('');
+  const [archives, setArchives] = useState<Archive[]>([]);
+  const [showPinModal, setShowPinModal] = useState<boolean>(false);
+  const [hasAccess, setHasAccess] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Check admin access on mount
   useEffect(() => {
-    const checkAccess = async () => {
+    const checkAccess = async (): Promise<void> => {
       await auth();
       try {
         const response = await fetchWithAuth(`v1/festival/${festivalCode}/admin/access`);
@@ -60,7 +72,7 @@ export const AdminScreen = ({route, navigation}) => {
     }
   }, [hasAccess]);
 
-  const loadArchives = async () => {
+  const loadArchives = async (): Promise<void> => {
     try {
       const response = await fetchWithAuth(
         `v1/festival/${festivalCode}/admin/getarchivedevents`,
@@ -74,13 +86,13 @@ export const AdminScreen = ({route, navigation}) => {
     }
   };
 
-  const handleInputChange = text => {
+  const handleInputChange = (text: string): void => {
     // Only allow numbers
     const filtered = text.replace(/[^0-9]/g, '');
     setInputValue(filtered);
   };
 
-  const handleSetGauge = async () => {
+  const handleSetGauge = async (): Promise<void> => {
     if (!inputValue) {
       setAlert(t('admin_numbers_only'));
       return;
@@ -108,7 +120,7 @@ export const AdminScreen = ({route, navigation}) => {
     }
   };
 
-  const handleArchive = async () => {
+  const handleArchive = async (): Promise<void> => {
     setLoading(true);
     try {
       const response = await fetchWithAuth(
@@ -127,7 +139,7 @@ export const AdminScreen = ({route, navigation}) => {
     }
   };
 
-  const downloadAndShareCSV = async (url, filename) => {
+  const downloadAndShareCSV = async (url: string, filename: string): Promise<void> => {
     setLoading(true);
     try {
       const token = await getAccessToken();
@@ -163,19 +175,19 @@ export const AdminScreen = ({route, navigation}) => {
     }
   };
 
-  const handleDownloadCurrent = async () => {
+  const handleDownloadCurrent = async (): Promise<void> => {
     const url = `${API_URL}v1/festival/${festivalCode}/admin/download/activecsv`;
     const filename = `festival-${festivalCode}-current.csv`;
     await downloadAndShareCSV(url, filename);
   };
 
-  const handleDownloadArchive = async id => {
+  const handleDownloadArchive = async (id: number): Promise<void> => {
     const url = `${API_URL}v1/festival/${festivalCode}/admin/download/archivedcsv/${id}`;
     const filename = `festival-${festivalCode}-${id}.csv`;
     await downloadAndShareCSV(url, filename);
   };
 
-  const handlePinSuccess = () => {
+  const handlePinSuccess = (): void => {
     setShowPinModal(false);
     setHasAccess(true);
   };

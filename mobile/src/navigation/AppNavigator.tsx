@@ -3,9 +3,15 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {HomeScreen, CounterScreen, AdminScreen} from '../screens';
 
-const Stack = createNativeStackNavigator();
+export type RootStackParamList = {
+  Home: undefined;
+  Counter: {festivalCode: string};
+  Admin: {festivalCode: string};
+};
 
-export const AppNavigator = () => {
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+export const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator

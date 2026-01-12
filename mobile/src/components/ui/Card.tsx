@@ -1,8 +1,13 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ViewStyle, ViewProps} from 'react-native';
 import {colors, borderRadius, spacing} from '../../utils/theme';
 
-export const Card = ({children, style, ...props}) => {
+interface CardProps extends ViewProps {
+  children: React.ReactNode;
+  style?: ViewStyle;
+}
+
+export const Card: React.FC<CardProps> = ({children, style, ...props}) => {
   return (
     <View style={[styles.card, style]} {...props}>
       {children}
@@ -10,7 +15,7 @@ export const Card = ({children, style, ...props}) => {
   );
 };
 
-export const CardContent = ({children, style, ...props}) => {
+export const CardContent: React.FC<CardProps> = ({children, style, ...props}) => {
   return (
     <View style={[styles.cardContent, style]} {...props}>
       {children}

@@ -1,8 +1,19 @@
 import React, {useEffect} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, ViewStyle} from 'react-native';
 import {colors, borderRadius, spacing, fontSize} from '../../utils/theme';
 
-export const Alert = ({
+type AlertVariant = 'destructive' | 'default';
+
+interface AlertProps {
+  message: string;
+  variant?: AlertVariant;
+  onDismiss?: () => void;
+  autoDismiss?: boolean;
+  dismissTimeout?: number;
+  style?: ViewStyle;
+}
+
+export const Alert: React.FC<AlertProps> = ({
   message,
   variant = 'destructive',
   onDismiss,
@@ -29,7 +40,7 @@ export const Alert = ({
       <Text style={styles.message}>{message}</Text>
       {onDismiss && (
         <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
-          <Text style={styles.closeText}>x</Text>
+          <Text style={styles.closeText}>×</Text>
         </TouchableOpacity>
       )}
     </View>

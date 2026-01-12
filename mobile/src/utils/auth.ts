@@ -4,8 +4,20 @@ import {API_URL} from '../config';
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 
+interface AuthResponse {
+  access_token?: string;
+  refresh_token?: string;
+}
+
+interface FetchOptions extends RequestInit {
+  headers?: Record<string, string>;
+}
+
 // Store tokens
-export const setTokens = async (accessToken, refreshToken = null) => {
+export const setTokens = async (
+  accessToken: string,
+  refreshToken: string | null = null,
+): Promise<void> => {
   try {
     await AsyncStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
     if (refreshToken) {
@@ -17,7 +29,7 @@ export const setTokens = async (accessToken, refreshToken = null) => {
 };
 
 // Get access token
-export const getAccessToken = async () => {
+export const getAccessToken = async (): Promise<string | null> => {
   try {
     return await AsyncStorage.getItem(ACCESS_TOKEN_KEY);
   } catch (error) {
@@ -27,7 +39,7 @@ export const getAccessToken = async () => {
 };
 
 // Get refresh token
-export const getRefreshToken = async () => {
+export const getRefreshToken = async (): Promise<string | null> => {
   try {
     return await AsyncStorage.getItem(REFRESH_TOKEN_KEY);
   } catch (error) {
@@ -37,7 +49,7 @@ export const getRefreshToken = async () => {
 };
 
 // Clear tokens
-export const clearTokens = async () => {
+export const clearTokens = async (): Promise<void> => {
   try {
     await AsyncStorage.removeItem(ACCESS_TOKEN_KEY);
     await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
@@ -47,7 +59,7 @@ export const clearTokens = async () => {
 };
 
 // Refresh or initialize access token
-export const auth = async () => {
+export const auth = async (): Promise<boolean> => {
   try {
     // Try to refresh access token first
     const refreshToken = await getRefreshToken();
@@ -60,7 +72,7 @@ export const auth = async () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data: AuthResponse = await response.json();
         if (data.access_token) {
           await setTokens(data.access_token, data.refresh_token || refreshToken);
           return true;
@@ -74,9 +86,9 @@ export const auth = async () => {
     });
 
     if (initResponse.ok) {
-      const data = await initResponse.json();
+      const data: AuthResponse = await initResponse.json();
       if (data.access_token) {
-        await setTokens(data.access_token, data.refresh_token);
+        await setTokens(data.access_token, data.refresh_token || null);
         return true;
       }
     }
@@ -89,10 +101,13 @@ export const auth = async () => {
 };
 
 // Fetch with authentication
-export const fetchWithAuth = async (endpoint, options = {}) => {
-  const makeRequest = async () => {
+export const fetchWithAuth = async (
+  endpoint: string,
+  options: FetchOptions = {},
+): Promise<Response> => {
+  const makeRequest = async (): Promise<Response> => {
     const accessToken = await getAccessToken();
-    const headers = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers || {}),
     };

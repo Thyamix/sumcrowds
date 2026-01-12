@@ -1,8 +1,21 @@
 import React from 'react';
-import {View, TextInput, Text, StyleSheet} from 'react-native';
+import {View, TextInput, Text, StyleSheet, ViewStyle, TextStyle, TextInputProps, KeyboardTypeOptions} from 'react-native';
 import {colors, borderRadius, spacing, fontSize} from '../../utils/theme';
 
-export const Input = ({
+interface InputProps extends Omit<TextInputProps, 'style'> {
+  label?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
+  placeholder?: string;
+  secureTextEntry?: boolean;
+  keyboardType?: KeyboardTypeOptions;
+  maxLength?: number;
+  error?: string;
+  style?: ViewStyle;
+  inputStyle?: TextStyle;
+}
+
+export const Input: React.FC<InputProps> = ({
   label,
   value,
   onChangeText,

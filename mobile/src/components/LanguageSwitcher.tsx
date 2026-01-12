@@ -1,21 +1,30 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, ViewStyle} from 'react-native';
 import {useTranslation} from 'react-i18next';
-import {changeLanguage} from '../utils/i18n';
+import {changeLanguage, SupportedLanguage} from '../utils/i18n';
 import {colors, borderRadius, spacing, fontSize} from '../utils/theme';
 
-const languages = [
+interface Language {
+  code: SupportedLanguage;
+  label: string;
+}
+
+interface LanguageSwitcherProps {
+  style?: ViewStyle;
+}
+
+const languages: Language[] = [
   {code: 'en', label: 'EN'},
   {code: 'fr', label: 'FR'},
 ];
 
-export const LanguageSwitcher = ({style}) => {
+export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({style}) => {
   const {i18n} = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const currentLang = i18n.language || 'en';
 
-  const handleSelect = async code => {
+  const handleSelect = async (code: SupportedLanguage): Promise<void> => {
     await changeLanguage(code);
     setIsOpen(false);
   };

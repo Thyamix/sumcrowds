@@ -2,22 +2,28 @@ import React, {useState} from 'react';
 import {View, Text, StyleSheet, StatusBar, Platform} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {Button, Card, CardContent} from '../components/ui';
 import {LanguageSwitcher, JoinModal, CreateModal} from '../components';
 import {colors, spacing, fontSize, fontWeight} from '../utils/theme';
+import type {RootStackParamList} from '../navigation';
 
-const STATUSBAR_HEIGHT = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
+const STATUSBAR_HEIGHT: number = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
 
-export const HomeScreen = ({navigation}) => {
+interface HomeScreenProps {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
+}
+
+export const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   const {t} = useTranslation();
   const [joinOpen, setJoinOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
-  const handleJoin = code => {
+  const handleJoin = (code: string): void => {
     navigation.navigate('Counter', {festivalCode: code});
   };
 
-  const handleCreated = code => {
+  const handleCreated = (code: string): void => {
     navigation.navigate('Counter', {festivalCode: code});
   };
 

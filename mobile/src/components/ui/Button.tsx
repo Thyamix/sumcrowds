@@ -4,10 +4,26 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
+  ViewStyle,
+  TextStyle,
+  TouchableOpacityProps,
 } from 'react-native';
 import {colors, borderRadius, spacing, fontSize, fontWeight} from '../../utils/theme';
 
-const variants = {
+type ButtonVariant = 'default' | 'secondary' | 'destructive' | 'success' | 'outline' | 'ghost' | 'accent';
+type ButtonSize = 'sm' | 'md' | 'lg' | 'xl' | 'counter' | 'counterLg';
+
+interface ButtonProps extends Omit<TouchableOpacityProps, 'style'> {
+  children: React.ReactNode;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  disabled?: boolean;
+  loading?: boolean;
+  style?: ViewStyle;
+  textStyle?: TextStyle;
+}
+
+const variants: Record<ButtonVariant, {backgroundColor: string; textColor: string; borderColor: string}> = {
   default: {
     backgroundColor: colors.primary,
     textColor: colors.white,
@@ -45,7 +61,7 @@ const variants = {
   },
 };
 
-const sizes = {
+const sizes: Record<ButtonSize, {paddingVertical: number; paddingHorizontal: number; fontSize: number; minWidth?: number; minHeight?: number}> = {
   sm: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
@@ -82,7 +98,7 @@ const sizes = {
   },
 };
 
-export const Button = ({
+export const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'default',
   size = 'md',
@@ -93,8 +109,8 @@ export const Button = ({
   textStyle,
   ...props
 }) => {
-  const variantStyles = variants[variant] || variants.default;
-  const sizeStyles = sizes[size] || sizes.md;
+  const variantStyles = variants[variant];
+  const sizeStyles = sizes[size];
 
   return (
     <TouchableOpacity

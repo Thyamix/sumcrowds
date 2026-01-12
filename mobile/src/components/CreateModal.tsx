@@ -5,16 +5,30 @@ import {Modal, Input, Button, Alert} from './ui';
 import {fetchWithAuth} from '../utils/auth';
 import {colors, spacing, fontSize} from '../utils/theme';
 
-export const PasswordModal = ({visible, onClose, festivalCode, onSuccess}) => {
+interface CreateModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onCreated: (code: string) => void;
+}
+
+export const CreateModal: React.FC<CreateModalProps> = ({visible, onClose, onCreated}) => {
   const {t} = useTranslation();
+  const [pin, setPin] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!password) {
-      setError(t('pwpopup_alert'));
+  const handlePinChange = (text: string): void => {
+    const filtered = text.replace(/[^0-9]/g, '');
+    if (filtered.length <= 4) {
+      setPin(filtered);
+    }
+  };
+
+  const handleCreate = async (): Promise<void> => {
+    if (pin.length !== 4) {
+      setError(t('pinpopup_alert'));
       return;
     }
 
@@ -22,33 +36,43 @@ export const PasswordModal = ({visible, onClose, festivalCode, onSuccess}) => {
     setError('');
 
     try {
-      const response = await fetchWithAuth(`v1/festival/${festivalCode}/getaccess`, {
+      const response = await fetchWithAuth('v1/create/festival', {
         method: 'POST',
-        body: JSON.stringify({password}),
+        body: JSON.stringify({
+          password: password || '',
+          pin: pin,
+        }),
       });
 
       if (response.ok) {
-        setPassword('');
-        onSuccess();
-      } else if (response.status === 403) {
-        setError(t('pwpopup_alert'));
+        const data = await response.json();
+        if (data.type === 'success' && data.content) {
+          onCreated(data.content);
+          setPin('');
+          setPassword('');
+          onClose();
+        } else {
+          setError(`${t('error_generic')} (unexpected response)`);
+        }
       } else {
         try {
           const errorData = await response.json();
           const errorCode = errorData.code ? ` (${errorData.code})` : '';
           setError(t('error_generic') + errorCode);
         } catch {
-          setError(t('error_generic'));
+          setError(`${t('error_generic')} (HTTP ${response.status})`);
         }
       }
     } catch (err) {
-      setError(t('error_generic'));
+      const message = err instanceof Error ? err.message : 'Network error';
+      setError(`${t('error_generic')} (${message})`);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleClose = () => {
+  const handleClose = (): void => {
+    setPin('');
     setPassword('');
     setError('');
     onClose();
@@ -58,21 +82,27 @@ export const PasswordModal = ({visible, onClose, festivalCode, onSuccess}) => {
     <Modal
       visible={visible}
       onClose={handleClose}
-      title={t('pwpopup_header')}>
+      title={t('createpopup_header')}>
       <View style={styles.content}>
-        <Text style={styles.festivalText}>
-          {t('pwpopup_festival')}: {festivalCode}
-        </Text>
-
         {error ? (
           <Alert message={error} onDismiss={() => setError('')} />
         ) : null}
 
         <Input
-          label={t('pwpopup_password')}
+          label={t('createpopup_pin_label')}
+          value={pin}
+          onChangeText={handlePinChange}
+          placeholder={t('createpopup_admin_pin')}
+          keyboardType="number-pad"
+          maxLength={4}
+          secureTextEntry
+        />
+
+        <Input
+          label={t('createpopup_password_label')}
           value={password}
           onChangeText={setPassword}
-          placeholder={t('pwpopup_password')}
+          placeholder={t('createpopup_password')}
           secureTextEntry={!showPassword}
         />
 
@@ -81,17 +111,17 @@ export const PasswordModal = ({visible, onClose, festivalCode, onSuccess}) => {
           onPress={() => setShowPassword(!showPassword)}>
           <Text style={styles.showPasswordText}>
             {showPassword ? '✓ ' : '○ '}
-            {t('pwpopup_show_password')}
+            {t('createpopup_show_password')}
           </Text>
         </TouchableOpacity>
 
         <Button
-          onPress={handleSubmit}
+          onPress={handleCreate}
           loading={loading}
-          disabled={!password}
+          disabled={pin.length !== 4}
           style={styles.button}
           variant="success">
-          {t('pwpopup_confirm')}
+          {t('createpopup_confirm')}
         </Button>
       </View>
     </Modal>
@@ -101,11 +131,6 @@ export const PasswordModal = ({visible, onClose, festivalCode, onSuccess}) => {
 const styles = StyleSheet.create({
   content: {
     gap: spacing.md,
-  },
-  festivalText: {
-    fontSize: fontSize.sm,
-    color: colors.textSecondary,
-    textAlign: 'center',
   },
   showPassword: {
     flexDirection: 'row',
@@ -120,4 +145,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PasswordModal;
+export default CreateModal;

@@ -4,7 +4,17 @@ import {useTranslation} from 'react-i18next';
 import {Modal, Button} from './ui';
 import {colors, spacing, fontSize} from '../utils/theme';
 
-export const LeaveConfirmModal = ({visible, onClose, onConfirm}) => {
+interface LeaveConfirmModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
+export const LeaveConfirmModal: React.FC<LeaveConfirmModalProps> = ({
+  visible,
+  onClose,
+  onConfirm,
+}) => {
   const {t} = useTranslation();
 
   return (

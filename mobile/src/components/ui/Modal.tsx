@@ -7,11 +7,18 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import {colors, borderRadius, spacing, fontSize, fontWeight} from '../../utils/theme';
 
-export const Modal = ({
+interface ModalProps {
+  visible: boolean;
+  onClose: () => void;
+  title?: string;
+  children: React.ReactNode;
+  showCloseButton?: boolean;
+}
+
+export const Modal: React.FC<ModalProps> = ({
   visible,
   onClose,
   title,
@@ -27,14 +34,13 @@ export const Modal = ({
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <KeyboardAvoidingView
-              behavior="padding">
+            <KeyboardAvoidingView behavior="padding">
               <View style={styles.modalContainer}>
                 <View style={styles.header}>
                   {title && <Text style={styles.title}>{title}</Text>}
                   {showCloseButton && (
                     <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                      <Text style={styles.closeText}>x</Text>
+                      <Text style={styles.closeText}>×</Text>
                     </TouchableOpacity>
                   )}
                 </View>

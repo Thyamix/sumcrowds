@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import type {RouteProp} from '@react-navigation/native';
 import {Button} from '../components/ui';
 import {
   LanguageSwitcher,
@@ -18,26 +20,40 @@ import {
 import {fetchWithAuth, auth} from '../utils/auth';
 import {WS_URL} from '../config';
 import {colors, spacing, fontSize, fontWeight, borderRadius} from '../utils/theme';
+import type {RootStackParamList} from '../navigation';
 
-const STATUSBAR_HEIGHT = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
+const STATUSBAR_HEIGHT: number = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
 
-export const CounterScreen = ({route, navigation}) => {
+type CounterStatus = 'normal' | 'warning' | 'danger';
+
+interface WebSocketMessage {
+  type?: string;
+  total?: number;
+  jauge?: number;
+}
+
+interface CounterScreenProps {
+  route: RouteProp<RootStackParamList, 'Counter'>;
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Counter'>;
+}
+
+export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation}) => {
   const {festivalCode} = route.params;
   const {t} = useTranslation();
 
-  const [total, setTotal] = useState('...');
-  const [maxJauge, setMaxJauge] = useState(0);
-  const [status, setStatus] = useState('normal');
-  const [isConnected, setIsConnected] = useState(false);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const [hasAccess, setHasAccess] = useState(false);
+  const [total, setTotal] = useState<number | string>('...');
+  const [maxJauge, setMaxJauge] = useState<number>(0);
+  const [status, setStatus] = useState<CounterStatus>('normal');
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
+  const [showLeaveModal, setShowLeaveModal] = useState<boolean>(false);
+  const [hasAccess, setHasAccess] = useState<boolean>(false);
 
-  const socketRef = useRef(null);
-  const heartbeatRef = useRef(null);
+  const socketRef = useRef<WebSocket | null>(null);
+  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Calculate status based on total and max
-  const calculateStatus = useCallback((currentTotal, max) => {
+  const calculateStatus = useCallback((currentTotal: number, max: number): CounterStatus => {
     if (max === 0) return 'normal';
     const percentage = (currentTotal / max) * 100;
     if (percentage >= 100) return 'danger';
@@ -46,7 +62,7 @@ export const CounterScreen = ({route, navigation}) => {
   }, []);
 
   // Get status color
-  const getStatusColor = () => {
+  const getStatusColor = (): string => {
     switch (status) {
       case 'danger':
         return colors.statusDanger;
@@ -58,7 +74,7 @@ export const CounterScreen = ({route, navigation}) => {
   };
 
   // WebSocket connection
-  const connectWebSocket = useCallback(() => {
+  const connectWebSocket = useCallback((): void => {
     if (socketRef.current) {
       socketRef.current.close();
     }
@@ -80,9 +96,9 @@ export const CounterScreen = ({route, navigation}) => {
       }, 10000);
     };
 
-    ws.onmessage = event => {
+    ws.onmessage = (event: MessageEvent): void => {
       try {
-        const data = JSON.parse(event.data);
+        const data: WebSocketMessage = JSON.parse(event.data);
         if (data.type === 'pong') return;
 
         if (data.total !== undefined) {
@@ -97,14 +113,14 @@ export const CounterScreen = ({route, navigation}) => {
       }
     };
 
-    ws.onclose = () => {
+    ws.onclose = (): void => {
       setIsConnected(false);
       if (heartbeatRef.current) {
         clearInterval(heartbeatRef.current);
       }
     };
 
-    ws.onerror = error => {
+    ws.onerror = (error: Event): void => {
       console.error('WebSocket error:', error);
     };
 
@@ -113,7 +129,7 @@ export const CounterScreen = ({route, navigation}) => {
 
   // Check access on mount
   useEffect(() => {
-    const checkAccess = async () => {
+    const checkAccess = async (): Promise<void> => {
       await auth();
       try {
         const response = await fetchWithAuth(`v1/festival/${festivalCode}/access`);
@@ -150,7 +166,7 @@ export const CounterScreen = ({route, navigation}) => {
   }, [hasAccess, connectWebSocket]);
 
   // Increment/Decrement handlers
-  const handleIncrement = async amount => {
+  const handleIncrement = async (amount: number): Promise<void> => {
     try {
       await fetchWithAuth(`v1/festival/${festivalCode}/inc`, {
         method: 'POST',
@@ -161,7 +177,7 @@ export const CounterScreen = ({route, navigation}) => {
     }
   };
 
-  const handleDecrement = async amount => {
+  const handleDecrement = async (amount: number): Promise<void> => {
     try {
       await fetchWithAuth(`v1/festival/${festivalCode}/dec`, {
         method: 'POST',
@@ -172,16 +188,16 @@ export const CounterScreen = ({route, navigation}) => {
     }
   };
 
-  const handlePasswordSuccess = () => {
+  const handlePasswordSuccess = (): void => {
     setShowPasswordModal(false);
     setHasAccess(true);
   };
 
-  const handleLeave = () => {
+  const handleLeave = (): void => {
     navigation.replace('Home');
   };
 
-  const handleAdminPress = () => {
+  const handleAdminPress = (): void => {
     navigation.navigate('Admin', {festivalCode});
   };
 

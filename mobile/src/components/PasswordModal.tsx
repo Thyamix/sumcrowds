@@ -5,23 +5,28 @@ import {Modal, Input, Button, Alert} from './ui';
 import {fetchWithAuth} from '../utils/auth';
 import {colors, spacing, fontSize} from '../utils/theme';
 
-export const PinModal = ({visible, onClose, festivalCode, onSuccess}) => {
+interface PasswordModalProps {
+  visible: boolean;
+  onClose: () => void;
+  festivalCode: string;
+  onSuccess: () => void;
+}
+
+export const PasswordModal: React.FC<PasswordModalProps> = ({
+  visible,
+  onClose,
+  festivalCode,
+  onSuccess,
+}) => {
   const {t} = useTranslation();
-  const [pin, setPin] = useState('');
-  const [showPin, setShowPin] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handlePinChange = text => {
-    const filtered = text.replace(/[^0-9]/g, '');
-    if (filtered.length <= 4) {
-      setPin(filtered);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (pin.length !== 4) {
-      setError(t('pinpopup_alert'));
+  const handleSubmit = async (): Promise<void> => {
+    if (!password) {
+      setError(t('pwpopup_alert'));
       return;
     }
 
@@ -29,17 +34,16 @@ export const PinModal = ({visible, onClose, festivalCode, onSuccess}) => {
     setError('');
 
     try {
-      const response = await fetchWithAuth(`v1/festival/${festivalCode}/admin/access`, {
-        headers: {
-          'admin-pin': pin,
-        },
+      const response = await fetchWithAuth(`v1/festival/${festivalCode}/getaccess`, {
+        method: 'POST',
+        body: JSON.stringify({password}),
       });
 
       if (response.ok) {
-        setPin('');
+        setPassword('');
         onSuccess();
-      } else if (response.status === 403 || response.status === 422) {
-        setError(t('pinpopup_alert'));
+      } else if (response.status === 403) {
+        setError(t('pwpopup_alert'));
       } else {
         try {
           const errorData = await response.json();
@@ -49,15 +53,15 @@ export const PinModal = ({visible, onClose, festivalCode, onSuccess}) => {
           setError(t('error_generic'));
         }
       }
-    } catch (err) {
+    } catch {
       setError(t('error_generic'));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleClose = () => {
-    setPin('');
+  const handleClose = (): void => {
+    setPassword('');
     setError('');
     onClose();
   };
@@ -66,39 +70,40 @@ export const PinModal = ({visible, onClose, festivalCode, onSuccess}) => {
     <Modal
       visible={visible}
       onClose={handleClose}
-      title={t('pinpopup_admin_access')}>
+      title={t('pwpopup_header')}>
       <View style={styles.content}>
-        <Text style={styles.label}>{t('pinpopup_label')}</Text>
+        <Text style={styles.festivalText}>
+          {t('pwpopup_festival')}: {festivalCode}
+        </Text>
 
         {error ? (
           <Alert message={error} onDismiss={() => setError('')} />
         ) : null}
 
         <Input
-          value={pin}
-          onChangeText={handlePinChange}
-          placeholder={t('pinpopup_pin')}
-          keyboardType="number-pad"
-          maxLength={4}
-          secureTextEntry={!showPin}
+          label={t('pwpopup_password')}
+          value={password}
+          onChangeText={setPassword}
+          placeholder={t('pwpopup_password')}
+          secureTextEntry={!showPassword}
         />
 
         <TouchableOpacity
-          style={styles.showPin}
-          onPress={() => setShowPin(!showPin)}>
-          <Text style={styles.showPinText}>
-            {showPin ? '✓ ' : '○ '}
-            {t('pinpopup_show_pin')}
+          style={styles.showPassword}
+          onPress={() => setShowPassword(!showPassword)}>
+          <Text style={styles.showPasswordText}>
+            {showPassword ? '✓ ' : '○ '}
+            {t('pwpopup_show_password')}
           </Text>
         </TouchableOpacity>
 
         <Button
           onPress={handleSubmit}
           loading={loading}
-          disabled={pin.length !== 4}
+          disabled={!password}
           style={styles.button}
-          variant="accent">
-          {t('pinpopup_confirm')}
+          variant="success">
+          {t('pwpopup_confirm')}
         </Button>
       </View>
     </Modal>
@@ -109,16 +114,16 @@ const styles = StyleSheet.create({
   content: {
     gap: spacing.md,
   },
-  label: {
+  festivalText: {
     fontSize: fontSize.sm,
     color: colors.textSecondary,
     textAlign: 'center',
   },
-  showPin: {
+  showPassword: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  showPinText: {
+  showPasswordText: {
     fontSize: fontSize.sm,
     color: colors.textSecondary,
   },
@@ -127,4 +132,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PinModal;
+export default PasswordModal;
