@@ -223,70 +223,92 @@ export const CounterScreen = ({route, navigation}) => {
           <>
             <Text style={styles.counterValue}>{total}</Text>
             {maxJauge > 0 && (
-              <View style={styles.gaugeContainer}>
-                <Text style={styles.gaugeLabel}>{t('counter_gauge')}</Text>
-                <Text style={styles.gaugeValue}>{maxJauge}</Text>
+              <View style={styles.gaugeWrapper}>
+                <View style={styles.gaugeHeader}>
+                  <Text style={styles.gaugeLabel}>{t('counter_gauge')}</Text>
+                  <Text style={styles.gaugeValue}>
+                    {typeof total === 'number' ? total : 0} / {maxJauge}
+                  </Text>
+                </View>
+                <View style={styles.gaugeBarBackground}>
+                  <View
+                    style={[
+                      styles.gaugeBarFill,
+                      {
+                        width: `${Math.min((typeof total === 'number' ? total : 0) / maxJauge * 100, 100)}%`,
+                        backgroundColor:
+                          status === 'danger'
+                            ? colors.destructive
+                            : status === 'warning'
+                            ? colors.warning
+                            : colors.success,
+                      },
+                    ]}
+                  />
+                </View>
               </View>
             )}
           </>
         )}
       </View>
 
-      <View style={styles.controls}>
-        {/* Exit column */}
-        <View style={styles.controlColumn}>
-          <Text style={[styles.controlLabel, {color: colors.destructive}]}>{t('counter_exit')}</Text>
-          <View style={styles.smallButtonRow}>
+      <View style={styles.controlsCard}>
+        <View style={styles.controls}>
+          {/* Exit column */}
+          <View style={[styles.controlColumn, styles.exitColumn]}>
+            <Text style={[styles.controlLabel, {color: colors.destructive}]}>{t('counter_exit')}</Text>
+            <View style={styles.smallButtonRow}>
+              <Button
+                onPress={() => handleDecrement(2)}
+                variant="destructive"
+                size="counter"
+                style={styles.smallButton}>
+                -2
+              </Button>
+              <Button
+                onPress={() => handleDecrement(3)}
+                variant="destructive"
+                size="counter"
+                style={styles.smallButton}>
+                -3
+              </Button>
+            </View>
             <Button
-              onPress={() => handleDecrement(2)}
+              onPress={() => handleDecrement(1)}
               variant="destructive"
-              size="counter"
-              style={styles.smallButton}>
-              -2
-            </Button>
-            <Button
-              onPress={() => handleDecrement(3)}
-              variant="destructive"
-              size="counter"
-              style={styles.smallButton}>
-              -3
+              size="counterLg"
+              style={styles.largeButton}>
+              -1
             </Button>
           </View>
-          <Button
-            onPress={() => handleDecrement(1)}
-            variant="destructive"
-            size="counterLg"
-            style={styles.largeButton}>
-            -1
-          </Button>
-        </View>
 
-        {/* Enter column */}
-        <View style={styles.controlColumn}>
-          <Text style={[styles.controlLabel, {color: colors.success}]}>{t('counter_enter')}</Text>
-          <View style={styles.smallButtonRow}>
+          {/* Enter column */}
+          <View style={[styles.controlColumn, styles.enterColumn]}>
+            <Text style={[styles.controlLabel, {color: colors.success}]}>{t('counter_enter')}</Text>
+            <View style={styles.smallButtonRow}>
+              <Button
+                onPress={() => handleIncrement(2)}
+                variant="success"
+                size="counter"
+                style={styles.smallButton}>
+                +2
+              </Button>
+              <Button
+                onPress={() => handleIncrement(3)}
+                variant="success"
+                size="counter"
+                style={styles.smallButton}>
+                +3
+              </Button>
+            </View>
             <Button
-              onPress={() => handleIncrement(2)}
+              onPress={() => handleIncrement(1)}
               variant="success"
-              size="counter"
-              style={styles.smallButton}>
-              +2
-            </Button>
-            <Button
-              onPress={() => handleIncrement(3)}
-              variant="success"
-              size="counter"
-              style={styles.smallButton}>
-              +3
+              size="counterLg"
+              style={styles.largeButton}>
+              +1
             </Button>
           </View>
-          <Button
-            onPress={() => handleIncrement(1)}
-            variant="success"
-            size="counterLg"
-            style={styles.largeButton}>
-            +1
-          </Button>
         </View>
       </View>
 
@@ -380,27 +402,53 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontFamily: 'monospace',
   },
-  gaugeContainer: {
+  gaugeWrapper: {
+    width: '80%',
+    maxWidth: 300,
+    marginTop: spacing.lg,
+  },
+  gaugeHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.md,
-    gap: spacing.sm,
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm,
   },
   gaugeLabel: {
-    fontSize: fontSize.md,
+    fontSize: fontSize.sm,
     color: colors.white,
     opacity: 0.8,
   },
   gaugeValue: {
-    fontSize: fontSize.xl,
+    fontSize: fontSize.sm,
     fontWeight: fontWeight.bold,
     color: colors.white,
+    fontFamily: 'monospace',
+  },
+  gaugeBarBackground: {
+    height: 12,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    borderRadius: borderRadius.full,
+    overflow: 'hidden',
+  },
+  gaugeBarFill: {
+    height: '100%',
+    borderRadius: borderRadius.full,
+  },
+  controlsCard: {
+    backgroundColor: colors.card,
+    borderTopLeftRadius: borderRadius.xl,
+    borderTopRightRadius: borderRadius.xl,
+    paddingTop: spacing.md,
+    shadowColor: colors.black,
+    shadowOffset: {width: 0, height: -2},
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   controls: {
     flexDirection: 'row',
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-    gap: spacing.md,
+    padding: spacing.md,
+    paddingBottom: spacing.xl,
+    gap: spacing.sm,
   },
   controlColumn: {
     flex: 1,
@@ -408,6 +456,12 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     padding: spacing.md,
     borderRadius: borderRadius.lg,
+  },
+  exitColumn: {
+    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+  },
+  enterColumn: {
+    backgroundColor: 'rgba(34, 197, 94, 0.08)',
   },
   controlLabel: {
     fontSize: fontSize.sm,
