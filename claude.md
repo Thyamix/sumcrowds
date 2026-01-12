@@ -58,3 +58,9 @@ git push origin <branch> || git push origin <branch> || git push origin <branch>
 ### Commit and Push When Done
 
 Always commit and push changes when finished with a task, unless explicitly told otherwise. Push to the current branch or create a new branch as appropriate.
+
+## Communication
+
+### "Remember" Instructions
+
+When the user says "remember something", ask for confirmation before adding it to this file. Only add to claude.md if the user confirms.

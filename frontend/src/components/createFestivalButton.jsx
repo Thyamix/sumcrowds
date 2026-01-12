@@ -44,7 +44,7 @@ export function CreatePopup({ close }) {
       body: body,
     }).then(response => response.json())
       .then(data => {
-        if (data.type === "festival code" && data.content !== null) {
+        if (data.type === "success" && data.content !== null) {
           navigate("/" + data.content, { replace: true })
         }
       })
