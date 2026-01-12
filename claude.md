@@ -69,6 +69,10 @@ git push origin <branch> || git push origin <branch> || git push origin <branch>
 
 Always commit and push changes when finished with a task, unless explicitly told otherwise. Push to the current branch or create a new branch as appropriate.
 
+### Never Push Directly to Main/Master
+
+Never push directly to `main` or `master` branch unless the user specifically tells you to. Always create a feature branch and push to that instead.
+
 ## Communication
 
 ### "Remember" Instructions
