@@ -41,12 +41,12 @@ export const JoinModal = ({visible, onClose, onJoin}) => {
           const errorData = await response.json();
           const errorCode = errorData.code ? ` (${errorData.code})` : '';
           setError(t('error_generic') + errorCode);
-        } catch {
-          setError(t('error_generic'));
+        } catch (parseErr) {
+          setError(`${t('error_generic')} (HTTP ${response.status})`);
         }
       }
     } catch (err) {
-      setError(t('error_generic'));
+      setError(`${t('error_generic')} (${err.message || 'Network error'})`);
     } finally {
       setLoading(false);
     }
