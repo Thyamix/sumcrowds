@@ -1,7 +1,7 @@
 // API Configuration
 // Update these URLs to match your backend
-export const API_URL = 'https://api.sumcrowds.com/api/';
-export const WS_URL = 'wss://ws.sumcrowds.com/';
+export const API_URL = 'https://app.sumcrowds.com/api/';
+export const WS_URL = 'wss://app.sumcrowds.com/ws/';
 
 // Environment helper
 export const isDev = __DEV__;
