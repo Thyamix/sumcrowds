@@ -13,13 +13,5 @@ allowed_origins = [
     "https://testingapp.sumcrowds.com"
 ]
 
-[database]
-host = "postgres_staging"
-port = 5432
-name = "sumcrowds"
-user = "sumcrowds"
-ssl_mode = "disable"
-# password is in .env.staging
-
 [frontend]
 port = 80

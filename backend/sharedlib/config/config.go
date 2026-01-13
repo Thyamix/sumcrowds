@@ -12,11 +12,13 @@ import (
 
 // Config represents the complete application configuration
 type Config struct {
-	Server   ServerConfig   `toml:"server"`
+	Server    ServerConfig    `toml:"server"`
 	Endpoints EndpointsConfig `toml:"endpoints"`
-	CORS     CORSConfig     `toml:"cors"`
-	Database DatabaseConfig `toml:"database"`
-	Frontend FrontendConfig `toml:"frontend"`
+	CORS      CORSConfig      `toml:"cors"`
+	Frontend  FrontendConfig  `toml:"frontend"`
+
+	// DatabaseURL is loaded from environment variable
+	DatabaseURL string `toml:"-"`
 }
 
 // ServerConfig holds server-related settings
@@ -34,16 +36,6 @@ type EndpointsConfig struct {
 // CORSConfig holds CORS settings
 type CORSConfig struct {
 	AllowedOrigins []string `toml:"allowed_origins"`
-}
-
-// DatabaseConfig holds database connection settings
-type DatabaseConfig struct {
-	Host     string `toml:"host"`
-	Port     int    `toml:"port"`
-	Name     string `toml:"name"`
-	User     string `toml:"user"`
-	SSLMode  string `toml:"ssl_mode"`
-	Password string `toml:"-"` // Loaded from environment variable
 }
 
 // FrontendConfig holds frontend-related settings
@@ -73,27 +65,19 @@ func Load(env string) (*Config, error) {
 		log.Printf("Note: Could not load %s (this is OK in Docker): %v", envPath, err)
 	}
 
-	// Load secrets from environment
-	cfg.Database.Password = os.Getenv("DATABASE_PASSWORD")
-	if cfg.Database.Password == "" {
-		return nil, fmt.Errorf("DATABASE_PASSWORD environment variable is required")
+	// Load database URL from environment
+	cfg.DatabaseURL = os.Getenv("DATABASE_URL")
+	if cfg.DatabaseURL == "" {
+		return nil, fmt.Errorf("DATABASE_URL environment variable is required")
 	}
 
 	AppConfig = &cfg
 	return &cfg, nil
 }
 
-// GetDatabaseURL builds the PostgreSQL connection string
+// GetDatabaseURL returns the PostgreSQL connection string from environment
 func (c *Config) GetDatabaseURL() string {
-	return fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s?sslmode=%s",
-		c.Database.User,
-		c.Database.Password,
-		c.Database.Host,
-		c.Database.Port,
-		c.Database.Name,
-		c.Database.SSLMode,
-	)
+	return c.DatabaseURL
 }
 
 // GetServerAddr returns the server address in host:port format

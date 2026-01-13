@@ -13,13 +13,5 @@ allowed_origins = [
     "https://app.sumcrowds.com"
 ]
 
-[database]
-host = "postgres_prod"
-port = 5432
-name = "sumcrowds"
-user = "sumcrowds"
-ssl_mode = "require"
-# password is in .env.prod
-
 [frontend]
 port = 80

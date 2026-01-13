@@ -34,7 +34,7 @@ Non-secret configuration (endpoints, CORS, ports) is stored in TOML files:
 
 ### Environment Files
 
-Secrets (database passwords, API keys) are stored in `.env` files:
+Secrets (database connection URL, API keys) are stored in `.env` files:
 
 - `.env.dev` - Development secrets
 - `.env.staging` - Staging secrets

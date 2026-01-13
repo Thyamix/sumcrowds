@@ -123,7 +123,7 @@ Ensure READMEs accurately reflect the current state of the codebase.
 
 The project uses a centralized configuration system with:
 - **Config files** (TOML) - Non-secret settings like endpoints, CORS origins, ports
-- **Env files** - Secrets like database passwords
+- **Env files** - Secrets like database connection URL
 
 ### File Structure
 

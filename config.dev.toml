@@ -15,13 +15,5 @@ allowed_origins = [
     "http://localhost:3000"
 ]
 
-[database]
-host = "postgres_dev"
-port = 5432
-name = "sumcrowds"
-user = "sumcrowds"
-ssl_mode = "disable"
-# password is in .env.dev
-
 [frontend]
 port = 3000
