@@ -108,6 +108,29 @@ Always build the **release/production** version of the mobile app, never the deb
 cd mobile/android && ./gradlew assembleRelease
 ```
 
+## Documentation
+
+### Keep READMEs Up to Date
+
+When adding new features or making significant changes, update the relevant README files:
+
+- `README.md` - Main project README with feature list
+- `mobile/README.md` - Mobile app README with features and project structure
+
+Ensure READMEs accurately reflect the current state of the codebase.
+
+## Database / SQLC
+
+### Regenerate SQLC After Query Changes
+
+If any database schema or query changes occur (files in `backend/sharedlib/database/` or `backend/sharedlib/database/queries/`), always regenerate the SQLC code before committing:
+
+```bash
+cd backend && sqlc generate
+```
+
+This ensures the generated Go code in `backend/sharedlib/database/sqlcdb/` stays in sync with the SQL queries.
+
 ## Communication
 
 ### "Remember" Instructions

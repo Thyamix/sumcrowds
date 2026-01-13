@@ -84,3 +84,19 @@ func initTables() error {
 
 	return nil
 }
+
+// CloseDB closes both database connections (legacy sql.DB and pgx pool)
+// This should be called during graceful shutdown
+func CloseDB() {
+	if Pool != nil {
+		Pool.Close()
+		fmt.Println("pgx pool closed")
+	}
+	if DB != nil {
+		if err := DB.Close(); err != nil {
+			fmt.Printf("Error closing legacy DB connection: %v\n", err)
+		} else {
+			fmt.Println("Legacy DB connection closed")
+		}
+	}
+}
