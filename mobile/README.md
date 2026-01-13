@@ -6,6 +6,7 @@ React Native Android app for Sumcrowds - a crowd counting application for events
 
 - **Join Session**: Enter a 6-character festival code to join an existing session
 - **Create Session**: Create a new festival with an admin PIN and optional password
+- **Recent Sessions**: Quick access to previously joined sessions with pagination
 - **Real-time Counter**: WebSocket-based live updates showing current crowd count
 - **Visual Status**: Color-coded capacity indicators (green/orange/red)
 - **Admin Panel**: Set capacity, archive events, and download CSV reports
@@ -72,25 +73,26 @@ The APK will be at `android/app/build/outputs/apk/release/app-release.apk`
 mobile/
 ├── src/
 │   ├── screens/           # Main app screens
-│   │   ├── HomeScreen.js      # Landing page
-│   │   ├── CounterScreen.js   # Real-time counter
-│   │   └── AdminScreen.js     # Admin panel
+│   │   ├── HomeScreen.tsx     # Landing page
+│   │   ├── CounterScreen.tsx  # Real-time counter
+│   │   └── AdminScreen.tsx    # Admin panel
 │   ├── components/        # Reusable components
-│   │   ├── ui/               # Base UI components
-│   │   ├── JoinModal.js      # Join session modal
-│   │   ├── CreateModal.js    # Create session modal
-│   │   ├── PasswordModal.js  # Password entry modal
-│   │   ├── PinModal.js       # Admin PIN modal
-│   │   └── LanguageSwitcher.js
+│   │   ├── ui/                # Base UI components
+│   │   ├── JoinModal.tsx      # Join session modal
+│   │   ├── CreateModal.tsx    # Create session modal
+│   │   ├── PasswordModal.tsx  # Password entry modal
+│   │   ├── PinModal.tsx       # Admin PIN modal
+│   │   ├── RecentSessionsModal.tsx  # Recent sessions with pagination
+│   │   └── LanguageSwitcher.tsx
 │   ├── navigation/        # React Navigation setup
 │   ├── utils/             # Utilities
-│   │   ├── auth.js           # JWT authentication
-│   │   ├── i18n.js           # Internationalization
-│   │   └── theme.js          # Colors and styling
+│   │   ├── auth.ts            # JWT authentication
+│   │   ├── i18n.ts            # Internationalization
+│   │   └── theme.ts           # Colors and styling
 │   ├── locales/           # Translation files
 │   │   ├── en/
 │   │   └── fr/
-│   └── config.js          # API configuration
+│   └── config.ts          # API configuration
 ├── android/               # Android native code
 └── App.tsx               # App entry point
 ```

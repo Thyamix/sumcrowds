@@ -63,5 +63,7 @@
 	"recent_sessions_title": "Recent Sessions",
 	"recent_sessions_empty": "No recent sessions found",
 	"recent_sessions_close": "Close",
-	"recent_sessions_load_more": "Load More"
+	"recent_sessions_prev": "Previous",
+	"recent_sessions_next": "Next",
+	"recent_sessions_page": "Page {{page}}"
 }

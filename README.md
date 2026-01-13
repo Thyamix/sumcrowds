@@ -10,11 +10,12 @@ The app uses a session code to sync users to events. When a session is created, 
 
 ## Features
 
-- Real-time tracking of festival attendance  
-- Unique 6-character session codes to join events  
-- Password-protected sessions for security  
-- Additional PIN protection for admin panel access  
-- Easy-to-use interface for volunteers and organizers  
+- Real-time tracking of festival attendance
+- Unique 6-character session codes to join events
+- Password-protected sessions for security
+- Additional PIN protection for admin panel access
+- Easy-to-use interface for volunteers and organizers
 - Supports multiple simultaneous sessions
+- Recent sessions history for quick access to previously joined events
 - Exports data to csv
 - Support for both English and French

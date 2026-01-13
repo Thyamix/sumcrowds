@@ -30,7 +30,6 @@ export const RecentSessionsModal: React.FC<RecentSessionsModalProps> = ({
   const {t} = useTranslation();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [page, setPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(false);
@@ -41,27 +40,19 @@ export const RecentSessionsModal: React.FC<RecentSessionsModalProps> = ({
       setSessions([]);
       setPage(0);
       setHasMore(false);
-      loadSessions(0, true);
+      loadSessions(0);
     }
   }, [visible]);
 
-  const loadSessions = async (pageNum: number, reset: boolean = false): Promise<void> => {
-    if (reset) {
-      setLoading(true);
-    } else {
-      setLoadingMore(true);
-    }
+  const loadSessions = async (pageNum: number): Promise<void> => {
+    setLoading(true);
     setError('');
 
     try {
       const response = await fetchWithAuth(`v1/user/sessions?page=${pageNum}`);
       if (response.ok) {
         const data: SessionsResponse = await response.json();
-        if (reset) {
-          setSessions(data.sessions || []);
-        } else {
-          setSessions(prev => [...prev, ...(data.sessions || [])]);
-        }
+        setSessions(data.sessions || []);
         setHasMore(data.has_more);
         setPage(data.page);
       } else {
@@ -72,13 +63,18 @@ export const RecentSessionsModal: React.FC<RecentSessionsModalProps> = ({
       setError(`${t('error_generic')} (${message})`);
     } finally {
       setLoading(false);
-      setLoadingMore(false);
     }
   };
 
-  const handleLoadMore = (): void => {
-    if (!loadingMore && hasMore) {
-      loadSessions(page + 1, false);
+  const handlePrevPage = (): void => {
+    if (page > 0) {
+      loadSessions(page - 1);
+    }
+  };
+
+  const handleNextPage = (): void => {
+    if (hasMore) {
+      loadSessions(page + 1);
     }
   };
 
@@ -126,18 +122,34 @@ export const RecentSessionsModal: React.FC<RecentSessionsModalProps> = ({
                 <Text style={styles.arrow}>→</Text>
               </TouchableOpacity>
             ))}
-            {hasMore && (
-              <Button
-                onPress={handleLoadMore}
-                variant="secondary"
-                style={styles.loadMoreButton}
-                disabled={loadingMore}>
-                {loadingMore ? (
-                  <ActivityIndicator size="small" color={colors.primary} />
+            {(page > 0 || hasMore) && (
+              <View style={styles.pagination}>
+                {page > 0 ? (
+                  <Button
+                    onPress={handlePrevPage}
+                    variant="secondary"
+                    style={styles.pageButton}
+                    disabled={loading}>
+                    {t('recent_sessions_prev')}
+                  </Button>
                 ) : (
-                  t('recent_sessions_load_more')
+                  <View style={styles.pageButtonPlaceholder} />
                 )}
-              </Button>
+                <Text style={styles.pageIndicator}>
+                  {t('recent_sessions_page', {page: page + 1})}
+                </Text>
+                {hasMore ? (
+                  <Button
+                    onPress={handleNextPage}
+                    variant="secondary"
+                    style={styles.pageButton}
+                    disabled={loading}>
+                    {t('recent_sessions_next')}
+                  </Button>
+                ) : (
+                  <View style={styles.pageButtonPlaceholder} />
+                )}
+              </View>
             )}
           </View>
         )}
@@ -200,8 +212,24 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: spacing.md,
   },
-  loadMoreButton: {
-    marginTop: spacing.sm,
+  pagination: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.cardBorder,
+  },
+  pageButton: {
+    minWidth: 80,
+  },
+  pageButtonPlaceholder: {
+    minWidth: 80,
+  },
+  pageIndicator: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
   },
 });
 

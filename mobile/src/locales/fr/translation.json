@@ -63,5 +63,7 @@
 	"recent_sessions_title": "Sessions Récentes",
 	"recent_sessions_empty": "Aucune session récente trouvée",
 	"recent_sessions_close": "Fermer",
-	"recent_sessions_load_more": "Charger Plus"
+	"recent_sessions_prev": "Précédent",
+	"recent_sessions_next": "Suivant",
+	"recent_sessions_page": "Page {{page}}"
 }
