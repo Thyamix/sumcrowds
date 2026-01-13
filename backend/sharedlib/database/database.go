@@ -9,13 +9,17 @@ import (
 	"os"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/lib/pq"
+	"github.com/thyamix/sumcrowds/backend/sharedlib/database/sqlcdb"
 )
 
 //go:embed init.sql
 var InitSQL string
 
 var DB *sql.DB
+var Pool *pgxpool.Pool
+var Queries *sqlcdb.Queries
 
 func InitDB() {
 	fmt.Println("Initialising Database")
@@ -27,6 +31,7 @@ func InitDB() {
 
 	var err error
 
+	// Initialize legacy database/sql connection for backward compatibility
 	DB, err = sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
@@ -39,6 +44,23 @@ func InitDB() {
 	if err != nil {
 		log.Fatalf("Failed to connect to Postgres database (ping failed): %v", err)
 	}
+
+	// Initialize pgx pool for SQLC
+	poolCtx, poolCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer poolCancel()
+
+	Pool, err = pgxpool.New(poolCtx, connStr)
+	if err != nil {
+		log.Fatalf("Failed to create pgx pool: %v", err)
+	}
+
+	err = Pool.Ping(poolCtx)
+	if err != nil {
+		log.Fatalf("Failed to ping pgx pool: %v", err)
+	}
+
+	// Initialize SQLC queries
+	Queries = sqlcdb.New(Pool)
 
 	fmt.Println("Successfully connected to database")
 
