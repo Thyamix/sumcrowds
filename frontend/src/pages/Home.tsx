@@ -3,14 +3,16 @@ import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "../components/languageSwitcher";
 import { JoinPopup } from "../components/joinFestivalButton";
 import { CreatePopup } from "../components/createFestivalButton";
+import { RecentSessionsPopup } from "../components/recentSessionsPopup";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Plus } from "lucide-react";
+import { Users, Plus, History } from "lucide-react";
 
 export function Home() {
   const { t } = useTranslation();
   const [joinOpen, setJoinOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [recentOpen, setRecentOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -58,12 +60,23 @@ export function Home() {
               <Plus className="w-5 h-5 mr-2" />
               {t("home_create_button")}
             </Button>
+
+            <Button
+              variant="secondary"
+              size="xl"
+              className="w-full"
+              onClick={() => setRecentOpen(true)}
+            >
+              <History className="w-5 h-5 mr-2" />
+              {t("home_recent_button")}
+            </Button>
           </div>
         </CardContent>
       </Card>
 
       {joinOpen && <JoinPopup close={() => setJoinOpen(false)} />}
       {createOpen && <CreatePopup close={() => setCreateOpen(false)} />}
+      {recentOpen && <RecentSessionsPopup close={() => setRecentOpen(false)} />}
     </div>
   );
 }

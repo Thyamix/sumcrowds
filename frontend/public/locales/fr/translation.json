@@ -10,6 +10,7 @@
 	"home_select_option": "Selectionnez une option pour commencer",
 	"home_join_button": "Rejoindre Session",
 	"home_create_button": "Nouvelle Session",
+	"home_recent_button": "Sessions Récentes",
 	"home_welcome": "Bienvenue",
 
 	"admin_title": "Panneau d'administration",
@@ -57,5 +58,10 @@
 	"leave_confirm_cancel": "Rester",
 	"leave_confirm_leave": "Quitter",
 
-	"error_generic": "Une erreur s'est produite. Veuillez réessayer plus tard."
+	"error_generic": "Une erreur s'est produite. Veuillez réessayer plus tard.",
+
+	"recent_sessions_title": "Sessions Récentes",
+	"recent_sessions_empty": "Aucune session récente trouvée",
+	"recent_sessions_close": "Fermer",
+	"recent_sessions_load_more": "Charger Plus"
 }

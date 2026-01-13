@@ -10,6 +10,7 @@
 	"home_select_option": "Choose an option to get started",
 	"home_join_button": "Join Session",
 	"home_create_button": "Create Session",
+	"home_recent_button": "Recent Sessions",
 	"home_welcome": "Welcome",
 
 	"admin_title": "Admin Panel",
@@ -57,5 +58,10 @@
 	"leave_confirm_cancel": "Stay",
 	"leave_confirm_leave": "Leave",
 
-	"error_generic": "An error occurred. Please try again later."
+	"error_generic": "An error occurred. Please try again later.",
+
+	"recent_sessions_title": "Recent Sessions",
+	"recent_sessions_empty": "No recent sessions found",
+	"recent_sessions_close": "Close",
+	"recent_sessions_load_more": "Load More"
 }
