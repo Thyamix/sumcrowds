@@ -15,20 +15,20 @@ export function EnterPin() {
   const { t } = useTranslation()
   const [pinInputValue, setPinInputValue] = useState("");
   const [showPin, setShowPin] = useState(false);
-  const [pinError, setPinError] = useState(null);
+  const [pinError, setPinError] = useState<string | null>(null);
   const { festivalCode } = useParams()
   const navigate = useNavigate()
 
-  function handlePinInputValue(event) {
+  function handlePinInputValue(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
     if (value.length > 4) return
-    if ("0123456789".includes(value.at(-1)) || value === "") {
+    if ("0123456789".includes(value.at(-1) || "") || value === "") {
       setPinInputValue(value);
       setPinError(null);
     }
   }
 
-  async function handleConfirm(event) {
+  async function handleConfirm(event: React.FormEvent) {
     event.preventDefault();
     setPinError(null);
 

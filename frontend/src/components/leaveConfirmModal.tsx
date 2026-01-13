@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
-export function LeaveConfirmModal({ open, onClose }) {
+interface LeaveConfirmModalProps {
+  open: boolean
+  onClose: () => void
+}
+
+export function LeaveConfirmModal({ open, onClose }: LeaveConfirmModalProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 

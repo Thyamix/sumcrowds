@@ -10,7 +10,11 @@ import { Plus, Eye, EyeOff } from "lucide-react";
 
 const APIURL = import.meta.env.VITE_APIURL;
 
-export function CreatePopup({ close }) {
+interface CreatePopupProps {
+  close: () => void
+}
+
+export function CreatePopup({ close }: CreatePopupProps) {
   useEffect(() => { auth() }, [])
 
   const [passwordInputValue, setPasswordInputValue] = useState("")
@@ -19,21 +23,21 @@ export function CreatePopup({ close }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
-  function handlePinInputValue(event) {
+  function handlePinInputValue(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value
-    if (("1234567890".includes(value.at(-1)) || value === "") && value.length <= 4) {
+    if (("1234567890".includes(value.at(-1) || "") || value === "") && value.length <= 4) {
       setPinInputValue(value)
     }
   }
 
-  function handlePasswordInputValue(event) {
+  function handlePasswordInputValue(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value
-    if ("abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-+_*".includes(value.at(-1)) || value === "") {
+    if ("abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-+_*".includes(value.at(-1) || "") || value === "") {
       setPasswordInputValue(value)
     }
   }
 
-  async function handleCreate(event) {
+  async function handleCreate(event: React.FormEvent) {
     event.preventDefault()
     const body = JSON.stringify({
       password: passwordInputValue,

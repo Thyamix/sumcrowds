@@ -10,7 +10,11 @@ import { Users, LogIn } from "lucide-react";
 
 const APIURL = import.meta.env.VITE_APIURL;
 
-export function JoinPopup({ close }) {
+interface JoinPopupProps {
+  close: () => void
+}
+
+export function JoinPopup({ close }: JoinPopupProps) {
   const { t } = useTranslation()
   useEffect(() => { auth() }, [])
 
@@ -18,14 +22,14 @@ export function JoinPopup({ close }) {
   const [alert, setAlert] = useState("")
   const navigate = useNavigate()
 
-  function handleCodeInputValue(event) {
+  function handleCodeInputValue(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value
-    if (("abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(value.at(-1)) || value === "") && value.length <= 6) {
+    if (("abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(value.at(-1) || "") || value === "") && value.length <= 6) {
       setCodeInputValue(value.toUpperCase())
     }
   }
 
-  async function handleJoin(event) {
+  async function handleJoin(event: React.FormEvent) {
     event.preventDefault()
     const response = await fetchWithAuth(APIURL + "v1/festival/" + codeInputValue + "/exists")
     if (response.ok) {

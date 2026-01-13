@@ -6,7 +6,7 @@ const SUPPORTED_LANGUAGES = ["en", "fr"]
 export function LanguageSwitcher() {
   const { i18n } = useTranslation()
 
-  function handleChange(e) {
+  function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const lang = e.target.value;
     i18n.changeLanguage(lang);
     localStorage.setItem('lang', lang);

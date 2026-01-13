@@ -16,7 +16,7 @@ const APIURL = import.meta.env.VITE_APIURL;
 
 export function Admin() {
   const [loading, setLoading] = useState(true)
-  const [isValid, setIsValid] = useState(null)
+  const [isValid, setIsValid] = useState<boolean | null>(null)
   const [hasAccess, setHasAccess] = useState(false)
   const [hasAdminAccess, setHasAdminAccess] = useState(false)
   const { festivalCode } = useParams()
@@ -72,12 +72,13 @@ function FestivalAdminPage() {
   const { t } = useTranslation()
   const { festivalCode } = useParams()
 
-  function handleClick(event) {
+  function handleClick(event: React.FormEvent) {
     event.preventDefault()
 
     let valid = true
     for (let i = 0; i < inputValue.length; i++) {
-      if (!"1234567890".includes(inputValue.at(i))) {
+      const char = inputValue.at(i)
+      if (char && !"1234567890".includes(char)) {
         valid = false
         break
       }
@@ -92,9 +93,9 @@ function FestivalAdminPage() {
     }
   }
 
-  function handleInputValue(event) {
+  function handleInputValue(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value
-    if ("1234567890".includes(value.at(-1)) || value === "") {
+    if ("1234567890".includes(value.at(-1) || "") || value === "") {
       setInputValue(value)
     }
   }
@@ -174,17 +175,16 @@ function FestivalAdminPage() {
                 <Archive className="h-5 w-5 mr-2" />
                 {t("admin_archive")}
               </Button>
-              <Button
-                variant="success"
-                size="lg"
-                asChild
-                className="shadow-lg hover:shadow-glow-success"
-              >
-                <a href={APIURL + "v1/festival/" + festivalCode + "/admin/download/activecsv"}>
+              <a href={APIURL + "v1/festival/" + festivalCode + "/admin/download/activecsv"}>
+                <Button
+                  variant="success"
+                  size="lg"
+                  className="shadow-lg hover:shadow-glow-success w-full"
+                >
                   <Download className="h-5 w-5 mr-2" />
                   {t("admin_get_csv")}
-                </a>
-              </Button>
+                </Button>
+              </a>
             </div>
           </div>
 
@@ -200,7 +200,7 @@ function FestivalAdminPage() {
     </div>
   )
 
-  async function onArchivePressed(event) {
+  async function onArchivePressed(event: React.MouseEvent) {
     event.preventDefault()
     const response = await fetch(APIURL + "v1/festival/" + festivalCode + "/admin/archivecurrentevent", {
       method: "get",
@@ -208,12 +208,12 @@ function FestivalAdminPage() {
     })
     if (!response.ok) {
       if (response.status === 422) location.reload()
-      throw new Error(`Response status:`, response.status)
+      throw new Error(`Response status: ${response.status}`)
     }
     location.reload()
   }
 
-  async function onSetGaugePressed(newMax) {
+  async function onSetGaugePressed(newMax: string) {
     const body = JSON.stringify({ max: +newMax })
     const response = await fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/setgauge", {
       method: "post",
@@ -222,13 +222,23 @@ function FestivalAdminPage() {
     })
     if (!response.ok) {
       if (response.status === 422) location.reload()
-      throw new Error("Response status:", response.status)
+      throw new Error(`Response status: ${response.status}`)
     }
   }
 }
 
-function ArchiveSection({ festivalCode, t }) {
-  const [archives, setArchives] = useState([])
+interface Archive {
+  id: number
+  time: number
+}
+
+interface ArchiveSectionProps {
+  festivalCode: string | undefined
+  t: (key: string) => string
+}
+
+function ArchiveSection({ festivalCode, t }: ArchiveSectionProps) {
+  const [archives, setArchives] = useState<Archive[]>([])
 
   useEffect(() => {
     fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/getarchivedevents")
@@ -236,7 +246,7 @@ function ArchiveSection({ festivalCode, t }) {
       .then(data => setArchives(data))
   }, [festivalCode])
 
-  function getDateTime(timestamp) {
+  function getDateTime(timestamp: number) {
     const time = new Date(timestamp * 1000)
     return time.toLocaleString().slice(0, 24)
   }
@@ -274,7 +284,7 @@ function ArchiveSection({ festivalCode, t }) {
   )
 }
 
-async function playAlert(alert, setAlert) {
+async function playAlert(alert: string, setAlert: (alert: string) => void) {
   setAlert(alert)
   await new Promise(resolve => setTimeout(resolve, 7500))
   setAlert("")

@@ -15,7 +15,7 @@ const APIURL = import.meta.env.VITE_APIURL;
 
 export function Counter() {
   const [loading, setLoading] = useState(true)
-  const [isValid, setIsValid] = useState(null)
+  const [isValid, setIsValid] = useState<boolean | null>(null)
   const [hasAccess, setHasAccess] = useState(false)
   const { festivalCode } = useParams()
 
@@ -58,41 +58,47 @@ export function Counter() {
 
 function FestivalCountedPage() {
   const { t } = useTranslation()
-  const [total, setTotal] = useState("...")
+  const [total, setTotal] = useState<number | string>("...")
   const [maxJauge, setMaxJauge] = useState(0)
   const [status, setStatus] = useState("normal")
   const [showLeaveModal, setShowLeaveModal] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
   const { festivalCode } = useParams()
-  const socketRef = useRef(null)
-  const heartbeatRef = useRef(null)
+  const socketRef = useRef<WebSocket | null>(null)
+  const heartbeatRef = useRef<number | null>(null)
 
   const connectWebSocket = () => {
     if (socketRef.current) {
       socketRef.current.close()
     }
-    clearInterval(heartbeatRef.current)
+    if (heartbeatRef.current !== null) {
+      clearInterval(heartbeatRef.current)
+    }
     setTotal("...")
 
     socketRef.current = new WebSocket(WSURL + festivalCode)
 
     socketRef.current.onopen = () => {
       setIsConnected(true)
-      getTotal(socketRef.current)
+      if (socketRef.current) {
+        getTotal(socketRef.current)
+      }
       heartbeatRef.current = setInterval(() => {
-        if (socketRef.current.readyState === WebSocket.OPEN) {
+        if (socketRef.current?.readyState === WebSocket.OPEN) {
           socketRef.current.send(JSON.stringify({ type: "ping" }))
         }
-      }, 10000)
+      }, 10000) as unknown as number
     }
 
-    socketRef.current.onmessage = (event) => {
+    socketRef.current.onmessage = (event: MessageEvent) => {
       handleMessage(event, setTotal, setMaxJauge)
     }
 
     socketRef.current.onclose = () => {
       setIsConnected(false)
-      clearInterval(heartbeatRef.current)
+      if (heartbeatRef.current !== null) {
+        clearInterval(heartbeatRef.current)
+      }
     }
   }
 
@@ -100,7 +106,9 @@ function FestivalCountedPage() {
     connectWebSocket()
 
     return () => {
-      clearInterval(heartbeatRef.current)
+      if (heartbeatRef.current !== null) {
+        clearInterval(heartbeatRef.current)
+      }
       socketRef.current?.close()
     }
   }, [festivalCode])
@@ -214,7 +222,7 @@ function FestivalCountedPage() {
                   variant="destructive"
                   size="counter"
                   className="shadow-lg hover:shadow-glow-destructive"
-                  onClick={() => handleMinus(2, festivalCode)}
+                  onClick={() => handleMinus(2, festivalCode!)}
                 >
                   −2
                 </Button>
@@ -222,7 +230,7 @@ function FestivalCountedPage() {
                   variant="destructive"
                   size="counter"
                   className="shadow-lg hover:shadow-glow-destructive"
-                  onClick={() => handleMinus(3, festivalCode)}
+                  onClick={() => handleMinus(3, festivalCode!)}
                 >
                   −3
                 </Button>
@@ -231,7 +239,7 @@ function FestivalCountedPage() {
                 variant="destructive"
                 size="counterLg"
                 className="shadow-lg hover:shadow-glow-destructive"
-                onClick={() => handleMinus(1, festivalCode)}
+                onClick={() => handleMinus(1, festivalCode!)}
               >
                 <Minus className="w-6 h-6 mr-2" />
                 1
@@ -248,7 +256,7 @@ function FestivalCountedPage() {
                   variant="success"
                   size="counter"
                   className="shadow-lg hover:shadow-glow-success"
-                  onClick={() => handlePlus(2, festivalCode)}
+                  onClick={() => handlePlus(2, festivalCode!)}
                 >
                   +2
                 </Button>
@@ -256,7 +264,7 @@ function FestivalCountedPage() {
                   variant="success"
                   size="counter"
                   className="shadow-lg hover:shadow-glow-success"
-                  onClick={() => handlePlus(3, festivalCode)}
+                  onClick={() => handlePlus(3, festivalCode!)}
                 >
                   +3
                 </Button>
@@ -265,7 +273,7 @@ function FestivalCountedPage() {
                 variant="success"
                 size="counterLg"
                 className="shadow-lg hover:shadow-glow-success"
-                onClick={() => handlePlus(1, festivalCode)}
+                onClick={() => handlePlus(1, festivalCode!)}
               >
                 <Plus className="w-6 h-6 mr-2" />
                 1
@@ -283,7 +291,7 @@ function FestivalCountedPage() {
   )
 }
 
-async function handlePlus(amount, festivalCode) {
+async function handlePlus(amount: number, festivalCode: string) {
   const body = JSON.stringify({ amount })
   try {
     await fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/inc", {
@@ -296,7 +304,7 @@ async function handlePlus(amount, festivalCode) {
   }
 }
 
-async function handleMinus(amount, festivalCode) {
+async function handleMinus(amount: number, festivalCode: string) {
   const body = JSON.stringify({ amount })
   try {
     await fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/dec", {
@@ -309,11 +317,15 @@ async function handleMinus(amount, festivalCode) {
   }
 }
 
-async function getTotal(socket) {
+async function getTotal(socket: WebSocket) {
   socket.send(JSON.stringify({ type: "getTotal" }))
 }
 
-function handleMessage(event, setTotal, setJauge) {
+function handleMessage(
+  event: MessageEvent,
+  setTotal: (total: number | string) => void,
+  setJauge: (jauge: number) => void
+) {
   const result = JSON.parse(event.data)
   if (result.type === "pong") return
   setTotal(result.total)

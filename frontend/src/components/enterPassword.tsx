@@ -15,14 +15,14 @@ export function EnterPassword() {
   const { t } = useTranslation()
   const [passwordInputValue, setPasswordInputValue] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const { festivalCode } = useParams()
   const navigate = useNavigate()
 
-  function handlePasswordInputValue(event) {
+  function handlePasswordInputValue(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
     if (
-      "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-+_*".includes(value.at(-1)) ||
+      "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-+_*".includes(value.at(-1) || "") ||
       value === ""
     ) {
       setPasswordInputValue(value);
@@ -30,7 +30,7 @@ export function EnterPassword() {
     }
   }
 
-  async function handleConfirm(event) {
+  async function handleConfirm(event: React.FormEvent) {
     event.preventDefault();
     setPasswordError(null);
 
