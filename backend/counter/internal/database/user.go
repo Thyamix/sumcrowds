@@ -187,17 +187,25 @@ type RecentSession struct {
 	LastUsedAt int64  `json:"last_used_at"`
 }
 
-func GetUserRecentSessions(userId int64, limit int) ([]RecentSession, error) {
+type RecentSessionsResponse struct {
+	Sessions []RecentSession `json:"sessions"`
+	HasMore  bool            `json:"has_more"`
+	Page     int             `json:"page"`
+}
+
+func GetUserRecentSessions(userId int64, page int, limit int) ([]RecentSession, bool, error) {
+	offset := page * limit
+	// Fetch one extra to check if there are more
 	rows, err := db.DB.Query(`
 		SELECT f.code, fa.last_used_at
 		FROM festival_access fa
 		JOIN festival f ON f.id = fa.festival_id
 		WHERE fa.user_id = $1 AND fa.revoked = false
 		ORDER BY fa.last_used_at DESC
-		LIMIT $2
-	`, userId, limit)
+		LIMIT $2 OFFSET $3
+	`, userId, limit+1, offset)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get recent sessions for user %d: %w", userId, err)
+		return nil, false, fmt.Errorf("failed to get recent sessions for user %d: %w", userId, err)
 	}
 	defer rows.Close()
 
@@ -205,14 +213,20 @@ func GetUserRecentSessions(userId int64, limit int) ([]RecentSession, error) {
 	for rows.Next() {
 		var s RecentSession
 		if err := rows.Scan(&s.Code, &s.LastUsedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan session row: %w", err)
+			return nil, false, fmt.Errorf("failed to scan session row: %w", err)
 		}
 		sessions = append(sessions, s)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating session rows: %w", err)
+		return nil, false, fmt.Errorf("error iterating session rows: %w", err)
 	}
 
-	return sessions, nil
+	// Check if there are more results
+	hasMore := len(sessions) > limit
+	if hasMore {
+		sessions = sessions[:limit] // Remove the extra item
+	}
+
+	return sessions, hasMore, nil
 }

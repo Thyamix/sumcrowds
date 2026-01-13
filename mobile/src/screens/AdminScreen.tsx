@@ -166,7 +166,8 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({route, navigation}) => 
       });
     } catch (err) {
       // User cancelled share - not an error
-      if (err.message !== 'User did not share') {
+      const message = err instanceof Error ? err.message : '';
+      if (message !== 'User did not share') {
         console.error('Download error:', err);
         setAlert(t('error_generic'));
       }

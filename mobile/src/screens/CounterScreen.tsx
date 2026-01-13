@@ -6,6 +6,7 @@ import {
   StatusBar,
   Platform,
   TouchableOpacity,
+  BackHandler,
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -96,7 +97,7 @@ export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation})
       }, 10000);
     };
 
-    ws.onmessage = (event: MessageEvent): void => {
+    ws.onmessage = (event): void => {
       try {
         const data: WebSocketMessage = JSON.parse(event.data);
         if (data.type === 'pong') return;
@@ -164,6 +165,19 @@ export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation})
       }
     };
   }, [hasAccess, connectWebSocket]);
+
+  // Handle hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (hasAccess) {
+        setShowLeaveModal(true);
+        return true; // Prevent default back behavior
+      }
+      return false;
+    });
+
+    return () => backHandler.remove();
+  }, [hasAccess]);
 
   // Increment/Decrement handlers
   const handleIncrement = async (amount: number): Promise<void> => {

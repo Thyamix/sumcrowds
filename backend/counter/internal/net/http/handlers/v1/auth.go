@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
@@ -140,7 +141,17 @@ func GetRecentSessions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sessions, err := database.GetUserRecentSessions(userId, 10)
+	// Parse page parameter (default to 0)
+	page := 0
+	if pageStr := r.URL.Query().Get("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p >= 0 {
+			page = p
+		}
+	}
+
+	const limit = 5
+
+	sessions, hasMore, err := database.GetUserRecentSessions(userId, page, limit)
 	if err != nil {
 		log.Printf("Failed to get recent sessions: %v", err)
 		apperrors.SendError(w, apperrors.APIErrInternal(err))
@@ -151,7 +162,13 @@ func GetRecentSessions(w http.ResponseWriter, r *http.Request) {
 		sessions = []database.RecentSession{}
 	}
 
+	response := database.RecentSessionsResponse{
+		Sessions: sessions,
+		HasMore:  hasMore,
+		Page:     page,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(sessions)
+	json.NewEncoder(w).Encode(response)
 }

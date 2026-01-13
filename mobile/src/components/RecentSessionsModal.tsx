@@ -10,6 +10,12 @@ interface Session {
   last_used_at: number;
 }
 
+interface SessionsResponse {
+  sessions: Session[];
+  has_more: boolean;
+  page: number;
+}
+
 interface RecentSessionsModalProps {
   visible: boolean;
   onClose: () => void;
@@ -24,23 +30,40 @@ export const RecentSessionsModal: React.FC<RecentSessionsModalProps> = ({
   const {t} = useTranslation();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [page, setPage] = useState<number>(0);
+  const [hasMore, setHasMore] = useState<boolean>(false);
 
   useEffect(() => {
     if (visible) {
-      loadSessions();
+      // Reset state when modal opens
+      setSessions([]);
+      setPage(0);
+      setHasMore(false);
+      loadSessions(0, true);
     }
   }, [visible]);
 
-  const loadSessions = async (): Promise<void> => {
-    setLoading(true);
+  const loadSessions = async (pageNum: number, reset: boolean = false): Promise<void> => {
+    if (reset) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
     setError('');
 
     try {
-      const response = await fetchWithAuth('v1/user/sessions');
+      const response = await fetchWithAuth(`v1/user/sessions?page=${pageNum}`);
       if (response.ok) {
-        const data = await response.json();
-        setSessions(data || []);
+        const data: SessionsResponse = await response.json();
+        if (reset) {
+          setSessions(data.sessions || []);
+        } else {
+          setSessions(prev => [...prev, ...(data.sessions || [])]);
+        }
+        setHasMore(data.has_more);
+        setPage(data.page);
       } else {
         setError(t('error_generic'));
       }
@@ -49,6 +72,13 @@ export const RecentSessionsModal: React.FC<RecentSessionsModalProps> = ({
       setError(`${t('error_generic')} (${message})`);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const handleLoadMore = (): void => {
+    if (!loadingMore && hasMore) {
+      loadSessions(page + 1, false);
     }
   };
 
@@ -82,9 +112,9 @@ export const RecentSessionsModal: React.FC<RecentSessionsModalProps> = ({
           <Text style={styles.emptyText}>{t('recent_sessions_empty')}</Text>
         ) : (
           <View style={styles.sessionList}>
-            {sessions.map((session) => (
+            {sessions.map((session, index) => (
               <TouchableOpacity
-                key={session.code}
+                key={`${session.code}-${index}`}
                 style={styles.sessionItem}
                 onPress={() => handleSelect(session.code)}>
                 <View style={styles.sessionInfo}>
@@ -96,6 +126,19 @@ export const RecentSessionsModal: React.FC<RecentSessionsModalProps> = ({
                 <Text style={styles.arrow}>→</Text>
               </TouchableOpacity>
             ))}
+            {hasMore && (
+              <Button
+                onPress={handleLoadMore}
+                variant="secondary"
+                style={styles.loadMoreButton}
+                disabled={loadingMore}>
+                {loadingMore ? (
+                  <ActivityIndicator size="small" color={colors.primary} />
+                ) : (
+                  t('recent_sessions_load_more')
+                )}
+              </Button>
+            )}
           </View>
         )}
 
@@ -156,6 +199,9 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     marginTop: spacing.md,
+  },
+  loadMoreButton: {
+    marginTop: spacing.sm,
   },
 });
 
