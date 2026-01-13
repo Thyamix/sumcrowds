@@ -19,3 +19,37 @@ The app uses a session code to sync users to events. When a session is created, 
 - Recent sessions history for quick access to previously joined events
 - Exports data to csv
 - Support for both English and French
+
+## Configuration
+
+The project uses a centralized configuration system with separate files for each environment.
+
+### Config Files
+
+Non-secret configuration (endpoints, CORS, ports) is stored in TOML files:
+
+- `config.dev.toml` - Development environment
+- `config.staging.toml` - Staging environment
+- `config.prod.toml` - Production environment
+
+### Environment Files
+
+Secrets (database passwords, API keys) are stored in `.env` files:
+
+- `.env.dev` - Development secrets
+- `.env.staging` - Staging secrets
+- `.env.prod` - Production secrets
+
+Copy `.env.example` and fill in the required values for your environment.
+
+### Mobile Configuration
+
+The mobile app generates its config at build time:
+
+```bash
+cd mobile
+npm run generate-config:dev   # For development
+npm run generate-config:prod  # For production
+```
+
+This reads from the root config files and generates `mobile/src/config.ts`.

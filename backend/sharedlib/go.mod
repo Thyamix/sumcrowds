@@ -4,7 +4,11 @@ go 1.24.0
 
 toolchain go1.24.5
 
-require github.com/lib/pq v1.10.9
+require (
+	github.com/BurntSushi/toml v1.4.0
+	github.com/joho/godotenv v1.5.1
+	github.com/lib/pq v1.10.9
+)
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect

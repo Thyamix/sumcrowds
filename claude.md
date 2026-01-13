@@ -112,12 +112,48 @@ cd mobile/android && ./gradlew assembleRelease
 
 ### Keep READMEs Up to Date
 
-When adding new features or making significant changes, update the relevant README files:
+**Always update README files after making changes.** When adding new features, modifying configuration, or making significant changes, update the relevant README files before committing:
 
-- `README.md` - Main project README with feature list
+- `README.md` - Main project README with feature list and configuration
 - `mobile/README.md` - Mobile app README with features and project structure
 
 Ensure READMEs accurately reflect the current state of the codebase.
+
+## Configuration System
+
+The project uses a centralized configuration system with:
+- **Config files** (TOML) - Non-secret settings like endpoints, CORS origins, ports
+- **Env files** - Secrets like database passwords
+
+### File Structure
+
+```
+config.dev.toml      # Development config
+config.staging.toml  # Staging config
+config.prod.toml     # Production config
+.env.dev             # Dev secrets (gitignored)
+.env.staging         # Staging secrets (gitignored)
+.env.prod            # Production secrets (gitignored)
+.env.example         # Template for required env vars
+```
+
+### Adding New Config Values
+
+1. Add the value to all `config.{env}.toml` files
+2. Update `backend/sharedlib/config/config.go` struct if needed
+3. If it's a secret, add to `.env.{env}` files and `.env.example`
+
+### Mobile Config Generation
+
+Mobile config is generated from root config files. Run before building:
+
+```bash
+cd mobile
+npm run generate-config:prod    # For production build
+npm run generate-config:dev     # For development
+```
+
+This generates `mobile/src/config.ts` from the corresponding config file.
 
 ## Database / SQLC
 

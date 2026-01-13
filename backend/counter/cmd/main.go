@@ -2,24 +2,25 @@ package main
 
 import (
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http"
+	"github.com/thyamix/sumcrowds/backend/sharedlib/config"
 	db "github.com/thyamix/sumcrowds/backend/sharedlib/database"
 )
 
 func main() {
-	getEnv()
-	db.InitDB()
-	http.StartAPI()
-}
-
-func getEnv() {
-	if os.Getenv("APP_DEPLOY") != "docker" {
-		err := godotenv.Load()
-		if err != nil {
-			log.Println("No .env file found (set APP_DEPLOY to 'docker' if deployed with docker)")
-		}
+	// Load configuration
+	env := config.GetEnv()
+	cfg, err := config.Load(env)
+	if err != nil {
+		log.Fatalf("Failed to load configuration: %v", err)
 	}
+
+	log.Printf("Starting with %s configuration", env)
+
+	// Initialize database with config
+	db.InitDBWithConfig(cfg)
+
+	// Start API server
+	http.StartAPI(cfg)
 }

@@ -3,7 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "generate-config": "node ../scripts/generate-mobile-config.js",
+    "generate-config:dev": "node ../scripts/generate-mobile-config.js dev",
+    "generate-config:staging": "node ../scripts/generate-mobile-config.js staging",
+    "generate-config:prod": "node ../scripts/generate-mobile-config.js prod",
+    "preandroid": "npm run generate-config:prod",
     "android": "react-native run-android",
+    "android:dev": "npm run generate-config:dev && react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",

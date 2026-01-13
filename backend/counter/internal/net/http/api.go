@@ -4,26 +4,31 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/rs/cors"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/net/websockets"
+	"github.com/thyamix/sumcrowds/backend/sharedlib/config"
 )
 
-func StartAPI() {
+func StartAPI(cfg *config.Config) {
 	fmt.Println("Starting API")
 	wsServer := websockets.NewHub()
 	router := getRoutes(wsServer)
 
-	allowedOrigin := os.Getenv("ORIGIN")
+	// Build allowed origins map for fast lookup
+	allowedOriginsMap := make(map[string]bool)
+	for _, origin := range cfg.CORS.AllowedOrigins {
+		allowedOriginsMap[origin] = true
+	}
+
 	handler := cors.New(cors.Options{
 		AllowOriginFunc: func(origin string) bool {
 			// Allow requests with no Origin header (mobile apps)
 			if origin == "" {
 				return true
 			}
-			// Allow the configured origin (web app)
-			return origin == allowedOrigin
+			// Allow configured origins
+			return allowedOriginsMap[origin]
 		},
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"*"},
@@ -31,13 +36,13 @@ func StartAPI() {
 	}).Handler(router)
 
 	server := http.Server{
-		Addr:    ":" + os.Getenv("PORT"),
+		Addr:    cfg.GetServerAddr(),
 		Handler: handler,
 	}
 
 	go wsServer.Run()
 
-	fmt.Printf("Server is listening to origin %v \n", os.Getenv("ORIGIN"))
-	fmt.Printf("Server is running on :%v...\n", os.Getenv("PORT"))
+	fmt.Printf("Server is listening to origins: %v\n", cfg.CORS.AllowedOrigins)
+	fmt.Printf("Server is running on %s...\n", cfg.GetServerAddr())
 	log.Fatal(server.ListenAndServe())
 }

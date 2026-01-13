@@ -6,3 +6,9 @@ backend/*/outputs/*
 */.env
 *tmp/*
 *.env.*
+
+# Root environment files (secrets)
+.env.dev
+.env.staging
+.env.prod
+!.env.example

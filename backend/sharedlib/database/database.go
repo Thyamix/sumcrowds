@@ -11,6 +11,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/lib/pq"
+	"github.com/thyamix/sumcrowds/backend/sharedlib/config"
 	"github.com/thyamix/sumcrowds/backend/sharedlib/database/sqlcdb"
 )
 
@@ -21,6 +22,16 @@ var DB *sql.DB
 var Pool *pgxpool.Pool
 var Queries *sqlcdb.Queries
 
+// InitDBWithConfig initializes the database using the config system
+func InitDBWithConfig(cfg *config.Config) {
+	fmt.Println("Initialising Database")
+
+	connStr := cfg.GetDatabaseURL()
+	initWithConnStr(connStr)
+}
+
+// InitDB initializes the database using legacy environment variable
+// Deprecated: Use InitDBWithConfig instead
 func InitDB() {
 	fmt.Println("Initialising Database")
 
@@ -28,6 +39,10 @@ func InitDB() {
 	if connStr == "" {
 		log.Fatal("Error: DATABASE_URL environment variable is not set.")
 	}
+	initWithConnStr(connStr)
+}
+
+func initWithConnStr(connStr string) {
 
 	var err error
 

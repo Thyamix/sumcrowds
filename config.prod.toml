@@ -1,0 +1,25 @@
+# Sumcrowds Production Configuration
+
+[server]
+port = 8080
+host = "0.0.0.0"
+
+[endpoints]
+api_base = "https://app.sumcrowds.com/api/"
+ws_base = "wss://app.sumcrowds.com/ws/"
+
+[cors]
+allowed_origins = [
+    "https://app.sumcrowds.com"
+]
+
+[database]
+host = "postgres_prod"
+port = 5432
+name = "sumcrowds"
+user = "sumcrowds"
+ssl_mode = "require"
+# password is in .env.prod
+
+[frontend]
+port = 80

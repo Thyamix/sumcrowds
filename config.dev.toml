@@ -1,0 +1,27 @@
+# Sumcrowds Development Configuration
+
+[server]
+port = 8080
+host = "192.168.1.75"
+
+[endpoints]
+api_base = "http://192.168.1.75:8080/api/"
+ws_base = "ws://192.168.1.75:8080/ws/"
+
+[cors]
+# Multiple origins allowed for development
+allowed_origins = [
+    "http://192.168.1.75:3000",
+    "http://localhost:3000"
+]
+
+[database]
+host = "postgres_dev"
+port = 5432
+name = "sumcrowds"
+user = "sumcrowds"
+ssl_mode = "disable"
+# password is in .env.dev
+
+[frontend]
+port = 3000

@@ -2,24 +2,25 @@ package main
 
 import (
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
+	"github.com/thyamix/sumcrowds/backend/sharedlib/config"
 	db "github.com/thyamix/sumcrowds/backend/sharedlib/database"
 	"github.com/thyamix/sumcrowds/cleanup/internal/cleanup"
 )
 
 func main() {
-	getEnv()
-	db.InitDB()
-	cleanup.Clean()
-}
-
-func getEnv() {
-	if os.Getenv("APP_DEPLOY") != "docker" {
-		err := godotenv.Load()
-		if err != nil {
-			log.Println("No .env file found (set APP_DEPLOY to 'docker' if deployed with docker)")
-		}
+	// Load configuration
+	env := config.GetEnv()
+	cfg, err := config.Load(env)
+	if err != nil {
+		log.Fatalf("Failed to load configuration: %v", err)
 	}
+
+	log.Printf("Starting cleanup with %s configuration", env)
+
+	// Initialize database with config
+	db.InitDBWithConfig(cfg)
+
+	// Run cleanup
+	cleanup.Clean()
 }

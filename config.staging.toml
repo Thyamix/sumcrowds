@@ -1,0 +1,25 @@
+# Sumcrowds Staging Configuration
+
+[server]
+port = 8080
+host = "0.0.0.0"
+
+[endpoints]
+api_base = "https://testingapp.sumcrowds.com/api/"
+ws_base = "wss://testingapp.sumcrowds.com/ws/"
+
+[cors]
+allowed_origins = [
+    "https://testingapp.sumcrowds.com"
+]
+
+[database]
+host = "postgres_staging"
+port = 5432
+name = "sumcrowds"
+user = "sumcrowds"
+ssl_mode = "disable"
+# password is in .env.staging
+
+[frontend]
+port = 80
