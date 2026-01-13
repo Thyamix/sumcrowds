@@ -100,6 +100,14 @@ Example workflow:
 4. Update issue: state="Awaiting Review", add PR link
 ```
 
+## Mobile App Builds
+
+Always build the **release/production** version of the mobile app, never the debug version:
+
+```bash
+cd mobile/android && ./gradlew assembleRelease
+```
+
 ## Communication
 
 ### "Remember" Instructions
