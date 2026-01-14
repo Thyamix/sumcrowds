@@ -91,6 +91,18 @@ func RefreshAccess(w http.ResponseWriter, r *http.Request) {
 	refreshToken, accessToken, err := auth.RefreshToken(refreshTokenString)
 	if err != nil {
 		log.Println("Failed to refresh token", err)
+		if err == apperrors.ErrInvalidToken {
+			apperrors.SendError(w, apperrors.APIErrInvalidRefreshToken(err))
+			return
+		}
+		if err == apperrors.ErrExpiredToken {
+			apperrors.SendError(w, apperrors.APIErrExpiredRefreshToken(err))
+			return
+		}
+		if err == apperrors.ErrServiceUnavailable {
+			apperrors.SendError(w, apperrors.APIErrServiceUnavailable(err))
+			return
+		}
 		apperrors.SendError(w, apperrors.APIErrInternal(err))
 		return
 	}

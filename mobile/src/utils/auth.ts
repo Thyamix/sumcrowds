@@ -13,6 +13,9 @@ interface FetchOptions extends RequestInit {
   headers?: Record<string, string>;
 }
 
+// Error codes that indicate token issues (should trigger initaccess)
+const TOKEN_ERROR_CODES = [1005, 1006, 1007, 1008]; // Invalid/expired/no/revoked refresh token
+
 // Store tokens
 export const setTokens = async (
   accessToken: string,
@@ -78,9 +81,30 @@ export const auth = async (): Promise<boolean> => {
           return true;
         }
       }
+
+      // Only call initaccess for token-specific errors, NOT for server errors (500/503)
+      // This prevents creating new tokens when the database is temporarily offline
+      if (response.status >= 500) {
+        console.warn('Server error during auth refresh, not requesting new tokens');
+        return false;
+      }
+
+      // Check for token-specific error codes before calling initaccess
+      try {
+        const errorData = await response.json();
+        if (!TOKEN_ERROR_CODES.includes(errorData.code)) {
+          console.warn('Non-token error during auth refresh:', errorData);
+          return false;
+        }
+      } catch {
+        // If we can't parse the response, only proceed if it was a 401
+        if (response.status !== 401) {
+          return false;
+        }
+      }
     }
 
-    // If refresh fails, initialize new access
+    // If refresh fails with token error or no refresh token exists, initialize new access
     const initResponse = await fetch(`${API_URL}v1/auth/initaccess`, {
       method: 'GET',
     });

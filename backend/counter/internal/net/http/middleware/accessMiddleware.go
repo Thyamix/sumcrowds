@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -27,7 +29,11 @@ func RequireAccess(next http.Handler) http.Handler {
 
 		accessToken, err := database.GetAccessToken(accessTokenValue)
 		if err != nil {
-			apperrors.SendError(w, apperrors.APIErrInvalidAccessToken(err))
+			if errors.Is(err, sql.ErrNoRows) {
+				apperrors.SendError(w, apperrors.APIErrInvalidAccessToken(err))
+			} else {
+				apperrors.SendError(w, apperrors.APIErrServiceUnavailable(err))
+			}
 			return
 		}
 
@@ -43,6 +49,10 @@ func RequireAccess(next http.Handler) http.Handler {
 			}
 			if err == apperrors.ErrRevokedToken {
 				apperrors.SendError(w, apperrors.APIErrRevokedAccessToken(err))
+				return
+			}
+			if err == apperrors.ErrServiceUnavailable {
+				apperrors.SendError(w, apperrors.APIErrServiceUnavailable(err))
 				return
 			}
 			apperrors.SendError(w, apperrors.APIErrInternal(err))

@@ -253,6 +253,7 @@ var (
 	ErrInvalidPin                 = errors.New("invalid admin pin")
 	ErrFailedToHashPassword       = errors.New("failed to hash password")
 	ErrRevokedToken               = errors.New("token has been revoked")
+	ErrServiceUnavailable         = errors.New("service temporarily unavailable")
 )
 
 func APIErrInternal(err error) *APIError {
@@ -262,5 +263,14 @@ func APIErrInternal(err error) *APIError {
 		Code:       4000,
 		Public:     "internal server error",
 		Internal:   internal,
+	}
+}
+
+func APIErrServiceUnavailable(err error) *APIError {
+	return &APIError{
+		StatusCode: http.StatusServiceUnavailable,
+		Code:       5001,
+		Public:     "service temporarily unavailable",
+		Internal:   fmt.Errorf("service unavailable: %w\n", err),
 	}
 }

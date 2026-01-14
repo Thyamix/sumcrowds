@@ -17,6 +17,7 @@ Error codes are returned in the JSON response body when an API error occurs:
 | 2xxx | Festival/session errors |
 | 3xxx | Request validation errors |
 | 4xxx | Internal server errors |
+| 5xxx | Service availability errors |
 
 ## Authentication Errors (1xxx)
 
@@ -61,6 +62,12 @@ Error codes are returned in the JSON response body when an API error occurs:
 | 4005 | Failed get total | Failed to retrieve counter total from database |
 | 4006 | Failed hash password | Failed to hash password |
 | 4007 | Failed reset festival | Failed to reset/archive festival data |
+
+## Service Availability Errors (5xxx)
+
+| Code | Error | HTTP Status | Description |
+|------|-------|-------------|-------------|
+| 5001 | Service temporarily unavailable | 503 | Database or other backend service is temporarily unavailable. Clients should retry later and NOT request new auth tokens. |
 
 ## Source Files
 

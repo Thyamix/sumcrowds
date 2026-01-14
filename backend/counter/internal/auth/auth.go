@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -101,10 +102,11 @@ func NewAuth() (*counterModels.RefreshToken, *counterModels.AccessToken, error) 
 func CheckAccess(token string) (bool, error) {
 	accessToken, err := database.GetAccessToken(token)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return false, apperrors.ErrInvalidToken
 		}
-		return false, err
+		// Database connection error or other DB failure
+		return false, apperrors.ErrServiceUnavailable
 	}
 
 	if accessToken.ExpiresAt < time.Now().Unix() {
@@ -118,11 +120,11 @@ func CheckAccess(token string) (bool, error) {
 func RefreshToken(token string) (*counterModels.RefreshToken, *counterModels.AccessToken, error) {
 	refreshToken, err := database.GetRefreshToken(token)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil, apperrors.ErrInvalidToken
 		}
 		log.Println("failed to get refresh token", err)
-		return nil, nil, err
+		return nil, nil, apperrors.ErrServiceUnavailable
 	}
 
 	if refreshToken.ExpiresAt < time.Now().Unix() {
@@ -148,17 +150,17 @@ func RefreshToken(token string) (*counterModels.RefreshToken, *counterModels.Acc
 	err = database.UpdateRefreshToken(*refreshToken)
 	if err != nil {
 		log.Println("failed to update refresh token", err)
-		return nil, nil, err
+		return nil, nil, apperrors.ErrServiceUnavailable
 	}
 	err = database.CreateAccessToken(*accessToken)
 	if err != nil {
 		log.Println("failed to create access token", err)
-		return nil, nil, err
+		return nil, nil, apperrors.ErrServiceUnavailable
 	}
 	err = database.CreateRefreshToken(*newRefreshToken)
 	if err != nil {
 		log.Println("failed to create refresh token", err)
-		return nil, nil, err
+		return nil, nil, apperrors.ErrServiceUnavailable
 	}
 
 	return newRefreshToken, accessToken, nil
