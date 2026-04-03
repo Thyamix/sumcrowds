@@ -3,6 +3,7 @@ services:
     build:
       context: ./backend/
       dockerfile: ./counter/Dockerfile
+    image: git.thyamix.com/thyamix/sumcrowds-counter:prod-latest
     environment:
       CONFIG_ENV: prod
       CONFIG_PATH: /app/config.prod.toml
@@ -18,6 +19,7 @@ services:
     build:
       context: ./backend/
       dockerfile: ./cleanup/Dockerfile
+    image: git.thyamix.com/thyamix/sumcrowds-cleanup:prod-latest
     environment:
       CONFIG_ENV: prod
       CONFIG_PATH: /app/config.prod.toml
@@ -37,6 +39,7 @@ services:
       args:
         VITE_APIURL: "https://app.sumcrowds.com/api/"
         VITE_WSURL: "wss://app.sumcrowds.com/ws/"
+    image: git.thyamix.com/thyamix/sumcrowds-frontend:prod-latest
     restart: unless-stopped
     networks:
       - prod_network
