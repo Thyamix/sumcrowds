@@ -19,7 +19,7 @@ func SendError(w http.ResponseWriter, appError *APIError) {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 	}
 
-	fmt.Print(appError.Internal)
+	fmt.Println(appError.Internal)
+	fmt.Println(appError.Public)
+	fmt.Println(appError.StatusCode, appError.StatusCode)
 }
-
-

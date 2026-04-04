@@ -72,7 +72,7 @@ func RefreshAccess(w http.ResponseWriter, r *http.Request) {
 		// Fallback to cookie for web clients
 		refreshTokenString, err = cookieutils.GetRefreshToken(r)
 		if err != nil {
-			if err == apperrors.ErrAccessTokenCookieNotFound {
+			if err == apperrors.ErrRefreshTokenCookieNotFound {
 				apperrors.SendError(w, apperrors.APIErrNoRefreshToken(err))
 				return
 			}
