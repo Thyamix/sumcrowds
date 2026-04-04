@@ -202,7 +202,7 @@ function FestivalAdminPage() {
 
   async function onArchivePressed(event: React.MouseEvent) {
     event.preventDefault()
-    const response = await fetch(APIURL + "v1/festival/" + festivalCode + "/admin/archivecurrentevent", {
+    const response = await fetchWithAuth(APIURL + "v1/festival/" + festivalCode + "/admin/archivecurrentevent", {
       method: "get",
       headers: { "Content-Type": "application/json" }
     })
