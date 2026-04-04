@@ -1,0 +1,63 @@
+services:
+  backend_counter_app:
+    build:
+      context: ./backend/
+      dockerfile: ./counter/Dockerfile
+    image: git.thyamix.com/thyamix/sumcrowds-counter:prod-latest
+    environment:
+      CONFIG_ENV: prod
+      CONFIG_PATH: /app/config.prod.toml
+      ENV_PATH: /app/.env.prod
+    volumes:
+      - ./config.prod.toml:/app/config.prod.toml:ro
+      - ./.env.prod:/app/.env.prod:ro
+    restart: unless-stopped
+    networks:
+      - prod_network
+
+  backend_cleanup_app:
+    build:
+      context: ./backend/
+      dockerfile: ./cleanup/Dockerfile
+    image: git.thyamix.com/thyamix/sumcrowds-cleanup:prod-latest
+    environment:
+      CONFIG_ENV: prod
+      CONFIG_PATH: /app/config.prod.toml
+      ENV_PATH: /app/.env.prod
+    volumes:
+      - ./config.prod.toml:/app/config.prod.toml:ro
+      - ./.env.prod:/app/.env.prod:ro
+    restart: unless-stopped
+    networks:
+      - prod_network
+
+
+  frontend_app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_APIURL: "http://192.168.1.75:31490/api/"
+        VITE_WSURL: "ws://192.168.1.75:31490/ws/"
+    image: git.thyamix.com/thyamix/sumcrowds-frontend:prod-latest
+    restart: unless-stopped
+    networks:
+      - prod_network
+
+  nginx_proxy:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.prod
+    ports:
+      - "40001:80"
+    restart: unless-stopped
+    networks:
+      - prod_network
+    depends_on:
+      - backend_counter_app
+      - frontend_app
+    command: ["nginx", "-g", "daemon off;"]
+
+networks:
+  prod_network:
+    driver: bridge
