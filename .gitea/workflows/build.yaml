@@ -35,7 +35,7 @@ jobs:
           )
 
           for IMAGE in "${IMAGES[@]}"; do
-            docker tag $IMAGE:$GIT_COMMIT_SHA $IMAGE:latest
+            docker tag $IMAGE:latest $IMAGE:$GIT_COMMIT_SHA 
             docker push $IMAGE:$GIT_COMMIT_SHA
             docker push $IMAGE:latest
           done
