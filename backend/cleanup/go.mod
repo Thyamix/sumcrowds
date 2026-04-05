@@ -1,4 +1,4 @@
-module github.com/thyamix/sumcrowds/cleanup
+module github.com/thyamix/sumcrowds/backend/cleanup
 
 go 1.22.0
 
