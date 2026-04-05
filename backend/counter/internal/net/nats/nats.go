@@ -43,7 +43,5 @@ func Leave(festivalCode string) {
 
 func Update(festivalCode string) {
 	fmt.Println("Update triggered for", festivalCode)
-	if Channels[festivalCode] > 0 {
-		Nc.Publish(festivalCode, []byte("ping"))
-	}
+	Nc.Publish(festivalCode, []byte("ping"))
 }
