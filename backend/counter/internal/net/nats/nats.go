@@ -1,6 +1,8 @@
 package nats
 
 import (
+	"fmt"
+
 	"github.com/nats-io/nats.go"
 )
 
@@ -13,13 +15,16 @@ func Enable() {
 	var err error
 	Nc, err = nats.Connect("nats://nats:4222")
 	if err != nil {
+		fmt.Println("Nats Unavailable")
 		return
 	}
+	fmt.Println("Nats Enabled")
 	Enabled = true
 }
 
 // This brings me shame, but circular dependencies would have require minor rework
 func Join(festivalCode string, broadcastTotal func(string) error) {
+	fmt.Println("User join", festivalCode)
 	if Channels[festivalCode] == 0 {
 		Sub[festivalCode], _ = Nc.Subscribe(festivalCode, func(msg *nats.Msg) {
 			broadcastTotal(festivalCode)
@@ -29,6 +34,7 @@ func Join(festivalCode string, broadcastTotal func(string) error) {
 }
 
 func Leave(festivalCode string) {
+	fmt.Println("User left", festivalCode)
 	Channels[festivalCode]--
 	if Channels[festivalCode] == 0 {
 		Sub[festivalCode].Unsubscribe()
@@ -36,6 +42,7 @@ func Leave(festivalCode string) {
 }
 
 func Update(festivalCode string) {
+	fmt.Println("Update triggered for", festivalCode)
 	if Channels[festivalCode] > 0 {
 		Nc.Publish(festivalCode, []byte("ping"))
 	}
