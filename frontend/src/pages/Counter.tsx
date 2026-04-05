@@ -99,6 +99,7 @@ function FestivalCountedPage() {
       if (heartbeatRef.current !== null) {
         clearInterval(heartbeatRef.current)
       }
+      connectWebSocket()
     }
   }
 
