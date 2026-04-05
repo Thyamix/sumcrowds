@@ -3,7 +3,7 @@ services:
     build:
       context: ./backend/
       dockerfile: ./counter/Dockerfile
-    image: git.thyamix.com/thyamix/sumcrowds-counter:prod-latest
+    image: git.thyamix.com/thyamix/sumcrowds-counter:${GIT_COMMIT_SHA:-latest}
     environment:
       CONFIG_ENV: prod
       CONFIG_PATH: /app/config.prod.toml
@@ -19,7 +19,7 @@ services:
     build:
       context: ./backend/
       dockerfile: ./cleanup/Dockerfile
-    image: git.thyamix.com/thyamix/sumcrowds-cleanup:prod-latest
+    image: git.thyamix.com/thyamix/sumcrowds-cleanup:${GIT_COMMIT_SHA:-latest}
     environment:
       CONFIG_ENV: prod
       CONFIG_PATH: /app/config.prod.toml
@@ -39,7 +39,7 @@ services:
       args:
         VITE_APIURL: "/api/"
         VITE_WSURL: "/ws/"
-    image: git.thyamix.com/thyamix/sumcrowds-frontend:prod-latest
+    image: git.thyamix.com/thyamix/sumcrowds-frontend:${GIT_COMMIT_SHA:-latest}
     restart: unless-stopped
     networks:
       - prod_network
