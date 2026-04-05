@@ -23,7 +23,7 @@ jobs:
 
       - name: Push package
         run : |
-          GIT_COMMIT_SHA=${{ env.GITEA_SHA }}
+          GIT_COMMIT_SHA=${{ env.GITHUB_SHA }}
 
           docker compose -f docker-compose.kubernetes.yaml build
 
@@ -35,7 +35,7 @@ jobs:
 
           for IMAGE in "${IMAGES[@]}"; do
             docker tag $IMAGE:$GIT_COMMIT_SHA $IMAGE:latest
-            docker push $IMAGE:$GIT_COMMIT_SHA
+            docker push $IMAGE:${GIT_COMMIT_SHA::10}
             docker push $IMAGE:latest
           done
 
