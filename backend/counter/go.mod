@@ -1,6 +1,6 @@
 module github.com/thyamix/sumcrowds/backend/counter
 
-go 1.24.5
+go 1.25.0
 
 require (
 	github.com/alexedwards/argon2id v1.0.0
@@ -11,7 +11,11 @@ require (
 )
 
 require (
+	github.com/klauspost/compress v1.18.5 // indirect
 	github.com/lib/pq v1.10.9 // indirect
-	golang.org/x/crypto v0.14.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	github.com/nats-io/nats.go v1.50.0 // indirect
+	github.com/nats-io/nkeys v0.4.15 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
+	golang.org/x/crypto v0.49.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
 )

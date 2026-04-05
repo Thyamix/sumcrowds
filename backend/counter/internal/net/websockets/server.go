@@ -7,6 +7,7 @@ import (
 
 	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/nats"
 )
 
 type Server struct {
@@ -42,6 +43,7 @@ func (s *Server) Run() {
 		case client := <-s.Register:
 			s.Clients[client] = true
 		case client := <-s.Unregister:
+			nats.Leave(client.FestivalCode)
 			if ok := s.Clients[client]; ok {
 				delete(s.Clients, client)
 				close(client.Send)

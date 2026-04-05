@@ -17,6 +17,7 @@ import (
 	"github.com/thyamix/sumcrowds/backend/counter/internal/database"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/models"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http/cookieutils"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/nats"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/net/websockets"
 	counterModels "github.com/thyamix/sumcrowds/backend/sharedlib/models"
 )
@@ -270,6 +271,8 @@ func Inc(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	nats.Update(festival.Code)
+
 	fmt.Println("Value change on: ", festival.Code)
 	fmt.Println("+", amount)
 	fmt.Println("New total of", total+amount)
@@ -340,6 +343,8 @@ func Dec(w http.ResponseWriter, r *http.Request) {
 		apperrors.SendError(w, apperrors.APIErrFailedAddValue(err))
 		return
 	}
+
+	nats.Update(festival.Code)
 
 	fmt.Println("-", amount)
 	fmt.Println("New total of", total-amount)

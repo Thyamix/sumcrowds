@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
+	"github.com/thyamix/sumcrowds/backend/cleanup/internal/cleanup"
 	"github.com/thyamix/sumcrowds/backend/sharedlib/config"
 	db "github.com/thyamix/sumcrowds/backend/sharedlib/database"
-	"github.com/thyamix/sumcrowds/cleanup/internal/cleanup"
 )
 
 func main() {

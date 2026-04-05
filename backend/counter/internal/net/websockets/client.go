@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/apperrors"
 	"github.com/thyamix/sumcrowds/backend/counter/internal/models"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/nats"
 )
 
 type Client struct {
@@ -69,6 +70,8 @@ func HandleCounter(server *Server, w http.ResponseWriter, r *http.Request) {
 		log.Println("Upgader error: ", err)
 		return
 	}
+
+	nats.Join(festivalCode, BroadcastTotal)
 
 	client := &Client{Server: server, Conn: conn, Send: make(chan []byte), FestivalCode: festivalCode}
 	client.Server.Register <- client

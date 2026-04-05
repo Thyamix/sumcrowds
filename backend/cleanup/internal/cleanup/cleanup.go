@@ -3,7 +3,7 @@ package cleanup
 import (
 	"fmt"
 
-	"github.com/thyamix/sumcrowds/cleanup/internal/database"
+	"github.com/thyamix/sumcrowds/backend/cleanup/internal/database"
 )
 
 func Clean() {
