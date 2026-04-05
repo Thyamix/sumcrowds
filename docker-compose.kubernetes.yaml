@@ -48,6 +48,7 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile.prod
+    image: git.thyamix.com/thyamix/sumcrowds-marketing:latest
     ports:
       - "40001:80"
     restart: unless-stopped

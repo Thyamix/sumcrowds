@@ -32,6 +32,7 @@ jobs:
             "git.thyamix.com/thyamix/sumcrowds-counter"
             "git.thyamix.com/thyamix/sumcrowds-cleanup"
             "git.thyamix.com/thyamix/sumcrowds-frontend"
+            "git.thyamix.com/thyamix/sumcrowds-marketing"
           )
 
           for IMAGE in "${IMAGES[@]}"; do
