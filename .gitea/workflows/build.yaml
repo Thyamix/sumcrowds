@@ -4,6 +4,9 @@ on:
     branches: [master]
   workflow_dispatch:
 
+env:
+  REGISTRY: git.thyamix.com
+
 jobs:
   build:
     runs-on: ubuntu-latest
