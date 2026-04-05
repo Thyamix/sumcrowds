@@ -23,7 +23,7 @@ jobs:
 
       - name: Push package
         run : |
-          GIT_COMMIT_SHA=$GITEA_SHA::10
+          GIT_COMMIT_SHA=${{ env.GITEA_SHA }}
 
           docker compose -f docker-compose.kubernetes.yaml build
 
