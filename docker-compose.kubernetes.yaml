@@ -37,8 +37,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
       args:
-        VITE_APIURL: "http://192.168.1.75:30638/api/"
-        VITE_WSURL: "ws://192.168.1.75:30638/ws/"
+        VITE_APIURL: "/api/"
+        VITE_WSURL: "/ws/"
     image: git.thyamix.com/thyamix/sumcrowds-frontend:prod-latest
     restart: unless-stopped
     networks:
