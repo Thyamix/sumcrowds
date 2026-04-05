@@ -4,7 +4,7 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-var Sub map[string]*nats.Subscription
+var Sub = make(map[string]*nats.Subscription)
 var Channels = make(map[string]int)
 var Enabled = false
 var Nc *nats.Conn
