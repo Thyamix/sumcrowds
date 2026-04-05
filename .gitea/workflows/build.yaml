@@ -1,0 +1,15 @@
+name: Build the packages/containers
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: push package
+      run : |
+        GIT_COMMIT_SHA=$(git rev-parse --short HEAD)
+        docker compose -f docker-compose.kubernetes.yaml build
+        docker compose -f docker-compose.kubernetes.yaml push
