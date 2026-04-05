@@ -4,16 +4,15 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-var Channels map[string]int
 var Sub map[string]*nats.Subscription
-var Enabled bool
+var Channels = make(map[string]int)
+var Enabled = false
 var Nc *nats.Conn
 
 func Enable() {
 	var err error
 	Nc, err = nats.Connect("nats://nats:4222")
 	if err != nil {
-		Enabled = false
 		return
 	}
 	Enabled = true

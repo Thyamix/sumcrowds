@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/thyamix/sumcrowds/backend/counter/internal/net/http"
+	"github.com/thyamix/sumcrowds/backend/counter/internal/net/nats"
 	"github.com/thyamix/sumcrowds/backend/sharedlib/config"
 	db "github.com/thyamix/sumcrowds/backend/sharedlib/database"
 )
@@ -17,6 +18,8 @@ func main() {
 	}
 
 	log.Printf("Starting with %s configuration", env)
+
+	nats.Enable()
 
 	// Initialize database with config
 	db.InitDBWithConfig(cfg)
