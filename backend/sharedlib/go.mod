@@ -1,8 +1,8 @@
 module github.com/thyamix/sumcrowds/backend/sharedlib
 
-go 1.24.0
+go 1.25.0
 
-toolchain go1.24.5
+toolchain go1.25
 
 require (
 	github.com/BurntSushi/toml v1.4.0

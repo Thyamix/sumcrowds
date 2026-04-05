@@ -1,6 +1,6 @@
 module github.com/thyamix/sumcrowds/backend/cleanup
 
-go 1.22.0
+go 1.25.0
 
 require github.com/lib/pq v1.10.9
 
