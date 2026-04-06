@@ -9,7 +9,6 @@ services:
       CONFIG_PATH: /app/config.prod.toml
     volumes:
       - ./config.prod.toml:/app/config.prod.toml:ro
-      - ./.env.prod:/app/.env.prod:ro
     restart: unless-stopped
     networks:
       - prod_network
@@ -24,7 +23,6 @@ services:
       CONFIG_PATH: /app/config.prod.toml
     volumes:
       - ./config.prod.toml:/app/config.prod.toml:ro
-      - ./.env.prod:/app/.env.prod:ro
     restart: unless-stopped
     networks:
       - prod_network
