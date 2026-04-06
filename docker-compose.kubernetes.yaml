@@ -7,7 +7,6 @@ services:
     environment:
       CONFIG_ENV: prod
       CONFIG_PATH: /app/config.prod.toml
-      ENV_PATH: /app/.env.prod
     volumes:
       - ./config.prod.toml:/app/config.prod.toml:ro
       - ./.env.prod:/app/.env.prod:ro
@@ -23,7 +22,6 @@ services:
     environment:
       CONFIG_ENV: prod
       CONFIG_PATH: /app/config.prod.toml
-      ENV_PATH: /app/.env.prod
     volumes:
       - ./config.prod.toml:/app/config.prod.toml:ro
       - ./.env.prod:/app/.env.prod:ro
