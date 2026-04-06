@@ -9,14 +9,14 @@ import (
 )
 
 func main() {
+	log.Println("Starting...")
 	// Load configuration
 	env := config.GetEnv()
+	log.Printf("Starting cleanup with %s configuration", env)
 	cfg, err := config.Load(env)
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
-
-	log.Printf("Starting cleanup with %s configuration", env)
 
 	// Initialize database with config
 	db.InitDBWithConfig(cfg)

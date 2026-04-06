@@ -16,7 +16,7 @@ services:
   backend_cleanup_app:
     build:
       context: ./backend/
-      dockerfile: ./cleanup/Dockerfile
+      dockerfile: ./cleanup/Dockerfile.kube
     image: git.thyamix.com/thyamix/sumcrowds-cleanup:latest
     environment:
       CONFIG_ENV: prod
