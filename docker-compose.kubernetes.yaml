@@ -1,9 +1,16 @@
 services:
+  runner:
+    image: code.forgejo.org/forgejo/runner:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config.yml:/config.yml
+      - ./runner-data:/data
+    command: forgejo-runner daemon --config /config.yml
   backend_counter_app:
     build:
       context: ./backend/
       dockerfile: ./counter/Dockerfile
-    image: git.thyamix.com/thyamix/sumcrowds-counter:latest
+    image: git.thyamix.com/thyamix/sumcrowds/counter:latest
     environment:
       CONFIG_ENV: prod
       CONFIG_PATH: /app/config.prod.toml
@@ -17,7 +24,7 @@ services:
     build:
       context: ./backend/
       dockerfile: ./cleanup/Dockerfile.kube
-    image: git.thyamix.com/thyamix/sumcrowds-cleanup:latest
+    image: git.thyamix.com/thyamix/sumcrowds/cleanup:latest
     environment:
       CONFIG_ENV: prod
       CONFIG_PATH: /app/config.prod.toml
@@ -35,7 +42,7 @@ services:
       args:
         VITE_APIURL: "/api/"
         VITE_WSURL: "/ws/"
-    image: git.thyamix.com/thyamix/sumcrowds-frontend:latest
+    image: git.thyamix.com/thyamix/sumcrowds/frontend:latest
     restart: unless-stopped
     networks:
       - prod_network
@@ -44,7 +51,7 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile.kubernetes
-    image: git.thyamix.com/thyamix/sumcrowds-marketing:latest
+    image: git.thyamix.com/thyamix/sumcrowds/marketing:latest
     ports:
       - "40001:80"
     restart: unless-stopped
