@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,20 +8,20 @@ import {
   TouchableOpacity,
   BackHandler,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {RouteProp} from '@react-navigation/native';
-import {Button} from '../components/ui';
+import { useTranslation } from 'react-i18next';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RouteProp } from '@react-navigation/native';
+import { Button } from '../components/ui';
 import {
   LanguageSwitcher,
   PasswordModal,
   LeaveConfirmModal,
 } from '../components';
-import {fetchWithAuth, auth} from '../utils/auth';
-import {WS_URL} from '../config';
-import {colors, spacing, fontSize, fontWeight, borderRadius} from '../utils/theme';
-import type {RootStackParamList} from '../navigation';
+import { fetchWithAuth, auth } from '../utils/auth';
+import { WS_URL } from '../config';
+import { colors, spacing, fontSize, fontWeight, borderRadius } from '../utils/theme';
+import type { RootStackParamList } from '../navigation';
 
 const STATUSBAR_HEIGHT: number = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
 
@@ -38,9 +38,9 @@ interface CounterScreenProps {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Counter'>;
 }
 
-export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation}) => {
-  const {festivalCode} = route.params;
-  const {t} = useTranslation();
+export const CounterScreen: React.FC<CounterScreenProps> = ({ route, navigation }) => {
+  const { festivalCode } = route.params;
+  const { t } = useTranslation();
 
   const [total, setTotal] = useState<number | string>('...');
   const [maxJauge, setMaxJauge] = useState<number>(0);
@@ -87,12 +87,12 @@ export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation})
 
     ws.onopen = () => {
       setIsConnected(true);
-      ws.send(JSON.stringify({type: 'getTotal'}));
+      ws.send(JSON.stringify({ type: 'getTotal' }));
 
       // Start heartbeat
       heartbeatRef.current = setInterval(() => {
         if (ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({type: 'ping'}));
+          ws.send(JSON.stringify({ type: 'ping' }));
         }
       }, 10000);
     };
@@ -119,6 +119,7 @@ export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation})
       if (heartbeatRef.current) {
         clearInterval(heartbeatRef.current);
       }
+      connectWebSocket()
     };
 
     ws.onerror = (error: Event): void => {
@@ -184,7 +185,7 @@ export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation})
     try {
       await fetchWithAuth(`v1/festival/${festivalCode}/inc`, {
         method: 'POST',
-        body: JSON.stringify({amount}),
+        body: JSON.stringify({ amount }),
       });
     } catch (err) {
       console.error('Increment error:', err);
@@ -195,7 +196,7 @@ export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation})
     try {
       await fetchWithAuth(`v1/festival/${festivalCode}/dec`, {
         method: 'POST',
-        body: JSON.stringify({amount}),
+        body: JSON.stringify({ amount }),
       });
     } catch (err) {
       console.error('Decrement error:', err);
@@ -212,11 +213,11 @@ export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation})
   };
 
   const handleAdminPress = (): void => {
-    navigation.navigate('Admin', {festivalCode});
+    navigation.navigate('Admin', { festivalCode });
   };
 
   return (
-    <SafeAreaView style={[styles.container, {backgroundColor: getStatusColor()}]} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: getStatusColor() }]} edges={['left', 'right', 'bottom']}>
       <StatusBar barStyle="light-content" backgroundColor={getStatusColor()} translucent />
 
       <View style={styles.header}>
@@ -270,8 +271,8 @@ export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation})
                           status === 'danger'
                             ? colors.destructive
                             : status === 'warning'
-                            ? colors.warning
-                            : colors.success,
+                              ? colors.warning
+                              : colors.success,
                       },
                     ]}
                   />
@@ -286,7 +287,7 @@ export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation})
         <View style={styles.controls}>
           {/* Exit column */}
           <View style={[styles.controlColumn, styles.exitColumn]}>
-            <Text style={[styles.controlLabel, {color: colors.destructive}]}>{t('counter_exit')}</Text>
+            <Text style={[styles.controlLabel, { color: colors.destructive }]}>{t('counter_exit')}</Text>
             <View style={styles.smallButtonRow}>
               <Button
                 onPress={() => handleDecrement(2)}
@@ -314,7 +315,7 @@ export const CounterScreen: React.FC<CounterScreenProps> = ({route, navigation})
 
           {/* Enter column */}
           <View style={[styles.controlColumn, styles.enterColumn]}>
-            <Text style={[styles.controlLabel, {color: colors.success}]}>{t('counter_enter')}</Text>
+            <Text style={[styles.controlLabel, { color: colors.success }]}>{t('counter_enter')}</Text>
             <View style={styles.smallButtonRow}>
               <Button
                 onPress={() => handleIncrement(2)}
@@ -471,7 +472,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: borderRadius.xl,
     paddingTop: spacing.md,
     shadowColor: colors.black,
-    shadowOffset: {width: 0, height: -2},
+    shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
