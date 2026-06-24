@@ -6,6 +6,7 @@ on:
 
 env:
   REGISTRY: git.thyamix.com
+  DOCKER_HOST: unix:///var/run/host-docker.sock
 
 jobs:
   build:

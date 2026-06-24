@@ -1,11 +1,4 @@
 services:
-  runner:
-    image: code.forgejo.org/forgejo/runner:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./config.yml:/config.yml
-      - ./runner-data:/data
-    command: forgejo-runner daemon --config /config.yml
   backend_counter_app:
     build:
       context: ./backend/
