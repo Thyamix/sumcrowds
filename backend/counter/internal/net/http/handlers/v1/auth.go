@@ -111,7 +111,11 @@ func RefreshAccess(w http.ResponseWriter, r *http.Request) {
 	cookieutils.CreateAccessCookie(w, accessToken.Token, "/", time.Unix(accessToken.ExpiresAt, 0), isSecureCookie())
 	cookieutils.CreateRefreshCookie(w, refreshToken.Token, "/api/v1/auth/refreshaccess", time.Unix(refreshToken.ExpiresAt, 0), isSecureCookie())
 
-	// Return JSON for mobile clients
+	// Return JS
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate, private, max-age=0")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", time.Unix(0, 0).UTC().Format(http.TimeFormat))
+	w.Header().Set("X-Accel-Expires", "0")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(AuthResponse{
